@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111" fx:controller="com.vitact.eegcontrol.EEGProtocolProgressController">
+   <top>
+      <HBox alignment="TOP_RIGHT" prefWidth="200.0" spacing="5.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="time" text="Tiempo:" textAlignment="RIGHT" />
+            <Label id="timeT" fx:id="timeT" text="00:00:00" />
+         </children>
+      </HBox>
+   </top>
+   <center>
+      <ListView fx:id="list" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

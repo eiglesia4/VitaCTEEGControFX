@@ -1,0 +1,11 @@
+; Demostraci�n de Multimedia
+;
+; 
+MARCAR 1
+LANZAR "Secuencia_01.mp4"
+ESPERAR 5000
+TACTIL
+ESPERAR 8000
+MARCAR 1
+ESPERAR 1000 
+TERMINAR

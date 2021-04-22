@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Appenders>
+		<Console name="Console">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+		<File name="MyFile" fileName="EEGControl.log"
+			immediateFlush="false" append="false">
+			<PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} - %msg%n" />
+		</File>
+		<File name="ProtocolLogFile" fileName="${sys:studyBaseDir}/${sys:studyNumber}/protocolo-${sys:studyNumber}-${sys:protocolNumber}.log">
+			immediateFlush="true" append="false">
+			<PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} - %msg%n" />
+		</File>
+		<File name="EventFile" fileName="${sys:studyBaseDir}/${sys:studyNumber}/eventos-${sys:studyNumber}-${sys:protocolNumber}.log">
+			<PatternLayout pattern="%msg%n" />
+		</File>
+		<File name="StudyFile" fileName="${sys:studyBaseDir}/${sys:studyNumber}/estudio-${sys:studyNumber}.dat">
+			<PatternLayout pattern="%msg%n" />
+		</File>
+		<File name="ProtocolFile" fileName="${sys:studyBaseDir}/${sys:studyNumber}/protocolo-${sys:studyNumber}-${sys:protocolNumber}.dat">
+			<PatternLayout pattern="%msg%n" />
+		</File>
+					</Appenders>
+	<Loggers>
+		<Root level="trace" additivity="false">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="MyFile" />
+		</Root>
+		<Logger name="ProtocolLog" additivity="false" level="info">
+			<AppenderRef ref="Console" />
+		    <AppenderRef ref="ProtocolLogFile" />
+		</Logger>
+		<Logger name="EventsLog" additivity="false" level="info">
+		    <AppenderRef ref="EventFile" />
+		</Logger>
+		<Logger name="Study" additivity="false" level="info">
+		    <AppenderRef ref="StudyFile" />
+		</Logger>
+		<Logger name="Protocol" additivity="false" level="info">
+		    <AppenderRef ref="ProtocolFile" />
+		</Logger>
+					</Loggers>
+</Configuration>

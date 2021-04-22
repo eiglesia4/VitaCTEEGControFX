@@ -1,0 +1,51 @@
+;Protocolo Test de Imágenes
+
+FULLSCREEN true
+USE_MATRIX false
+USE_EEG false
+CENTER_MOUSE true
+
+INICIAR inicio-experimento.png
+MARCAR 1
+ESPERAR 3000
+
+;Lanza la imagen y espera 10 segundos
+ESTIM_OLD stim_pancita_abajo.jpg
+;CLICKSTOP
+MARCAR 2
+ESPERAR 500
+ESTIM_OLD white.png
+ESPERAR 500
+
+ESTIM_OLD stim_pancita_abajo.jpg
+MARCAR 1
+ESPERAR 500
+ESTIM_OLD white.png
+ESPERAR 500
+
+ESTIM_OLD stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 500
+ESTIM_OLD white.png
+ESPERAR 500
+
+ESTIM_OLD stim_pancita_abajo.jpg
+MARCAR 1
+ESPERAR 500
+ESTIM_OLD white.png
+ESPERAR 500
+
+ESTIM_OLD stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 500
+ESTIM_OLD white.png
+ESPERAR 500
+
+ESTIM_OLD stim_pancita_abajo.jpg
+MARCAR 1
+ESPERAR 500
+ESTIM_OLD white.png
+ESPERAR 500
+
+TERMINAR
+

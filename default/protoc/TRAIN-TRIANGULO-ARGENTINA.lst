@@ -1,0 +1,1818 @@
+;Protocolo ENTRENAMIENTO TRIANGULO
+
+FULLSCREEN false
+USE_MATRIX false
+USE_EEG false
+CENTER_MOUSE true
+KGS_VIBRATE false
+USE_SPACEKEY false
+
+; TRIANGULO => SIN Marca (ENTRENAMIENTO)
+
+INICIAR inicio-experimento.png
+ESPERAR 3000
+
+;Lanza la imagen y espera la tecla espacio
+KGS stim_pancita_abajo.jpg
+SPACESTOP
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_figura_triangulo.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+TERMINAR

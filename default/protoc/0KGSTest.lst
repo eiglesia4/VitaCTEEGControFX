@@ -1,0 +1,487 @@
+;Protocolo Test de Imágenes
+
+FULLSCREEN false
+USE_MATRIX false
+USE_EEG false
+CENTER_MOUSE true
+KGS_VIBRATE false
+USE_SPACEKEY true
+
+INICIAR inicio-experimento.png
+MARCAR 1
+ESPERAR 3000
+
+;Lanza la imagen y espera la tecla espacio
+KGS stim_pancita_abajo.jpg
+SPACESTOP
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_abajo.jpg
+MARCAR 2
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+KGS stim_pancita_arriba.jpg
+MARCAR 1
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+TERMINAR
+

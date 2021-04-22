@@ -1,0 +1,1818 @@
+;Protocolo ENTRENAMIENTO M
+
+FULLSCREEN false
+USE_MATRIX false
+USE_EEG false
+CENTER_MOUSE true
+KGS_VIBRATE false
+USE_SPACEKEY false
+
+; M => SIN Marca (ENTRENAMIENTO)
+
+INICIAR inicio-experimento.png
+ESPERAR 3000
+
+;Lanza la imagen y espera la tecla espacio
+KGS stim_pancita_abajo.jpg
+SPACESTOP
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+
+KGS stim_letra_m_mayuscula.jpg
+ESPERAR 300
+KGS white.png
+ESPERAR 700
+
+TERMINAR
