@@ -1,57 +1,32 @@
 package com.vitact.eegcontrol;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.io.File;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.fazecast.jSerialComm.SerialPort;
-import com.vitact.eegcontrol.bean.EstimulusBean;
-import com.vitact.eegcontrol.bean.EventBean;
+import com.vitact.eegcontrol.bean.*;
 import com.vitact.eegcontrol.opencv.OpenCVTransform;
-
-import javafx.animation.AnimationTimer;
-import javafx.animation.Timeline;
+import java.awt.*;
+import java.io.*;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
+import javafx.animation.*;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.*;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javafx.geometry.*;
+import javafx.scene.control.*;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
+import javafx.scene.layout.*;
+import javafx.scene.media.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.util.Duration;
+import org.apache.logging.log4j.*;
 
-class ProtocolThread extends NotifyingThread
-{
+class ProtocolThread extends NotifyingThread {
 	ListView<EventBean> list;
 	Label timeT;
 	ArrayList<EventBean> events;
@@ -63,7 +38,7 @@ class ProtocolThread extends NotifyingThread
 	SerialPort comEEG;
 	SerialPort comMatrix;
 	SerialPort comGlove;
-	byte[] zeros = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	byte[] zeros = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	Logger loggerProtocol = null;
 	Logger loggerEvent = null;
 	Logger logger = null;
@@ -91,7 +66,7 @@ class ProtocolThread extends NotifyingThread
 	 * byte[][] estimInsub;
 	 */
 
-	byte[] charInt = { '?' };
+	byte[] charInt = {'?'};
 	EstimulusBean defaultStimulus, nullStimulus;
 	String stimInsubInt = "0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0 , 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0 , 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0 , 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0";
 	String stimNullInt = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
@@ -102,17 +77,9 @@ class ProtocolThread extends NotifyingThread
 	AnimationTimer timer = null;
 	ScheduledExecutorService timerXcutor;
 
-	public ProtocolThread(ListView<EventBean> l,
-	                      ArrayList<EventBean> ev,
-	                      List<Integer> ma,
-	                      ArrayList<EstimulusBean> es,
-	                      EstimulusBean eN,
-	                      SerialPort cEEG,
-	                      SerialPort cMatr,
-	                      SerialPort cGlove,
-	                      Label ti,
-	                      EEGControl padre)
-	{
+	public ProtocolThread(ListView<EventBean> l, ArrayList<EventBean> ev, List<Integer> ma,
+			ArrayList<EstimulusBean> es, EstimulusBean eN, SerialPort cEEG, SerialPort cMatr,
+			SerialPort cGlove, Label ti, EEGControl padre) {
 		logger = LogManager.getLogger(this.getClass().getName());
 		loggerProtocol = LogManager.getLogger("ProtocolLog");
 		loggerEvent = LogManager.getLogger("EventsLog");
@@ -128,17 +95,13 @@ class ProtocolThread extends NotifyingThread
 		comGlove = cGlove;
 		timeT = ti;
 
-		defaultStimulus = new EstimulusBean(1, EEGControl.matrixDimension,
-		                                    stimInsubInt);
-		nullStimulus = new EstimulusBean(0, EEGControl.matrixDimension,
-		                                 stimNullInt);
-		String mediaIniciar = EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE
-		    + "white.png";
+		defaultStimulus = new EstimulusBean(1, EEGControl.matrixDimension, stimInsubInt);
+		nullStimulus = new EstimulusBean(0, EEGControl.matrixDimension, stimNullInt);
+		String mediaIniciar = EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE + "white.png";
 
 		File file = new File(mediaIniciar);
-		whiteImage = new Image(file.toURI().toString(),
-		                       OpenCVTransform.OLD_STIM_VIDEO_WIDTH,
-		                       OpenCVTransform.OLD_STIM_VIDEO_HEIGHT, false, false);
+		whiteImage = new Image(file.toURI().toString(), OpenCVTransform.OLD_STIM_VIDEO_WIDTH,
+				OpenCVTransform.OLD_STIM_VIDEO_HEIGHT, false, false);
 
 	}
 
@@ -149,24 +112,17 @@ class ProtocolThread extends NotifyingThread
 	 * @see com.vitact.eegcontrol.NotifyingThread#doRun()
 	 */
 	@Override
-	public void doRun()
-	{
+	public void doRun() {
 		int i = 0;
 
-		if (EEGControl.useMatrixProtocol)
-		{
+		if (EEGControl.useMatrixProtocol) {
 			logger.info("PREPARANDO MATRIZ");
 
-			if (comMatrix != null)
-			{
-				if (comMatrix.isOpen())
-				{
-					if (!sendNULL())
-					{
-						if (comMatrix != null)
-						{
-							if (comMatrix.isOpen())
-							{
+			if (comMatrix != null) {
+				if (comMatrix.isOpen()) {
+					if (!sendNULL()) {
+						if (comMatrix != null) {
+							if (comMatrix.isOpen()) {
 								comMatrix.closePort();
 								comMatrix = null;
 							}
@@ -174,60 +130,45 @@ class ProtocolThread extends NotifyingThread
 						return;
 					}
 					comMatrix.writeBytes("AST".getBytes(), "AST".getBytes().length);
-					synchronized (this)
-					{
-						try
-						{
+					synchronized (this) {
+						try {
 							wait(1000);
-						}
-						catch (Exception e)
-						{
+						} catch (Exception e) {
 							notifyError("Error initilizing matrix", e);
 						}
 					}
-				}
-				else
-				{
+				} else {
 					throw new RuntimeException("The comunications with the matrix is closed.");
 				}
 			}
 		}
 
-		if (EEGControl.useGloveProtocol)
-		{
+		if (EEGControl.useGloveProtocol) {
 			logger.info("PREPARANDO GUANTE");
 
-			if (comGlove != null)
-			{
-				if (comGlove.isOpen())
-				{
-//					if (true)
-//					{
-//						if (comGlove != null)
-//						{
-//							if (comGlove.isOpen())
-//							{
-//								comGlove.closePort();
-//								comGlove = null;
-//							}
-//						}
-//						return;
-//					}
+			if (comGlove != null) {
+				if (comGlove.isOpen()) {
+					//					if (true)
+					//					{
+					//						if (comGlove != null)
+					//						{
+					//							if (comGlove.isOpen())
+					//							{
+					//								comGlove.closePort();
+					//								comGlove = null;
+					//							}
+					//						}
+					//						return;
+					//					}
 					comGlove.writeBytes("INI".getBytes(), "INI".getBytes().length);
-					synchronized (this)
-					{
-						try
-						{
+					synchronized (this) {
+						try {
 							wait(1000);
-						}
-						catch (Exception e)
-						{
+						} catch (Exception e) {
 							notifyError("Error initilizing glove", e);
 						}
 					}
-				}
-				else
-				{
+				} else {
 					throw new RuntimeException("The comunications with the glove is closed.");
 				}
 			}
@@ -237,29 +178,23 @@ class ProtocolThread extends NotifyingThread
 		accTime = initTime;
 
 		// If is fullScreen we must wait until the screen has resized
-		if(padre.showFullScreen)
-		{
-			synchronized (this)
-			{
+		if (padre.showFullScreen) {
+			synchronized (this) {
 				accTime += 3000;
 				waitFor(accTime);
 			}
 		}
 
 		// If needed position the mouse in the center of the screen
-		if (EEGControl.centerMouse)
-		{
-	    Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-	    int screenX = (int) screenBounds.getWidth()/2;
-	    int screenY = (int) screenBounds.getHeight()/2;
+		if (EEGControl.centerMouse) {
+			Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+			int screenX = (int) screenBounds.getWidth() / 2;
+			int screenY = (int) screenBounds.getHeight() / 2;
 			Platform.runLater(() -> {
-				try
-				{
+				try {
 					Robot robot = new Robot();
 					robot.mouseMove(screenX, screenY);
-				}
-				catch (AWTException e)
-				{
+				} catch (AWTException e) {
 					e.printStackTrace();
 				}
 			});
@@ -267,178 +202,141 @@ class ProtocolThread extends NotifyingThread
 
 		loggerProtocol.info("INICIO PROTOCOLO");
 
-		for (EventBean e : events)
-		{
-			if (isStop())
-			{
+		for (EventBean e : events) {
+			if (isStop()) {
 				System.out.println("Stopping");
 				break;
 			}
-			if (list != null)
-			{
+			if (list != null) {
 				list.scrollTo(i);
 				list.getFocusModel().focus(i);
 				list.getSelectionModel().select(i);
 			}
 			i++;
-			switch (e.getTipo())
-			{
-				case "INICIAR":
-				{
+			switch (e.getTipo()) {
+				case "INICIAR": {
 					loggerProtocol.info("INICIAR " + e.getFile());
 					checkForTimer();
-					if (e.getFile() != null)
-					{
+					if (e.getFile() != null) {
 						multimediaFlag = false;
-						Platform.runLater(new Runnable()
-						{
+						Platform.runLater(new Runnable() {
 							@Override
-							public void run()
-							{
+							public void run() {
 								EEGControl.addImage(padre.getRootProtocol(), e.getFile(), true);
 								multimediaFlag = true;
 							}
 						});
-						try
-						{
+						try {
 							waitForMultimediaFlagImage();
-						}
-						catch (TimeoutException e1)
-						{
-							notifyError("No se ha podido cargar la imagen " + e.getFile(),
-							            null);
+						} catch (TimeoutException e1) {
+							notifyError("No se ha podido cargar la imagen " + e.getFile(), null);
 						}
 					}
 					break;
 				}
-				case "CLICKSTOP":
-				{
+				case "CLICKSTOP": {
 					loggerProtocol.info("CLICKSTOP " + e.getFile());
 					multimediaFlag = false;
-					Platform.runLater(new Runnable()
-					{
+					Platform.runLater(new Runnable() {
 						@Override
-						public void run()
-						{
+						public void run() {
 							padre.showClickLabel(true);
 						}
 					});
-					try
-					{
+					try {
 						waitForClickFlag();
 						// If needed possition the mouse in the center of the screen
-						if (EEGControl.centerMouse)
-						{
-					    Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-					    int screenX = (int) screenBounds.getWidth()/2;
-					    int screenY = (int) screenBounds.getHeight()/2;
+						if (EEGControl.centerMouse) {
+							Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+							int screenX = (int) screenBounds.getWidth() / 2;
+							int screenY = (int) screenBounds.getHeight() / 2;
 							Platform.runLater(() -> {
-								try
-								{
+								try {
 									Robot robot = new Robot();
 									robot.mouseMove(screenX, screenY);
-								}
-								catch (AWTException e1)
-								{
+								} catch (AWTException e1) {
 									e1.printStackTrace();
 								}
 							});
 						}
 
-					}
-					catch (TimeoutException e1)
-					{
-						notifyError("No se ha recibido el click del raton" + e.getFile(),
-						            null);
+					} catch (TimeoutException e1) {
+						notifyError("No se ha recibido el click del raton" + e.getFile(), null);
 					}
 					break;
 				}
 
-				case "SPACESTOP":
-				{
+				case "SPACESTOP": {
 					loggerProtocol.info("SPACESTOP " + e.getFile());
 					multimediaFlag = false;
-					Platform.runLater(new Runnable()
-					{
+					Platform.runLater(new Runnable() {
 						@Override
-						public void run()
-						{
+						public void run() {
 							padre.showClickLabel(false);
 						}
 					});
-					try
-					{
+					try {
 						waitForClickFlag();
 						// If needed position the mouse in the center of the screen
-						if (EEGControl.centerMouse)
-						{
-					    Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-					    int screenX = (int) screenBounds.getWidth()/2;
-					    int screenY = (int) screenBounds.getHeight()/2;
+						if (EEGControl.centerMouse) {
+							Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+							int screenX = (int) screenBounds.getWidth() / 2;
+							int screenY = (int) screenBounds.getHeight() / 2;
 							Platform.runLater(() -> {
-								try
-								{
+								try {
 									Robot robot = new Robot();
 									robot.mouseMove(screenX, screenY);
-								}
-								catch (AWTException e1)
-								{
+								} catch (AWTException e1) {
 									e1.printStackTrace();
 								}
 							});
 						}
 
-					}
-					catch (TimeoutException e1)
-					{
-						notifyError("No se ha recibido el click del raton" + e.getFile(),
-						            null);
+					} catch (TimeoutException e1) {
+						notifyError("No se ha recibido el click del raton" + e.getFile(), null);
 					}
 					break;
 				}
-				case "ESTIM_OLD":
-				{
+				case "ESTIM_OLD": {
 					loggerProtocol.info("ESTIM_OLD " + e.getFile());
-					if (e.getFile() != null)
-					{
-//						Runnable frameGrabber = new Runnable()
-//						{
-//							int counter = 0;
-//							@Override
-//							public void run()
-//							{
-//								System.out.println("Counter: " + counter);
-//								if (counter % 2 == 0)
-//									EEGControl.addImage(padre.getRootProtocol(), e.getImg());
-//								else
-//									EEGControl.addImage(padre.getRootProtocol(), whiteImage);
-//
-//								counter++;
-//							}
-//						};
-//
-//						timerXcutor = Executors.newSingleThreadScheduledExecutor();
-//						timerXcutor.scheduleAtFixedRate(frameGrabber, 0, 33,
-//						                               TimeUnit.MILLISECONDS);
+					if (e.getFile() != null) {
+						//						Runnable frameGrabber = new Runnable()
+						//						{
+						//							int counter = 0;
+						//							@Override
+						//							public void run()
+						//							{
+						//								System.out.println("Counter: " + counter);
+						//								if (counter % 2 == 0)
+						//									EEGControl.addImage(padre.getRootProtocol(), e.getImg());
+						//								else
+						//									EEGControl.addImage(padre.getRootProtocol(), whiteImage);
+						//
+						//								counter++;
+						//							}
+						//						};
+						//
+						//						timerXcutor = Executors.newSingleThreadScheduledExecutor();
+						//						timerXcutor.scheduleAtFixedRate(frameGrabber, 0, 33,
+						//						                               TimeUnit.MILLISECONDS);
 
-						if(EEGControl.kgsVibrate)
-						{
+						if (EEGControl.kgsVibrate) {
 							checkForTimer();
-							timer = new AnimationTimer()
-							{
+							timer = new AnimationTimer() {
 								int counter = 0;
 								private long lastUpdate = 0;
 
 								@Override
-								public void handle(long now)
-								{
+								public void handle(long now) {
 									if (now - lastUpdate >= EEGControl.OLD_STIM_VIBRATION_MILIS
-									    * 1000000) // THIS TIME IS NANOS
+											* 1000000) // THIS TIME IS NANOS
 									{
 										if (counter % 2 == 0)
-											EEGControl.addImage(padre.getRootProtocol(), e.getImg());
+											EEGControl.addImage(padre.getRootProtocol(),
+													e.getImg());
 										else
-											EEGControl.addImage(padre.getRootProtocol(), whiteImage);
+											EEGControl.addImage(padre.getRootProtocol(),
+													whiteImage);
 										counter++;
 										lastUpdate = now;
 									}
@@ -446,29 +344,22 @@ class ProtocolThread extends NotifyingThread
 								}
 							};
 							timer.start();
-						}
-						else
-						{
+						} else {
 
 							multimediaFlag = false;
-							Platform.runLater(new Runnable()
-							{
+							Platform.runLater(new Runnable() {
 
 								@Override
-								public void run()
-								{
+								public void run() {
 									EEGControl.addImage(padre.getRootProtocol(), e.getImg());
 									multimediaFlag = true;
 								}
 							});
-							try
-							{
+							try {
 								waitForMultimediaFlagImage();
-							}
-							catch (TimeoutException e1)
-							{
+							} catch (TimeoutException e1) {
 								notifyError("No se ha podido cargar la imagen " + e.getFile(),
-								            null);
+										null);
 							}
 
 						}
@@ -485,48 +376,35 @@ class ProtocolThread extends NotifyingThread
 					}
 					break;
 				}
-				case "MOSTRAR":
-				{
+				case "MOSTRAR": {
 					loggerProtocol.info("MOSTRAR " + e.getFile());
 					checkForTimer();
-					if (e.getFile() != null)
-					{
+					if (e.getFile() != null) {
 						multimediaFlag = false;
-						Platform.runLater(new Runnable()
-						{
+						Platform.runLater(new Runnable() {
 							@Override
-							public void run()
-							{
-								EEGControl.addImage(padre.getRootProtocol(), e.getFile(),
-								                    false);
+							public void run() {
+								EEGControl.addImage(padre.getRootProtocol(), e.getFile(), false);
 								multimediaFlag = true;
 							}
 						});
-						try
-						{
+						try {
 							waitForMultimediaFlagImage();
-						}
-						catch (TimeoutException e1)
-						{
-							notifyError("No se ha podido cargar la imagen " + e.getFile(),
-							            null);
+						} catch (TimeoutException e1) {
+							notifyError("No se ha podido cargar la imagen " + e.getFile(), null);
 						}
 					}
 					break;
 				}
-				case "LANZAR":
-				{
+				case "LANZAR": {
 					long multimediaInit = System.currentTimeMillis();
 					loggerProtocol.info("LANZAR " + e.getFile());
 					checkForTimer();
 					multimediaFlag = false;
 					addVideo(this.padre.getRootProtocol(), e.getFile());
-					try
-					{
+					try {
 						waitForMultimediaFlagVideo();
-					}
-					catch (TimeoutException e1)
-					{
+					} catch (TimeoutException e1) {
 						notifyError("No se ha podido cargar el video " + e.getFile(), null);
 						setStop(true);
 						break;
@@ -537,8 +415,7 @@ class ProtocolThread extends NotifyingThread
 
 					break;
 				}
-				case "MARCAR":
-				{
+				case "MARCAR": {
 					loggerProtocol.info("MARCAR " + e.getLength());
 
 					sendMark(e.getLength());
@@ -548,51 +425,42 @@ class ProtocolThread extends NotifyingThread
 					 */
 					break;
 				}
-				case "TACTIL":
-				{
+				case "TACTIL": {
 					loggerProtocol.info("TACTIL");
 
-					Thread t1 = new Thread(new Runnable()
-					{
-						public void run()
-						{
+					Thread t1 = new Thread(new Runnable() {
+						public void run() {
 							sendEstim();
 						}
 					});
 					t1.start();
 					break;
 				}
-				case "VIBRAR":
-				{
-					loggerProtocol.info("VIBRAR "+e.getFile());
+				case "VIBRAR": {
+					loggerProtocol.info("VIBRAR " + e.getFile());
 
-					Thread t1 = new Thread(new Runnable()
-					{
-						public void run()
-						{
+					Thread t1 = new Thread(new Runnable() {
+						public void run() {
 							sendGlove(e.getFile());
 						}
 					});
 					t1.start();
 					break;
 				}
-				case "ESPERAR":
-				{
+				case "ESPERAR": {
 					loggerProtocol.info("ESPERAR " + e.getLength());
 
 					accTime += e.getLength();
 					waitFor(accTime);
 					break;
 				}
-				case "TERMINAR":
-				{
+				case "TERMINAR": {
 					loggerProtocol.info("TERMINAR");
 					checkForTimer();
 					setStop(true);
 					break;
 				}
-				default:
-				{
+				default: {
 					checkForTimer();
 					logger.error("Unknown Protocol Event " + e.getTipo());
 					break;
@@ -601,10 +469,8 @@ class ProtocolThread extends NotifyingThread
 		}
 		loggerProtocol.info("FINALIZADO");
 
-		if (comMatrix != null)
-		{
-			if (comMatrix.isOpen())
-			{
+		if (comMatrix != null) {
+			if (comMatrix.isOpen()) {
 				comMatrix.closePort();
 				comMatrix = null;
 			}
@@ -612,45 +478,39 @@ class ProtocolThread extends NotifyingThread
 		// padrePane.getScene().getWindow().hide();
 	}
 
-	public void checkForTimer()
-	{
-		if (timer != null)
-		{
+	public void checkForTimer() {
+		if (timer != null) {
 			timer.stop();
 			timer = null;
 		}
 
-//		if (timerXcutor != null && !timerXcutor.isShutdown())
-//		{
-//			try
-//			{
-//				// stop the timer
-//				timerXcutor.shutdown();
-//				timerXcutor.awaitTermination(33, TimeUnit.MILLISECONDS);
-//			}
-//			catch (InterruptedException e)
-//			{
-//				// log any exception
-//				System.err
-//				  .println("Exception in stopping the frame capture, trying to release the camera now... "
-//				      + e);
-//			}
-//		}
+		//		if (timerXcutor != null && !timerXcutor.isShutdown())
+		//		{
+		//			try
+		//			{
+		//				// stop the timer
+		//				timerXcutor.shutdown();
+		//				timerXcutor.awaitTermination(33, TimeUnit.MILLISECONDS);
+		//			}
+		//			catch (InterruptedException e)
+		//			{
+		//				// log any exception
+		//				System.err
+		//				  .println("Exception in stopping the frame capture, trying to release the camera now... "
+		//				      + e);
+		//			}
+		//		}
 	}
 
-	private void waitFor(long t)
-	{
-		while (System.currentTimeMillis() < t)
-		{
+	private void waitFor(long t) {
+		while (System.currentTimeMillis() < t) {
 			toMin2(System.currentTimeMillis() - initTime);
 		}
 	}
 
-	private void waitForMultimediaFlagVideo() throws TimeoutException
-	{
+	private void waitForMultimediaFlagVideo() throws TimeoutException {
 		long initFlag = System.currentTimeMillis();
-		while (!multimediaFlag)
-		{
+		while (!multimediaFlag) {
 			toMin2(System.currentTimeMillis() - initTime);
 			if (System.currentTimeMillis() - initFlag > EEGControl.MULTIMEDIA_TIMEOUT)
 				throw new TimeoutException("No se ha podido cargar el contenido multimedia.");
@@ -658,15 +518,11 @@ class ProtocolThread extends NotifyingThread
 		}
 	}
 
-	private void waitForMultimediaFlagImage() throws TimeoutException
-	{
+	private void waitForMultimediaFlagImage() throws TimeoutException {
 		long multimediaInit = System.currentTimeMillis();
-		while (!multimediaFlag)
-		{
+		while (!multimediaFlag) {
 			toMin2(System.currentTimeMillis() - initTime);
-			if (System.currentTimeMillis()
-			    - multimediaInit > EEGControl.MULTIMEDIA_TIMEOUT)
-			{
+			if (System.currentTimeMillis() - multimediaInit > EEGControl.MULTIMEDIA_TIMEOUT) {
 				long multimediaStart = System.currentTimeMillis();
 				accTime = accTime + (multimediaStart - multimediaInit);
 				throw new TimeoutException("No se ha podido cargar el contenido multimedia.");
@@ -676,30 +532,26 @@ class ProtocolThread extends NotifyingThread
 		accTime = accTime + (multimediaStart - multimediaInit);
 	}
 
-	private void waitForClickFlag() throws TimeoutException
-	{
+	private void waitForClickFlag() throws TimeoutException {
 		long multimediaInit = System.currentTimeMillis();
-		while (!multimediaFlag)
-		{
+		while (!multimediaFlag) {
 			toMin2(System.currentTimeMillis() - initTime);
 		}
 		long multimediaStart = System.currentTimeMillis();
 		accTime = accTime + (multimediaStart - multimediaInit);
 	}
 
-	public String toMin2(final long millis)
-	{
-		long seconds = TimeUnit.MILLISECONDS.toSeconds(millis)
-		    - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
-		long minutes = TimeUnit.MILLISECONDS.toMinutes(millis)
-		    - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
+	public String toMin2(final long millis) {
+		long seconds = TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(
+				TimeUnit.MILLISECONDS.toMinutes(millis));
+		long minutes = TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(
+				TimeUnit.MILLISECONDS.toHours(millis));
 		long hours = TimeUnit.MILLISECONDS.toHours(millis);
 
 		StringBuilder b = new StringBuilder();
 		if (hours == 0)
 			b.append("00");
-		else
-		{
+		else {
 			if (hours < 10)
 				b.append("0");
 			b.append(String.valueOf(hours));
@@ -707,8 +559,7 @@ class ProtocolThread extends NotifyingThread
 		b.append(":");
 		if (minutes == 0)
 			b.append("00");
-		else
-		{
+		else {
 			if (minutes < 10)
 				b.append("0");
 			b.append(String.valueOf(minutes));
@@ -716,8 +567,7 @@ class ProtocolThread extends NotifyingThread
 		b.append(":");
 		if (seconds == 0)
 			b.append("00");
-		else
-		{
+		else {
 			if (seconds < 10)
 				b.append("0");
 			b.append(String.valueOf(seconds));
@@ -725,164 +575,118 @@ class ProtocolThread extends NotifyingThread
 		return b.toString();
 	}
 
-	public void sendMark(int m)
-	{
+	public void sendMark(int m) {
 		// loggerEvent.info("order;event;event literal;milliseconds");
-		if (EEGControl.useEEGProtocol)
-		{
-			loggerEvent.info((eventCounter++) + ";" + m + ";Marca Externa " + m + ";"
-			    + System.currentTimeMillis());
+		if (EEGControl.useEEGProtocol) {
+			loggerEvent.info((eventCounter++) + ";" + m + ";Marca Externa " + m + ";" + System
+					.currentTimeMillis());
 			if (m > 9)
 				m = 9;
 			if (comEEG != null)
 				comEEG.writeBytes(zeros, m);
-		}
-		else
-		{
-			loggerEvent.info((eventCounter++) + ";" + m + ";Marca Externa " + m + ";"
-			    + System.currentTimeMillis() + "; NOT SENT TO EEG DUE TO CONFIG");
+		} else {
+			loggerEvent.info((eventCounter++) + ";" + m + ";Marca Externa " + m + ";" + System
+					.currentTimeMillis() + "; NOT SENT TO EEG DUE TO CONFIG");
 		}
 	}
 
-	public void sendEstim(int m)
-	{
-		if (EEGControl.useMatrixProtocol)
-		{
-			if (comMatrix != null)
-			{
-				if (comMatrix.isOpen())
-				{
-					try
-					{
+	public void sendEstim(int m) {
+		if (EEGControl.useMatrixProtocol) {
+			if (comMatrix != null) {
+				if (comMatrix.isOpen()) {
+					try {
 						if (estims.get(m) == null)
 							return;
-					}
-					catch (IndexOutOfBoundsException e1)
-					{
+					} catch (IndexOutOfBoundsException e1) {
 						logger.error("Error leyendo estímulos: " + e1.getMessage());
 						return;
 					}
 					loggerProtocol.debug("ENVIADO EST�MULO T�CTIL " + m);
 					sendMSG(estims.get(m));
 					// waitFor(3000);
-					synchronized (this)
-					{
-						try
-						{
+					synchronized (this) {
+						try {
 							wait(EEGControl.STIMULUS_TIME_MILIS);
-						}
-						catch (Exception e)
-						{
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
 
 					sendNULL();
-				}
-				else
-				{
+				} else {
 					logger.error("The comunications with the matrix is closed.");
 					return;
 				}
 			}
-		}
-		else
-		{
-			loggerProtocol.info("ESTIMULO TACTICL " + m
-			    + " NO ENVIADO DEBIDO A CONFIGURACIÓN DEL PROTOCOLO");
+		} else {
+			loggerProtocol.info(
+					"ESTIMULO TACTICL " + m + " NO ENVIADO DEBIDO A CONFIGURACIÓN DEL PROTOCOLO");
 		}
 	}
 
-	public void sendGlove(String t)
-	{
-		if (EEGControl.useGloveProtocol)
-		{
-			if (comGlove != null)
-			{
-				if (comGlove.isOpen())
-				{
-					loggerProtocol.info("ENVIADO EST�MULO T�CTIL "+t+" A GUANTE ");
+	public void sendGlove(String t) {
+		if (EEGControl.useGloveProtocol) {
+			if (comGlove != null) {
+				if (comGlove.isOpen()) {
+					loggerProtocol.info("ENVIADO EST�MULO T�CTIL " + t + " A GUANTE ");
 
 					sendStrGlove(t);
 
-				}
-				else
-				{
+				} else {
 					logger.error("The comunications with the glove is closed.");
 					return;
 				}
 			}
-		}
-		else
-		{
-			loggerProtocol.info("ESTIMULO TACTIL A GUANTE NO ENVIADO DEBIDO A CONFIGURACI�N DEL PROTOCOLO");
+		} else {
+			loggerProtocol.info(
+					"ESTIMULO TACTIL A GUANTE NO ENVIADO DEBIDO A CONFIGURACI�N DEL PROTOCOLO");
 		}
 	}
 
-	public void sendEstim()
-	{
-		if (EEGControl.useMatrixProtocol)
-		{
-			if (comMatrix != null)
-			{
-				if (comMatrix.isOpen())
-				{
+	public void sendEstim() {
+		if (EEGControl.useMatrixProtocol) {
+			if (comMatrix != null) {
+				if (comMatrix.isOpen()) {
 					loggerProtocol.info("ENVIADO EST�MULO T�CTIL POR DEFECTO");
 
 					sendMSG(defaultStimulus);
 					// waitFor(3000);
-					synchronized (this)
-					{
-						try
-						{
+					synchronized (this) {
+						try {
 							wait(EEGControl.STIMULUS_TIME_MILIS);
-						}
-						catch (Exception e)
-						{
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
 
 					sendNULL();
-				}
-				else
-				{
+				} else {
 					logger.error("The comunications with the matrix is closed.");
 					return;
 				}
 			}
-		}
-		else
-		{
-			loggerProtocol.info("ESTIMULO TACTICL POR DEFECTO NO ENVIADO DEBIDO A CONFIGURACIÓN DEL PROTOCOLO");
+		} else {
+			loggerProtocol.info(
+					"ESTIMULO TACTICL POR DEFECTO NO ENVIADO DEBIDO A CONFIGURACIÓN DEL PROTOCOLO");
 		}
 	}
 
-	boolean waitFor2(char c)
-	{
+	boolean waitFor2(char c) {
 		InputStream in = comMatrix.getInputStream();
 		int counter = 0;
 		long readTimeout = 20;
 		long timeoutReadMillis = 1000;
-		try
-		{
-			while (true)
-			{
-				if (comMatrix.bytesAvailable() == 0)
-				{
-					synchronized (this)
-					{
-						try
-						{
+		try {
+			while (true) {
+				if (comMatrix.bytesAvailable() == 0) {
+					synchronized (this) {
+						try {
 							wait(readTimeout);
-						}
-						catch (Exception e)
-						{
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 						counter++;
-						if (counter * readTimeout > timeoutReadMillis)
-						{
+						if (counter * readTimeout > timeoutReadMillis) {
 							logger.warn("Cansado de esperar " + c);
 							notifyError("No comunico con la matriz. ¿Está encendida?", null);
 							this.setStop(false);
@@ -890,85 +694,67 @@ class ProtocolThread extends NotifyingThread
 							return false;
 						}
 					}
-				}
-				else
-				{
+				} else {
 					char ca = (char) in.read();
 					// System.out.print(ca);
-					if (ca == c)
-					{
+					if (ca == c) {
 						in.close();
 						return true;
 					}
 				}
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			logger.error("Error found waiting for char " + c, e);
 			return false;
 		}
 	}
 
-	void sendMSG(EstimulusBean est)
-	{
+	void sendMSG(EstimulusBean est) {
 		// comMatrix.writeBytes(charInt, 1);
 		byte[] bytesInt = "?".getBytes();
 		comMatrix.writeBytes(bytesInt, bytesInt.length);
 		int dim = est.getDim();
 		waitFor2('!');
-		for (int i = 0; i < 4; i++)
-		{
-			comMatrix
-			  .writeBytes(Arrays.copyOfRange(est.getEstim(), dim * i, dim * (i + 1)),
-			              dim);
+		for (int i = 0; i < 4; i++) {
+			comMatrix.writeBytes(Arrays.copyOfRange(est.getEstim(), dim * i, dim * (i + 1)), dim);
 			if (i != 3 && !useOldProtocol)
 				waitFor2('*');
 		}
 	}
 
-	void sendStrGlove(String t)
-	{
-		comGlove.writeBytes(t.getBytes(),t.getBytes().length);
+	void sendStrGlove(String t) {
+		comGlove.writeBytes(t.getBytes(), t.getBytes().length);
 	}
 
-	boolean sendNULL()
-	{
+	boolean sendNULL() {
 		// comMatrix.writeBytes(charInt, 1);
 		byte[] bytesInt = "?".getBytes();
 		comMatrix.writeBytes(bytesInt, bytesInt.length);
 		int dim = nullStimulus.getDim();
-		if (!waitFor2('!'))
-		{
+		if (!waitFor2('!')) {
 			return false;
 		}
-		for (int i = 0; i < 4; i++)
-		{
-			comMatrix.writeBytes(Arrays.copyOfRange(nullStimulus.getEstim(), dim * i,
-			                                        dim * (i + 1)),
-			                     dim);
+		for (int i = 0; i < 4; i++) {
+			comMatrix.writeBytes(
+					Arrays.copyOfRange(nullStimulus.getEstim(), dim * i, dim * (i + 1)), dim);
 			if (i != 3 && !useOldProtocol)
 				waitFor2('*');
 		}
 		return true;
 	}
 
-	private void addVideo(BorderPane pane, String fileName)
-	{
-		String mediaSample = EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE
-		    + fileName;
+	private void addVideo(BorderPane pane, String fileName) {
+		String mediaSample = EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE + fileName;
 
 		File file = new File(mediaSample);
 		Media media = null;
-		try
-		{
+		try {
 			media = new Media(file.toURI().toString());
-		}
-		catch (Exception e1)
-		{
+		} catch (Exception e1) {
 			notifyError("Error al cargar el fichero de video " + fileName, e1);
 			return;
 		}
+		logger.debug("Trying to load video " + media.getSource());
 		MediaPlayer mediaPlayer = new MediaPlayer(media);
 		mediaPlayer.setAutoPlay(false);
 		MediaView mediaView = new MediaView(mediaPlayer);
@@ -978,11 +764,9 @@ class ProtocolThread extends NotifyingThread
 			setStop(true);
 		});
 		// create mediaView and add media player to the viewer
-		mediaPlayer.setOnReady(new Runnable()
-		{
+		mediaPlayer.setOnReady(new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				pane.getChildren().removeAll();
 
 				VBox mvPane = new VBox();
@@ -990,9 +774,9 @@ class ProtocolThread extends NotifyingThread
 				mvPane.setStyle("-fx-background-color: black;");
 				mvPane.setAlignment(Pos.CENTER);
 				pane.setCenter(mvPane);
+				logger.debug("Media Ready. Trying to run video ");
 
-				if (EEGControl.showVideoController)
-				{
+				if (EEGControl.showVideoController) {
 					HBox mediaBar = new HBox();
 					mediaBar.setAlignment(Pos.CENTER);
 					mediaBar.setPadding(new Insets(5, 10, 5, 10));
@@ -1036,34 +820,28 @@ class ProtocolThread extends NotifyingThread
 			}
 		});
 
-		mediaPlayer.currentTimeProperty().addListener(new InvalidationListener()
-		{
-			public void invalidated(Observable ov)
-			{
+		mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
+			public void invalidated(Observable ov) {
 				updateValues(mediaPlayer);
 			}
 		});
 
 	}
 
-	private void notifyError(String message, Throwable th)
-	{
+	private void notifyError(String message, Throwable th) {
 		if (th == null)
 			logger.error(message);
 		else
 			logger.error(message, th);
 
-		Platform.runLater(new Runnable()
-		{
+		Platform.runLater(new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Error Ejecutando Protocolo");
 				alert.setContentText(message);
 
-				if (th != null)
-				{
+				if (th != null) {
 					// Create expandable Exception.
 					StringWriter sw = new StringWriter();
 					PrintWriter pw = new PrintWriter(sw);
@@ -1095,73 +873,51 @@ class ProtocolThread extends NotifyingThread
 		});
 	}
 
-	protected void updateValues(MediaPlayer mp)
-	{
-		if (playTime != null && timeSlider != null)
-		{
-			Platform.runLater(new Runnable()
-			{
+	protected void updateValues(MediaPlayer mp) {
+		if (playTime != null && timeSlider != null) {
+			Platform.runLater(new Runnable() {
 				@SuppressWarnings("deprecation")
-				public void run()
-				{
+				public void run() {
 					Duration currentTime = mp.getCurrentTime();
 					playTime.setText(formatTime(currentTime, duration));
 					timeSlider.setDisable(duration.isUnknown());
 					if (!timeSlider.isDisabled() && duration.greaterThan(Duration.ZERO)
-					    && !timeSlider.isValueChanging())
-					{
-						timeSlider
-						  .setValue(currentTime.divide(duration).toMillis() * 100.0);
+							&& !timeSlider.isValueChanging()) {
+						timeSlider.setValue(currentTime.divide(duration).toMillis() * 100.0);
 					}
 				}
 			});
 		}
 	}
 
-	private static String formatTime(Duration elapsed, Duration duration)
-	{
+	private static String formatTime(Duration elapsed, Duration duration) {
 		int intElapsed = (int) Math.floor(elapsed.toSeconds());
 		int elapsedHours = intElapsed / (60 * 60);
-		if (elapsedHours > 0)
-		{
+		if (elapsedHours > 0) {
 			intElapsed -= elapsedHours * 60 * 60;
 		}
 		int elapsedMinutes = intElapsed / 60;
-		int elapsedSeconds = intElapsed - elapsedHours * 60 * 60
-		    - elapsedMinutes * 60;
+		int elapsedSeconds = intElapsed - elapsedHours * 60 * 60 - elapsedMinutes * 60;
 
-		if (duration.greaterThan(Duration.ZERO))
-		{
+		if (duration.greaterThan(Duration.ZERO)) {
 			int intDuration = (int) Math.floor(duration.toSeconds());
 			int durationHours = intDuration / (60 * 60);
-			if (durationHours > 0)
-			{
+			if (durationHours > 0) {
 				intDuration -= durationHours * 60 * 60;
 			}
 			int durationMinutes = intDuration / 60;
-			int durationSeconds = intDuration - durationHours * 60 * 60
-			    - durationMinutes * 60;
-			if (durationHours > 0)
-			{
-				return String.format("%d:%02d:%02d/%d:%02d:%02d", elapsedHours,
-				                     elapsedMinutes, elapsedSeconds, durationHours,
-				                     durationMinutes, durationSeconds);
+			int durationSeconds = intDuration - durationHours * 60 * 60 - durationMinutes * 60;
+			if (durationHours > 0) {
+				return String.format("%d:%02d:%02d/%d:%02d:%02d", elapsedHours, elapsedMinutes,
+						elapsedSeconds, durationHours, durationMinutes, durationSeconds);
+			} else {
+				return String.format("%02d:%02d/%02d:%02d", elapsedMinutes, elapsedSeconds,
+						durationMinutes, durationSeconds);
 			}
-			else
-			{
-				return String.format("%02d:%02d/%02d:%02d", elapsedMinutes,
-				                     elapsedSeconds, durationMinutes, durationSeconds);
-			}
-		}
-		else
-		{
-			if (elapsedHours > 0)
-			{
-				return String.format("%d:%02d:%02d", elapsedHours, elapsedMinutes,
-				                     elapsedSeconds);
-			}
-			else
-			{
+		} else {
+			if (elapsedHours > 0) {
+				return String.format("%d:%02d:%02d", elapsedHours, elapsedMinutes, elapsedSeconds);
+			} else {
 				return String.format("%02d:%02d", elapsedMinutes, elapsedSeconds);
 			}
 		}

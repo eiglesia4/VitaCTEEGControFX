@@ -845,3 +845,52 @@ fecha creación=22-4-2021 01:20:43
 [estudio]
 nombre=null
 
+[protocolo]
+descripcion=;Protocolo InSub AUDIO-TACTIL-SUBTITULO-EMOT-MUDO
+fichero=0PabloNew.lst
+fecha creación=30-5-2021 08:33:47
+[estudio]
+nombre=0PabloNew.lst
+
+[protocolo]
+descripcion=;Protocolo ENTRENAMIENTO HORIZONTAL - VERTICAL
+fichero=TRAIN-LINEA-HORIZONTAL-VERTICAL-ARGENTINA.lst
+fecha creación=30-5-2021 08:38:03
+[estudio]
+nombre=TRAIN-LINEA-HORIZONTAL-VERTICAL-ARGENTINA.lst
+
+[protocolo]
+descripcion=;Protocolo InSub AUDIO-TACTIL-SUBTITULO-EMOT-MUDO
+fichero=0PabloNew.lst
+fecha creación=30-5-2021 08:38:26
+[estudio]
+nombre=0PabloNew.lst
+
+[protocolo]
+descripcion=;Protocolo InSub AUDIO-TACTIL-SUBTITULO-EMOT-MUDO
+fichero=0PabloNew.lst
+fecha creación=30-5-2021 08:41:45
+[estudio]
+nombre=0PabloNew.lst
+
+[protocolo]
+descripcion=;Protocolo InSub AUDIO-TACTIL-SUBTITULO-EMOT-MUDO
+fichero=0PabloNew.lst
+fecha creación=30-5-2021 08:55:10
+[estudio]
+nombre=0PabloNew.lst
+
+[protocolo]
+descripcion=;Protocolo InSub AUDIO-TACTIL-SUBTITULO-EMOT-MUDO
+fichero=0PabloNew.lst
+fecha creación=30-5-2021 08:59:17
+[estudio]
+nombre=0PabloNew.lst
+
+[protocolo]
+descripcion=;Protocolo InSub AUDIO-TACTIL-SUBTITULO-EMOT-MUDO
+fichero=0PabloNew.lst
+fecha creación=30-5-2021 09:01:47
+[estudio]
+nombre=0PabloNew.lst
+

@@ -1,48 +1,41 @@
 package com.vitact.eegcontrol;
 
+import com.vitact.eegcontrol.bean.StudyBean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.vitact.eegcontrol.bean.StudyBean;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.collections.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Control;
+import org.apache.logging.log4j.*;
 
-public class EEGStudyLoaderController
-{
-	EEGViewController padre = null;
-	@FXML TextField tfNameUser;
-	@FXML TextField tfSurnameUser;
-	@FXML TextField tfAgeUser;
-	@FXML ChoiceBox<String> cbSexUser;
-	@FXML ChoiceBox<String> cbInvestigator;
-	@FXML TextField tfStudyName;
+public class EEGStudyLoaderController extends EEGStudyLoader {
+	@FXML
+	TextField tfNameUser;
+	@FXML
+	TextField tfSurnameUser;
+	@FXML
+	TextField tfAgeUser;
+	@FXML
+	ChoiceBox<String> cbSexUser;
+	@FXML
+	ChoiceBox<String> cbInvestigator;
+	@FXML
+	TextField tfStudyName;
 	static Logger logger = null;
-	
-	public EEGStudyLoaderController()
-	{
+
+	public EEGStudyLoaderController() {
 		logger = LogManager.getLogger(this.getClass().getName());
 	}
 
 	@FXML
-	public void initialize()
-	{
+	public void initialize() {
 		ObservableList<String> sexesList = FXCollections.observableArrayList();
 		sexesList.add("Masculino");
 		sexesList.add("Femenino");
-		// TODO: SUSTITUIR ESTO POR UN FICHERO EXTERNO
+		//TODO: SUSTITUIR ESTO POR UN FICHERO EXTERNO
 		ObservableList<String> investigatorList = FXCollections.observableArrayList();
 		investigatorList.add("Elena");
 		investigatorList.add("Verónica");
@@ -52,93 +45,70 @@ public class EEGStudyLoaderController
 		cbSexUser.setItems(sexesList);
 		cbInvestigator.setItems(investigatorList);
 	}
-	
+
 	@FXML
-	public void cancelDialog(ActionEvent event)
-	{
+	public void cancelDialog(ActionEvent event) {
 		Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
 		stage.close();
 	}
-	
+
 	@FXML
-	public void okDialog(ActionEvent event)
-	{
+	public void okDialog(ActionEvent event) {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 		StudyBean studyBean = new StudyBean();
 
-		if(cbInvestigator.getValue() != null && cbInvestigator.getValue().length()>0)	
+		if (cbInvestigator.getValue() != null && cbInvestigator.getValue().length() > 0)
 			studyBean.setInvestigator(cbInvestigator.getValue());
-		else
-		{
+		else {
 			launchBlockDialog(event, "nombre del investigador", cbInvestigator);
 			return;
 		}
-		if(tfAgeUser.getText() != null && tfAgeUser.getText().length()>0)
+		if (tfAgeUser.getText() != null && tfAgeUser.getText().length() > 0)
 			studyBean.setAge(tfAgeUser.getText());
-		else
-		{
+		else {
 			launchBlockDialog(event, "edad", tfAgeUser);
 			return;
 		}
 		studyBean.setDateInit(sdf.format(new Date()));
-		if(tfNameUser.getText() != null && tfNameUser.getText().length()>0)
+		if (tfNameUser.getText() != null && tfNameUser.getText().length() > 0)
 			studyBean.setName(tfNameUser.getText());
-		else
-		{
+		else {
 			launchBlockDialog(event, "nombre del sujeto", tfNameUser);
 			return;
 		}
-		if(cbSexUser.getValue() != null && cbSexUser.getValue().length()>0)	
+		if (cbSexUser.getValue() != null && cbSexUser.getValue().length() > 0)
 			studyBean.setSex(cbSexUser.getValue());
-		else
-		{
+		else {
 			launchBlockDialog(event, "sexo", cbSexUser);
 			return;
 		}
-		
-		if(tfStudyName.getText() != null && tfStudyName.getText().length()>0)
+
+		if (tfStudyName.getText() != null && tfStudyName.getText().length() > 0)
 			studyBean.setStudyName(tfStudyName.getText());
-		else
-		{
+		else {
 			launchBlockDialog(event, "nombre del estudio", tfStudyName);
 			return;
 		}
-		if(tfSurnameUser.getText() != null && tfSurnameUser.getText().length()>0)
+		if (tfSurnameUser.getText() != null && tfSurnameUser.getText().length() > 0)
 			studyBean.setSurname(tfSurnameUser.getText());
-		else
-		{
+		else {
 			launchBlockDialog(event, "apellidos del sujeto", tfSurnameUser);
 			return;
 		}
-		
+
 		padre.setStudyBean(studyBean);
 		cancelDialog(event);
-		Logger loggerStudy = LogManager.getLogger("Study");
-		loggerStudy.info(studyBean.toString());
 		padre.bContinueStudy.setDisable(false);
 		padre.executeExperiment(event);
 
 	}
-	
-	private void launchBlockDialog(ActionEvent event,
-	                               String string,
-	                               Control tfAgeUser2)
-	{
+
+	private void launchBlockDialog(ActionEvent event, String string, Control tfAgeUser2) {
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("Error");
-		alert.setContentText("El campo "+string+" es obligatorio.");
+		alert.setContentText("El campo " + string + " es obligatorio.");
 		alert.show();
 		tfAgeUser2.requestFocus();
-	}
-
-	public EEGViewController getPadre()
-	{
-		return padre;
-	}
-
-	public void setPadre(EEGViewController padre)
-	{
-		this.padre = padre;
 	}
 
 }

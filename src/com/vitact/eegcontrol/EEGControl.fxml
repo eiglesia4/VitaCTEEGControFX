@@ -83,7 +83,7 @@
                         </ImageView>
                     </center>
                 </BorderPane>
-                <BorderPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-image: url('@../../../resources/images/Logo_Vitact_Cuadrado_transparente.png');">
+                <BorderPane prefHeight="200.0" prefWidth="200.0">
                     <top>
                         <Label text="ULTIMO ESTUDIO REALIZADO" BorderPane.alignment="CENTER">
                             <font>
@@ -103,19 +103,16 @@
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                <RowConstraints/>
                             </rowConstraints>
                             <children>
                                 <Label text="Estudio Número:"/>
                                 <Label fx:id="lStudy" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-                                <Label text="Sujeto:" GridPane.rowIndex="1"/>
-                                <Label fx:id="lSubject" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1"/>
+                                <Label text="Código de Estudio:" GridPane.rowIndex="1"/>
+                                <Label fx:id="lStudyCode" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1"/>
                                 <Label text="Protocolo:" GridPane.rowIndex="2"/>
                                 <Label fx:id="lProtocol" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2"/>
-                                <Label text="Investigador:" GridPane.rowIndex="3"/>
-                                <Label fx:id="lInvestigator" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3"/>
-                                <Label text="Fecha creación:" GridPane.rowIndex="4"/>
-                                <Label fx:id="lDate" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4"/>
+                                <Label text="Fecha creación:" GridPane.rowIndex="3"/>
+                                <Label fx:id="lDate" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3"/>
                             </children>
                             <padding>
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>

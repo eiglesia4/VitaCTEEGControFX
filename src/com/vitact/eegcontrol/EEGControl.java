@@ -29,7 +29,7 @@ public class EEGControl extends Application
 	private final int MATRIX_BAUDRATE = 115200; // 9600;
 	public static final long STIMULUS_TIME_MILIS = 3000;
 	public static final long END_PROTOCOL_WAIT_MILIS = 5000;
-	public static final long MULTIMEDIA_TIMEOUT = 5000;
+	public static final long MULTIMEDIA_TIMEOUT = 15000;
 	public static final long OLD_STIM_VIBRATION_MILIS = 33;
 
 	public static final String MULTIMEDIA_FILE_BASE = "default/Multimedia/";
@@ -39,6 +39,7 @@ public class EEGControl extends Application
 	public static final String CONFIG_FILE = "default/properties.ini";
 	public static final String STUDY_BASE_DIR = "estudios";
 	public static String BASE_FILE = "c://";
+	public static final Boolean USE_FULL_STUDY_DATA = false;
 
 	ArrayList<EventBean> events = new ArrayList<EventBean>();
 	ArrayList<EstimulusBean> estims = new ArrayList<EstimulusBean>();
@@ -146,6 +147,7 @@ public class EEGControl extends Application
 			return;
 		}
 		logger.debug("Protocolo seleccionado: " + chosenFile.getAbsolutePath());
+
 		if (!checkProtocolFile(chosenFile)) {
 			logger.debug("Programa terminado. Protocolo err�neo");
 		} else {
