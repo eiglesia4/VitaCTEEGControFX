@@ -3,6 +3,7 @@ package com.vitact.eegcontrol;
 import com.fazecast.jSerialComm.SerialPort;
 import com.vitact.eegcontrol.bean.*;
 import com.vitact.eegcontrol.opencv.OpenCVTransform;
+import com.vitact.eegcontrol.type.MediaTypeEnum;
 import java.io.*;
 import java.util.*;
 import javafx.application.*;
@@ -15,6 +16,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.*;
@@ -42,6 +44,7 @@ public class EEGControl extends Application
 	public static final Boolean USE_FULL_STUDY_DATA = false;
 
 	ArrayList<EventBean> events = new ArrayList<EventBean>();
+	HashMap<String, MediaBean> medias = new HashMap<String, MediaBean>();
 	ArrayList<EstimulusBean> estims = new ArrayList<EstimulusBean>();
 	EstimulusBean estNull;
 	boolean off = true;
@@ -59,9 +62,9 @@ public class EEGControl extends Application
 	String protocolName = null;
 	Stage stageProtocol;
 	boolean showFullScreen = false;
-	static boolean useEEGProtocol = true;
-	static boolean useGloveProtocol = true;
-	static boolean useMatrixProtocol = true;
+	static boolean useEEGProtocol = false;
+	static boolean useGloveProtocol = false;
+	static boolean useMatrixProtocol = false;
 	static boolean showProtocolEvolWindow = false;
 	static boolean showVideoController = false;
 	static boolean centerMouse = false;
@@ -309,8 +312,8 @@ public class EEGControl extends Application
 		StackPane grandParentRoot = new StackPane();
 		rootProtocol = new BorderPane();
 
-		executer = new ProtocolThread(controller.list, events, marks, estims, estNull, comEEG,
-				comMatrix, comGlove, controller.timeT, this);
+		executer = new ProtocolThread(controller.list, events, medias, marks, estims, estNull,
+				comEEG, comMatrix, comGlove, controller.timeT, this);
 		executer.addListener(this);
 
 		if (comMatrix != null) {
@@ -532,7 +535,10 @@ public class EEGControl extends Application
 			String anal = arr[i].toUpperCase();
 			if (arr[i].length() == 0)
 				continue;
+				// COMMENTS WITH ; OR #
 			else if (arr[i].charAt(0) == ';')
+				continue;
+			else if (arr[i].charAt(0) == '#')
 				continue;
 				// CONFIGURATION OF THE TEST
 			else if (anal.indexOf("FULLSCREEN") == 0) {
@@ -737,9 +743,8 @@ public class EEGControl extends Application
 					// logger.debug("a:"+a+", b:"+b);
 					EventBean lanzarEvent = new EventBean("LANZAR", arr[i].substring(a + 2, b));
 
-					String mediaSample =
-							EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE + lanzarEvent
-									.getFile();
+					String mediaSample = EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE
+							+ lanzarEvent.getFile();
 
 					System.out.println(mediaSample);
 
@@ -852,9 +857,8 @@ public class EEGControl extends Application
 							lanzarEvent.setFile(fileName);
 						}
 
-						String mediaIniciar =
-								EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE + lanzarEvent
-										.getFile();
+						String mediaIniciar = EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE
+								+ lanzarEvent.getFile();
 
 						File file = new File(mediaIniciar);
 						if (file.exists()) {
@@ -891,46 +895,83 @@ public class EEGControl extends Application
 					check = false;
 				}
 			} else if (anal.indexOf("MOSTRAR") == 0) {
+				// TODO: IMAGES ARE REPEATED, TRY TO AVOID EXTRA MEMORY STORAGE BY USING MAPS
 				try {
 					String data[] = arr[i].split("\\s");
 					String fileName = null;
-					if (data.length > 1)
+					if (data.length > 1) {
 						fileName = data[1].replace("\"", "");
-					EventBean lanzarEvent = new EventBean("MOSTRAR", fileName);
 
-					if (fileName != null) {
-						if (!fileName.contains(".")) {
+						if (!fileName.contains("."))
 							fileName = fileName + ".bmp";
-							lanzarEvent.setFile(fileName);
+						EventBean mostrarEvent = new EventBean("MOSTRAR", fileName);
+						mostrarEvent.setMediaReference(fileName);
+						if (checkMediaReference(fileName)) {
+							if (!createMediaReference(fileName, null, MediaTypeEnum.IMAGE)) {
+								sc.close();
+								return false;
+							}
 						}
-
-						String mediaIniciar =
-								EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE + lanzarEvent
-										.getFile();
-
-						File file = new File(mediaIniciar);
-						if (file.exists()) {
-							events.add(lanzarEvent);
-							continue;
-						} else {
-							Alert alert = new Alert(AlertType.ERROR);
-							alert.setTitle("Error");
-							alert.setContentText(
-									"No se encuentra la imagen " + lanzarEvent.getFile());
-							alert.show();
-							sc.close();
-							return false;
-						}
-					} else {
-						// TODO: There is nothing to show. Include black image???
-
-						events.add(lanzarEvent);
+						events.add(mostrarEvent);
 						continue;
+					} else {
+						String errorMsg =
+								"Error en línea " + (i + 1) + " del protocolo: " + arr[i].trim()
+										+ ", No hay fichero de imagen indicado. ";
+						logger.error(errorMsg);
+						showErrorDialog(errorMsg);
+						sc.close();
+						return false;
+
 					}
 				} catch (Exception e) {
-					logger.debug(
-							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
-									+ e.getMessage());
+					logger.debug("Error en l�nea " + (i + 1) + " del protocolo: " + arr[i].trim()
+							+ ", Error: " + e.getMessage());
+					check = false;
+				}
+			} else if (anal.indexOf("SONAR") == 0) {
+				// TODO: SOUNDS ARE REPEATED, TRY TO AVOID EXTRA MEMORY STORAGE BY USING MAPS
+				try {
+					String data[] = arr[i].split("\\s");
+					String fileNameSound = null;
+					if (data.length > 1) {
+						fileNameSound = data[1].replace("\"", "");
+						if (!fileNameSound.contains(".")) {
+							fileNameSound = fileNameSound + ".wav";
+						}
+						EventBean soundEvent = new EventBean("SONAR", fileNameSound);
+
+						soundEvent.setMediaReference(fileNameSound);
+						String fileNameImage = null;
+						MediaTypeEnum mediaTypeEnum = MediaTypeEnum.SOUND;
+						if (checkMediaReference(fileNameSound)) {
+							if (data.length > 2) {
+								fileNameImage = data[2].replace("\"", "");
+								if (!fileNameImage.contains(".")) {
+									fileNameImage = fileNameImage + ".bmp";
+								}
+								mediaTypeEnum = MediaTypeEnum.SOUND_IMAGE;
+							}
+							if (!createMediaReference(fileNameSound, fileNameImage,
+									mediaTypeEnum)) {
+								sc.close();
+								return false;
+							}
+						}
+						events.add(soundEvent);
+						continue;
+					} else {
+						String errorMsg =
+								"Error en línea " + (i + 1) + " del protocolo: " + arr[i].trim()
+										+ ", No hay fichero de sonido indicado. ";
+						logger.error(errorMsg);
+						showErrorDialog(errorMsg);
+						sc.close();
+						return false;
+					}
+				} catch (Exception e) {
+					logger.debug("Error en l�nea " + (i + 1) + " del protocolo: " + arr[i].trim()
+							+ ", Error: " + e.getMessage());
 					check = false;
 				}
 			} else if (arr[i].indexOf("MARCAR") == 0) {
@@ -1118,8 +1159,8 @@ public class EEGControl extends Application
 		System.setProperty("studyBaseDir", EEGControl.STUDY_BASE_DIR);
 		System.setProperty("studyNumber", names[0]);
 		System.setProperty("protocolNumber", names[1]);
-		org.apache.logging.log4j.core.LoggerContext ctx = (org.apache.logging.log4j.core.LoggerContext) LogManager
-				.getContext(false);
+		org.apache.logging.log4j.core.LoggerContext ctx = (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(
+				false);
 		ctx.reconfigure();
 	}
 
@@ -1168,4 +1209,71 @@ public class EEGControl extends Application
 		this.rootProtocol = rootProtocol;
 	}
 
+	private boolean checkMediaReference(String mediaReference) {
+		return medias.get(mediaReference) == null;
+	}
+
+	/**
+	 * Creates a MediaBean of type MediaTypeEnum with the appropriate Media element as Primary, if
+	 * the MediaBean contains an image, is the imageFile, if contains a sound, is the soundFile (and
+	 * also the fileNameImage for the image to show meanwhile the sound is playing)
+	 *
+	 * @param fileNamePrimary
+	 * @param fileNameImage
+	 * @param mediaTypeEnum
+	 */
+	private boolean createMediaReference(String fileNamePrimary, String fileNameImage,
+			MediaTypeEnum mediaTypeEnum) {
+		String fileNamePrimaryAbs =
+				EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE + fileNamePrimary;
+		File file = new File(fileNamePrimaryAbs);
+		if (!file.exists()) {
+			showErrorDialog("No se encuentra el fichero " + fileNamePrimary + " de tipo "
+					+ mediaTypeEnum.getDescription());
+			return false;
+		}
+		switch (mediaTypeEnum) {
+			case SOUND: {
+				Media mediaSound = new Media(file.toURI().toString());
+				MediaBean mediaBean = new MediaBean(mediaSound, null, mediaTypeEnum);
+				medias.put(fileNamePrimary, mediaBean);
+				break;
+			}
+			case SOUND_IMAGE: {
+				Media mediaSound = new Media(file.toURI().toString());
+				String fileNameImageAbs =
+						EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE + fileNameImage;
+				File file1 = new File(fileNameImageAbs);
+				if (!file1.exists()) {
+					showErrorDialog("No se encuentra el fichero " + fileNameImage
+							+ " de tipo imagen para el sonido" + fileNamePrimary);
+					return false;
+				}
+				Image mediaImage = new Image(file1.toURI().toString());
+				MediaBean mediaBean = new MediaBean(mediaSound, mediaImage, mediaTypeEnum);
+				medias.put(fileNamePrimary, mediaBean);
+				break;
+			}
+			case IMAGE: {
+				Image mediaImage = new Image(file.toURI().toString());
+				MediaBean mediaBean = new MediaBean(mediaImage, mediaTypeEnum);
+				medias.put(fileNamePrimary, mediaBean);
+				break;
+			}
+			case VIDEO: {
+				Media mediaVideo = new Media(file.toURI().toString());
+				MediaBean mediaBean = new MediaBean(mediaVideo, mediaTypeEnum);
+				medias.put(fileNamePrimary, mediaBean);
+				break;
+			}
+		}
+		return true;
+	}
+
+	private void showErrorDialog(String message) {
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle("Error");
+		alert.setContentText(message);
+		alert.show();
+	}
 }

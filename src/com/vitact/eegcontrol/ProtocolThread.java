@@ -30,6 +30,7 @@ class ProtocolThread extends NotifyingThread {
 	ListView<EventBean> list;
 	Label timeT;
 	ArrayList<EventBean> events;
+	HashMap<String, MediaBean> medias;
 	ArrayList<EstimulusBean> estims;
 	EstimulusBean estNull;
 	List<Integer> marks;
@@ -77,9 +78,10 @@ class ProtocolThread extends NotifyingThread {
 	AnimationTimer timer = null;
 	ScheduledExecutorService timerXcutor;
 
-	public ProtocolThread(ListView<EventBean> l, ArrayList<EventBean> ev, List<Integer> ma,
-			ArrayList<EstimulusBean> es, EstimulusBean eN, SerialPort cEEG, SerialPort cMatr,
-			SerialPort cGlove, Label ti, EEGControl padre) {
+	public ProtocolThread(ListView<EventBean> l, ArrayList<EventBean> ev,
+			HashMap<String, MediaBean> medias, List<Integer> ma, ArrayList<EstimulusBean> es,
+			EstimulusBean eN, SerialPort cEEG, SerialPort cMatr, SerialPort cGlove, Label ti,
+			EEGControl padre) {
 		logger = LogManager.getLogger(this.getClass().getName());
 		loggerProtocol = LogManager.getLogger("ProtocolLog");
 		loggerEvent = LogManager.getLogger("EventsLog");
@@ -94,6 +96,7 @@ class ProtocolThread extends NotifyingThread {
 		comMatrix = cMatr;
 		comGlove = cGlove;
 		timeT = ti;
+		this.medias = medias;
 
 		defaultStimulus = new EstimulusBean(1, EEGControl.matrixDimension, stimInsubInt);
 		nullStimulus = new EstimulusBean(0, EEGControl.matrixDimension, stimNullInt);
@@ -297,6 +300,7 @@ class ProtocolThread extends NotifyingThread {
 					}
 					break;
 				}
+				case "KGS":
 				case "ESTIM_OLD": {
 					loggerProtocol.info("ESTIM_OLD " + e.getFile());
 					if (e.getFile() != null) {
@@ -379,19 +383,58 @@ class ProtocolThread extends NotifyingThread {
 				case "MOSTRAR": {
 					loggerProtocol.info("MOSTRAR " + e.getFile());
 					checkForTimer();
-					if (e.getFile() != null) {
+					MediaBean mediaBean = medias.get(e.getMediaReference());
+					if (mediaBean != null) {
 						multimediaFlag = false;
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
-								EEGControl.addImage(padre.getRootProtocol(), e.getFile(), false);
+								if (mediaBean.getImage() != null)
+									EEGControl.addImage(padre.getRootProtocol(),
+											mediaBean.getImage());
+								else
+									EEGControl.addImage(padre.getRootProtocol(), e.getFile(),
+											false);
 								multimediaFlag = true;
 							}
 						});
 						try {
 							waitForMultimediaFlagImage();
 						} catch (TimeoutException e1) {
-							notifyError("No se ha podido cargar la imagen " + e.getFile(), null);
+							notifyError("No se ha podido cargar la imagen " + e.getMediaReference(),
+									null);
+						}
+					}
+					break;
+				}
+				case "SONAR": {
+					loggerProtocol.info("SONAR " + e.getMediaReference());
+					checkForTimer();
+					MediaBean mediaBean = medias.get(e.getMediaReference());
+					if (mediaBean != null) {
+						multimediaFlag = false;
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								// ShowImage
+								if (mediaBean.getImage() != null)
+									EEGControl.addImage(padre.getRootProtocol(),
+											mediaBean.getImage());
+								else
+									EEGControl.addImage(padre.getRootProtocol(),
+											MediaBean.SOUND_DEFAULT_IMAGE, false);
+								// Play Sound
+								MediaPlayer mediaPlayer = new MediaPlayer(mediaBean.getSound());
+								mediaPlayer.play();
+								//mediaBean.getMediaPlayer().play();
+								multimediaFlag = true;
+							}
+						});
+						try {
+							waitForMultimediaFlagImage();
+						} catch (TimeoutException e1) {
+							notifyError("No se ha podido cargar el sonido " + e.getMediaReference(),
+									null);
 						}
 					}
 					break;
@@ -578,15 +621,15 @@ class ProtocolThread extends NotifyingThread {
 	public void sendMark(int m) {
 		// loggerEvent.info("order;event;event literal;milliseconds");
 		if (EEGControl.useEEGProtocol) {
-			loggerEvent.info((eventCounter++) + ";" + m + ";Marca Externa " + m + ";" + System
-					.currentTimeMillis());
+			loggerEvent.info((eventCounter++) + ";" + m + ";Marca Externa " + m + ";"
+					+ System.currentTimeMillis());
 			if (m > 9)
 				m = 9;
 			if (comEEG != null)
 				comEEG.writeBytes(zeros, m);
 		} else {
-			loggerEvent.info((eventCounter++) + ";" + m + ";Marca Externa " + m + ";" + System
-					.currentTimeMillis() + "; NOT SENT TO EEG DUE TO CONFIG");
+			loggerEvent.info((eventCounter++) + ";" + m + ";Marca Externa " + m + ";"
+					+ System.currentTimeMillis() + "; NOT SENT TO EEG DUE TO CONFIG");
 		}
 	}
 

@@ -1,0 +1,36 @@
+;Protocolo TESTING Sounds
+
+FULLSCREEN false
+USE_MATRIX false
+USE_EEG false
+CENTER_MOUSE false
+KGS_VIBRATE false
+USE_SPACEKEY false
+
+; HORIZONTAL => MARCA 1
+; VERTICAL => MARCA 2
+
+INICIAR inicio-experimento.png
+ESPERAR 3000
+
+;mostrar una imagen
+MOSTRAR Lenna.png
+ESPERAR 1000
+
+;Lanza el sonido
+SONAR MOUSE.wav
+;SONAR file_example_WAV_1MG.wav
+ESPERAR 1000
+
+;mostrar una imagen
+MOSTRAR Lenna.png
+ESPERAR 1000
+
+;Lanza el sonido
+SONAR MOUSE.wav
+;SONAR file_example_WAV_1MG.wav
+ESPERAR 1000
+
+
+#com/vitact/eegcontrol/EEGControl.java:1239
+;/Volumes/Code/VitaCT/VitaCTEEGControFX/default/Multimedia/MOUSE.WAV
