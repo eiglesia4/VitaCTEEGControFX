@@ -32,6 +32,8 @@ public class EEGViewController {
 	Label lDate;
 	@FXML
 	Label lStudy;
+	@FXML
+	Button bRelauchProtocol;
 
 	public EEGViewController() {
 		logger = LogManager.getLogger(this.getClass().getName());
@@ -128,6 +130,7 @@ public class EEGViewController {
 		loggerStudy.info(studyBean.toString());
 		lProtocol.setText(lLastProtocolName.getText());
 		padre.fileProtocolLoaded(chosenFile);
+		bRelauchProtocol.setDisable(false);
 	}
 
 	@SuppressWarnings("finally")
@@ -168,6 +171,7 @@ public class EEGViewController {
 	}
 
 	private void loadLastStudy(String[] routePath) {
+		bRelauchProtocol.setDisable(true);
 		String filePath =
 				EEGControl.STUDY_BASE_DIR + "/" + routePath[0] + "/estudio-" + routePath[0]
 						+ ".dat";
@@ -208,4 +212,7 @@ public class EEGViewController {
 			padre.setStudyBean(studyBean);
 	}
 
+	public void restartExperiment(ActionEvent actionEvent) {
+		padre.fileProtocolLoaded(chosenFile);
+	}
 }
