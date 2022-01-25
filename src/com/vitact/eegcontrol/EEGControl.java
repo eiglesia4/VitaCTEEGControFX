@@ -384,8 +384,10 @@ public class EEGControl extends Application
 				} else
 					executer.sendMark(8);
 			} else if (e.getCode() == KeyCode.DIGIT1 || e.getCode() == KeyCode.Z)
+				// RED BUTTON
 				executer.sendMark(8);
 			else if (e.getCode() == KeyCode.DIGIT2 || e.getCode() == KeyCode.M)
+				// GREEN BUTTON
 				executer.sendMark(9);
 		});
 

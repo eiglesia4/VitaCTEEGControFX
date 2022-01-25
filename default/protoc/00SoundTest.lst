@@ -18,8 +18,8 @@ MOSTRAR Lenna.png
 ESPERAR 1000
 
 ;Lanza el sonido
-SONAR MOUSE.wav
-;SONAR file_example_WAV_1MG.wav
+;SONAR MOUSE.wav
+SONAR file_example_WAV_1MG.wav
 ESPERAR 1000
 
 ;mostrar una imagen

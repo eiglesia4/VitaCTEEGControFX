@@ -4,12 +4,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
-<BorderPane prefHeight="500.0" prefWidth="500.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vitact.eegcontrol.EEGViewController">
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="500.0" prefWidth="500.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vitact.eegcontrol.EEGViewController">
     <top>
         <VBox BorderPane.alignment="CENTER">
             <BorderPane.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </BorderPane.margin>
             <children>
                 <HBox id="buttonsPane" prefHeight="75.0" prefWidth="267.0" spacing="10.0">
@@ -18,23 +19,23 @@
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../../../resources/images/eeg_icon.png"/>
+                                        <Image url="@../../../resources/images/eeg_icon.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
                         </Button>
-                        <Button mnemonicParsing="false" fx:id="bRelauchProtocol" onAction="#restartExperiment" text="Volver a Ejecutar&#10;Protocolo">
+                        <Button fx:id="bRelauchProtocol" mnemonicParsing="false" onAction="#restartExperiment" text="Volver a Ejecutar&#10;Protocolo">
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../../../resources/images/eeg_icon_reload.png"/>
+                                        <Image url="@../../../resources/images/eeg_icon_reload.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
                         </Button>
                     </children>
                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </padding>
                 </HBox>
                 <HBox prefHeight="75.0" prefWidth="267.0" spacing="10.0">
@@ -43,7 +44,7 @@
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../../../resources/images/glasses_icon.png"/>
+                                        <Image url="@../../../resources/images/glasses_icon.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
@@ -52,7 +53,7 @@
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../../../resources/images/new_icon.png"/>
+                                        <Image url="@../../../resources/images/new_icon.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
@@ -61,33 +62,33 @@
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../../../resources/images/continue_icon.png"/>
+                                        <Image url="@../../../resources/images/continue_icon.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
                         </Button>
                     </children>
                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </padding>
                 </HBox>
             </children>
         </VBox>
     </top>
     <padding>
-        <Insets top="10.0"/>
+        <Insets top="10.0" />
     </padding>
     <center>
         <StackPane BorderPane.alignment="CENTER">
             <BorderPane.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </BorderPane.margin>
             <children>
                 <BorderPane prefHeight="200.0" prefWidth="200.0">
                     <center>
                         <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
                             <image>
-                                <Image url="@../../../resources/images/Logo_Vitact_Cuadrado_transparente.png"/>
+                                <Image url="@../../../resources/images/Logo_Vitact_Cuadrado_transparente.png" />
                             </image>
                         </ImageView>
                     </center>
@@ -96,35 +97,35 @@
                     <top>
                         <Label text="ULTIMO ESTUDIO REALIZADO" BorderPane.alignment="CENTER">
                             <font>
-                                <Font size="24.0"/>
+                                <Font size="24.0" />
                             </font>
                         </Label>
                     </top>
                     <center>
                         <GridPane hgap="5.0" vgap="20.0" BorderPane.alignment="CENTER">
                             <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                             </columnConstraints>
                             <rowConstraints>
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                             </rowConstraints>
                             <children>
-                                <Label text="Estudio Número:"/>
-                                <Label fx:id="lStudy" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-                                <Label text="Código de Estudio:" GridPane.rowIndex="1"/>
-                                <Label fx:id="lStudyCode" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1"/>
-                                <Label text="Protocolo:" GridPane.rowIndex="2"/>
-                                <Label fx:id="lProtocol" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2"/>
-                                <Label text="Fecha creación:" GridPane.rowIndex="3"/>
-                                <Label fx:id="lDate" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3"/>
+                                <Label text="Estudio Número:" />
+                                <Label fx:id="lStudy" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                                <Label text="Código de Estudio:" GridPane.rowIndex="1" />
+                                <Label fx:id="lStudyCode" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                <Label text="Protocolo:" GridPane.rowIndex="2" />
+                                <Label fx:id="lProtocol" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                <Label text="Fecha creación:" GridPane.rowIndex="3" />
+                                <Label fx:id="lDate" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                             </children>
                             <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                             </padding>
                         </GridPane>
                     </center>
@@ -135,14 +136,17 @@
     <bottom>
         <BorderPane BorderPane.alignment="CENTER">
             <BorderPane.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </BorderPane.margin>
             <left>
-                <Label id="lLastProtocol" fx:id="lLastProtocol" text="Ultimo protocolo usado: " BorderPane.alignment="CENTER"/>
+                <Label id="lLastProtocol" fx:id="lLastProtocol" text="Ultimo protocolo usado: " BorderPane.alignment="CENTER" />
             </left>
             <center>
-                <Label id="lLastProtocolName" fx:id="lLastProtocolName" BorderPane.alignment="CENTER_LEFT"/>
+                <Label id="lLastProtocolName" fx:id="lLastProtocolName" BorderPane.alignment="CENTER_LEFT" />
             </center>
+         <right>
+            <Label text="v 3.0" BorderPane.alignment="CENTER" />
+         </right>
         </BorderPane>
     </bottom>
 

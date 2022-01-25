@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="EEGControlFX" type="Application" factoryName="Application" activateToolWindowBeforeRun="false">
     <envs>
-      <env name="DYLD_LIBRARY_PATH" value="$PROJECT_DIR$/lib/:$DYLD_LIBRARY_PATH" />
+      <env name="DYLD_LIBRARY_PATH" value="/usr/local/Cellar/opencv/4.5.4_2/lib/:$PROJECT_DIR$/lib/:$DYLD_LIBRARY_PATH" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.vitact.eegcontrol.EEGControl" />
     <module name="VitaCTEEGControFX" />
