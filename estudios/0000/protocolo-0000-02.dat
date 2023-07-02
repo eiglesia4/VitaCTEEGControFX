@@ -978,3 +978,59 @@ fecha creación=10-11-2021 08:58:04
 [estudio]
 nombre=00SoundTest.lst
 
+[protocolo]
+descripcion=;Protocolo TESTING Sounds
+fichero=00SoundTest.lst
+fecha creación=25-1-2022 07:14:50
+[estudio]
+nombre=00SoundTest.lst
+
+[protocolo]
+descripcion=;Protocolo 1: 2 Tonos 200ms y descanso 300ms. 360 repeticiones. Registro EEG
+fichero=Protoco1_2Tonos.txt
+fecha creación=25-1-2022 07:52:58
+[estudio]
+nombre=Protoco1_2Tonos.txt
+
+[protocolo]
+descripcion=;Protocolo 1: 2 Tonos 200ms y descanso 300ms. 360 repeticiones. Registro EEG
+fichero=Protoco1_2Tonos.txt
+fecha creación=26-1-2022 10:32:36
+[estudio]
+nombre=Protoco1_2Tonos.txt
+
+[protocolo]
+descripcion=;Protocolo 3: 1 Tono 200ms y descanso 300ms. 200 repeticiones. Registro EEG
+fichero=Protoco3_SoloTono1.txt
+fecha creación=26-1-2022 10:36:08
+[estudio]
+nombre=Protoco3_SoloTono1.txt
+
+[protocolo]
+descripcion=;Protocolo 4: 1 Tono 200ms y descanso 300ms. 360 repeticiones. Registro EEG
+fichero=Protoco4_SoloTono2.txt
+fecha creación=26-1-2022 10:38:12
+[estudio]
+nombre=Protoco4_SoloTono2.txt
+
+[protocolo]
+descripcion=;Sonrisa con respuesta a tono 
+fichero=AAAFQ sonsrisa.LST
+fecha creación=02-4-2022 04:09:23
+[estudio]
+nombre=AAAFQ sonsrisa.LST
+
+[protocolo]
+descripcion=;Sonrisa con respuesta a tono 
+fichero=AAAFQ sonsrisa.LST
+fecha creación=02-4-2022 04:10:39
+[estudio]
+nombre=AAAFQ sonsrisa.LST
+
+[protocolo]
+descripcion=;Sonrisa con respuesta a tono 
+fichero=AAAFQ sonsrisa.LST
+fecha creación=02-4-2022 04:16:15
+[estudio]
+nombre=AAAFQ sonsrisa.LST
+

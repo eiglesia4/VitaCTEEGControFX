@@ -529,7 +529,7 @@ public class EEGControl extends Application
 		myBean.setStudyBean(getStudyBean());
 
 		while (sc.hasNextLine()) {
-			lines.add(sc.nextLine());
+			lines.add(sc.nextLine().trim());
 		}
 
 		String[] arr = lines.toArray(new String[0]);
