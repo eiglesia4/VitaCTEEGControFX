@@ -24,7 +24,9 @@
     		<ComboBox fx:id="cbMatrix" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
     	<Label fx:id="lGlove" text="Puerto conectado al Guante" GridPane.columnIndex="0" GridPane.rowIndex="3" />
     		<ComboBox fx:id="cbGlove" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-     	<HBox alignment="CENTER" GridPane.columnSpan="2" GridPane.rowIndex="4">
+    	<Label fx:id="lMulti" text="Puerto conectado al Guante" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+    		<ComboBox fx:id="cbMulti" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+     	<HBox alignment="CENTER" GridPane.columnSpan="2" GridPane.rowIndex="5">
         		<children>
             		<Button mnemonicParsing="false" onAction="#conectar" text="Conectar" />
         		</children>

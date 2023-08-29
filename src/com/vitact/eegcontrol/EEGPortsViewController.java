@@ -21,9 +21,13 @@ public class EEGPortsViewController {
 	@FXML
 	ComboBox<ComPortBean> cbGlove;
 	@FXML
+	ComboBox<ComPortBean> cbMulti;
+	@FXML
 	Label lMatrix;
 	@FXML
 	Label lGlove;
+	@FXML
+	Label lMulti;
 	@FXML
 	CheckBox cbPorts;
 
@@ -31,6 +35,7 @@ public class EEGPortsViewController {
 	SerialPort comEEG;
 	SerialPort comMatrix;
 	SerialPort comGlove;
+	SerialPort comMulti;
 	SerialPort comPort[];
 	boolean configured = false;
 	static Logger logger = null;
@@ -60,6 +65,7 @@ public class EEGPortsViewController {
 		cbEEG.setItems(list);
 		cbMatrix.setItems(list);
 		cbGlove.setItems(list);
+		cbMulti.setItems(list);
 
 		if (!EEGControl.useEEGProtocol)
 			cbEEG.setDisable(true);
@@ -67,6 +73,8 @@ public class EEGPortsViewController {
 			cbMatrix.setDisable(true);
 		if (!EEGControl.useGloveProtocol)
 			cbGlove.setDisable(true);
+		if (!EEGControl.useMultiStimulator)
+			cbMulti.setDisable(true);
 	}
 
 	@FXML
@@ -86,10 +94,16 @@ public class EEGPortsViewController {
 			comGlove = null;
 		} else
 			comGlove = cbGlove.getValue().getSerialPort();
+		if (cbMulti.getValue() == null) {
+			logger.debug("Ningún multiestimulador seleccionado");
+			cbMulti = null;
+		} else
+			comMulti = cbMulti.getValue().getSerialPort();
 
-		if ((comEEG == null || !EEGControl.useEEGProtocol) && (comMatrix == null
-				|| !EEGControl.useMatrixProtocol) && (comGlove == null
-				|| !EEGControl.useGloveProtocol)) {
+		if ((comEEG == null || !EEGControl.useEEGProtocol) &&
+				(comMatrix == null || !EEGControl.useMatrixProtocol) &&
+				(comGlove == null || !EEGControl.useGloveProtocol) &&
+				(comMulti == null || !EEGControl.useMultiStimulator)) {
 			logger.info("Programa terminado. Ningún puerto abierto");
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
@@ -100,6 +114,8 @@ public class EEGPortsViewController {
 				message = message + "Debe elegir un puerto para la comunicación con la Matriz\n";
 			else if (EEGControl.useGloveProtocol && comGlove == null)
 				message = message + "Debe elegir un puerto para la comunicación con el Guante\n";
+			else if (EEGControl.useMultiStimulator && comMulti == null)
+				message = message + "Debe elegir un puerto para la comunicación con el Multiestimulador\n";
 			alert.setContentText(message);
 			alert.show();
 		} else {

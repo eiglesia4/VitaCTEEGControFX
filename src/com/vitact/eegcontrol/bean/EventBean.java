@@ -1,21 +1,22 @@
 package com.vitact.eegcontrol.bean;
 
+import com.vitact.eegcontrol.type.EventEnum;
 import javafx.scene.image.Image;
 
 public class EventBean {
-	String tipo;
+	EventEnum tipo;
 	int length;
 	String file;
 	Image img;
 	String mediaReference;
 
-	public EventBean(String t, int l) {
+	public EventBean(EventEnum t, int l) {
 		tipo = t;
 		length = l;
 		file = "";
 	}
 
-	public EventBean(String t, String f) {
+	public EventBean(EventEnum t, String f) {
 		tipo = t;
 		length = -1;
 		file = f;
@@ -31,11 +32,11 @@ public class EventBean {
 		return sb.toString();
 	}
 
-	public String getTipo() {
+	public EventEnum getTipo() {
 		return tipo;
 	}
 
-	public void setTipo(String tipo) {
+	public void setTipo(EventEnum tipo) {
 		this.tipo = tipo;
 	}
 

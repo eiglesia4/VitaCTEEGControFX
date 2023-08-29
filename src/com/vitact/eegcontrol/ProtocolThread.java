@@ -3,6 +3,7 @@ package com.vitact.eegcontrol;
 import com.fazecast.jSerialComm.SerialPort;
 import com.vitact.eegcontrol.bean.*;
 import com.vitact.eegcontrol.opencv.OpenCVTransform;
+import com.vitact.eegcontrol.type.EventEnum;
 import java.awt.*;
 import java.io.*;
 import java.util.List;
@@ -217,8 +218,8 @@ class ProtocolThread extends NotifyingThread {
 			}
 			i++;
 			switch (e.getTipo()) {
-				case "INICIAR": {
-					loggerProtocol.info("INICIAR " + e.getFile());
+				case INICIAR: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					checkForTimer();
 					if (e.getFile() != null) {
 						multimediaFlag = false;
@@ -237,13 +238,14 @@ class ProtocolThread extends NotifyingThread {
 					}
 					break;
 				}
-				case "CLICKSTOP": {
-					loggerProtocol.info("CLICKSTOP " + e.getFile());
+				case SPACESTOP:
+				case CLICKSTOP: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					multimediaFlag = false;
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
-							padre.showClickLabel(true);
+							padre.showClickLabel(e.getTipo()== EventEnum.CLICKSTOP);
 						}
 					});
 					try {
@@ -269,40 +271,9 @@ class ProtocolThread extends NotifyingThread {
 					break;
 				}
 
-				case "SPACESTOP": {
-					loggerProtocol.info("SPACESTOP " + e.getFile());
-					multimediaFlag = false;
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							padre.showClickLabel(false);
-						}
-					});
-					try {
-						waitForClickFlag();
-						// If needed position the mouse in the center of the screen
-						if (EEGControl.centerMouse) {
-							Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-							int screenX = (int) screenBounds.getWidth() / 2;
-							int screenY = (int) screenBounds.getHeight() / 2;
-							Platform.runLater(() -> {
-								try {
-									Robot robot = new Robot();
-									robot.mouseMove(screenX, screenY);
-								} catch (AWTException e1) {
-									e1.printStackTrace();
-								}
-							});
-						}
-
-					} catch (TimeoutException e1) {
-						notifyError("No se ha recibido el click del raton" + e.getFile(), null);
-					}
-					break;
-				}
-				case "KGS":
-				case "ESTIM_OLD": {
-					loggerProtocol.info("ESTIM_OLD " + e.getFile());
+				case KGS:
+				case ESTIM_OLD: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					if (e.getFile() != null) {
 						//						Runnable frameGrabber = new Runnable()
 						//						{
@@ -380,8 +351,8 @@ class ProtocolThread extends NotifyingThread {
 					}
 					break;
 				}
-				case "MOSTRAR": {
-					loggerProtocol.info("MOSTRAR " + e.getFile());
+				case MOSTRAR: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					checkForTimer();
 					MediaBean mediaBean = medias.get(e.getMediaReference());
 					if (mediaBean != null) {
@@ -407,8 +378,8 @@ class ProtocolThread extends NotifyingThread {
 					}
 					break;
 				}
-				case "SONAR": {
-					loggerProtocol.info("SONAR " + e.getMediaReference());
+				case SONAR: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					checkForTimer();
 					MediaBean mediaBean = medias.get(e.getMediaReference());
 					if (mediaBean != null) {
@@ -439,9 +410,9 @@ class ProtocolThread extends NotifyingThread {
 					}
 					break;
 				}
-				case "LANZAR": {
+				case LANZAR: {
 					long multimediaInit = System.currentTimeMillis();
-					loggerProtocol.info("LANZAR " + e.getFile());
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					checkForTimer();
 					multimediaFlag = false;
 					addVideo(this.padre.getRootProtocol(), e.getFile());
@@ -458,8 +429,8 @@ class ProtocolThread extends NotifyingThread {
 
 					break;
 				}
-				case "MARCAR": {
-					loggerProtocol.info("MARCAR " + e.getLength());
+				case MARCAR: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 
 					sendMark(e.getLength());
 					/*
@@ -468,8 +439,8 @@ class ProtocolThread extends NotifyingThread {
 					 */
 					break;
 				}
-				case "TACTIL": {
-					loggerProtocol.info("TACTIL");
+				case TACTIL: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 
 					Thread t1 = new Thread(new Runnable() {
 						public void run() {
@@ -479,8 +450,8 @@ class ProtocolThread extends NotifyingThread {
 					t1.start();
 					break;
 				}
-				case "VIBRAR": {
-					loggerProtocol.info("VIBRAR " + e.getFile());
+				case VIBRAR: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 
 					Thread t1 = new Thread(new Runnable() {
 						public void run() {
@@ -490,15 +461,15 @@ class ProtocolThread extends NotifyingThread {
 					t1.start();
 					break;
 				}
-				case "ESPERAR": {
-					loggerProtocol.info("ESPERAR " + e.getLength());
+				case ESPERAR: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 
 					accTime += e.getLength();
 					waitFor(accTime);
 					break;
 				}
-				case "TERMINAR": {
-					loggerProtocol.info("TERMINAR");
+				case TERMINAR: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					checkForTimer();
 					setStop(true);
 					break;

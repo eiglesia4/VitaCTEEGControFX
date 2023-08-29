@@ -3,7 +3,8 @@ package com.vitact.eegcontrol;
 import com.fazecast.jSerialComm.SerialPort;
 import com.vitact.eegcontrol.bean.*;
 import com.vitact.eegcontrol.opencv.OpenCVTransform;
-import com.vitact.eegcontrol.type.MediaTypeEnum;
+import com.vitact.eegcontrol.type.*;
+import com.vitact.eegcontrol.utils.ProtocolUtils;
 import java.io.*;
 import java.util.*;
 import javafx.application.*;
@@ -71,6 +72,7 @@ public class EEGControl extends Application
 	static boolean kgsVibrate = false;
 	static boolean useSpaceAsKey = false;
 	static boolean useTarget = false;
+	static boolean useMultiStimulator = false;
 	boolean correctStimulus = false;
 	static int matrixDimension = 28;
 	static boolean waitingForSpace = false;
@@ -157,7 +159,7 @@ public class EEGControl extends Application
 			if (doReusePorts)
 				portsLoaded();
 			else {
-				if (useEEGProtocol || useMatrixProtocol || useGloveProtocol)
+				if (useEEGProtocol || useMatrixProtocol || useGloveProtocol || useMultiStimulator)
 					loadPorts();
 				else
 					loadBusinessLogic();
@@ -535,32 +537,13 @@ public class EEGControl extends Application
 		String[] arr = lines.toArray(new String[0]);
 		for (int i = 0; i < arr.length; i++) {
 			String anal = arr[i].toUpperCase();
-			if (arr[i].length() == 0)
+			// COMMENTS WITH ; OR #, also ignore empty lines
+			if (arr[i].length() == 0 || arr[i].charAt(0) == ';' || arr[i].charAt(0) == '#')
 				continue;
-				// COMMENTS WITH ; OR #
-			else if (arr[i].charAt(0) == ';')
-				continue;
-			else if (arr[i].charAt(0) == '#')
-				continue;
-				// CONFIGURATION OF THE TEST
+			// CONFIGURATION OF THE PROTOCOL
 			else if (anal.indexOf("FULLSCREEN") == 0) {
 				try {
-					String data[] = arr[i].split("\\s");
-					String fileName = null;
-					if (data.length > 1)
-						fileName = data[1].replace("\"", "");
-
-					if (fileName != null) {
-						// OVERRIDES CONFIGURATION DEFINITION OF FULLSCREEN
-						if (fileName.equalsIgnoreCase("SI") || fileName.equalsIgnoreCase("YES")
-								|| fileName.equalsIgnoreCase("TRUE"))
-							this.showFullScreen = true;
-						else
-							this.showFullScreen = false;
-					} else {
-						// IGNORE MALFORMED FULLSCREEN
-						continue;
-					}
+					this.showFullScreen = ProtocolUtils.trueFalseLine(arr[i]);
 				} catch (Exception e) {
 					logger.debug(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
@@ -569,22 +552,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("CENTER_MOUSE") == 0) {
 				try {
-					String data[] = arr[i].split("\\s");
-					String fileName = null;
-					if (data.length > 1)
-						fileName = data[1].replace("\"", "");
-
-					if (fileName != null) {
-						// OVERRIDES CONFIGURATION DEFINITION OF FULLSCREEN
-						if (fileName.equalsIgnoreCase("SI") || fileName.equalsIgnoreCase("YES")
-								|| fileName.equalsIgnoreCase("TRUE"))
-							EEGControl.centerMouse = true;
-						else
-							EEGControl.centerMouse = false;
-					} else {
-						// IGNORE MALFORMED FULLSCREEN
-						continue;
-					}
+					EEGControl.centerMouse = ProtocolUtils.trueFalseLine(arr[i]);
 				} catch (Exception e) {
 					logger.debug(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
@@ -593,22 +561,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("USE_SPACEKEY") == 0) {
 				try {
-					String data[] = arr[i].split("\\s");
-					String fileName = null;
-					if (data.length > 1)
-						fileName = data[1].replace("\"", "");
-
-					if (fileName != null) {
-						// OVERRIDES CONFIGURATION DEFINITION OF FULLSCREEN
-						if (fileName.equalsIgnoreCase("SI") || fileName.equalsIgnoreCase("YES")
-								|| fileName.equalsIgnoreCase("TRUE"))
-							EEGControl.useSpaceAsKey = true;
-						else
-							EEGControl.useSpaceAsKey = false;
-					} else {
-						// IGNORE MALFORMED FULLSCREEN
-						continue;
-					}
+					EEGControl.useSpaceAsKey = ProtocolUtils.trueFalseLine(arr[i]);
 				} catch (Exception e) {
 					logger.debug(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
@@ -617,22 +570,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("USE_TARGET") == 0) {
 				try {
-					String data[] = arr[i].split("\\s");
-					String fileName = null;
-					if (data.length > 1)
-						fileName = data[1].replace("\"", "");
-
-					if (fileName != null) {
-						// OVERRIDES CONFIGURATION DEFINITION OF FULLSCREEN
-						if (fileName.equalsIgnoreCase("SI") || fileName.equalsIgnoreCase("YES")
-								|| fileName.equalsIgnoreCase("TRUE"))
-							EEGControl.useTarget = true;
-						else
-							EEGControl.useTarget = false;
-					} else {
-						// IGNORE MALFORMED FULLSCREEN
-						continue;
-					}
+					EEGControl.useTarget = ProtocolUtils.trueFalseLine(arr[i]);
 				} catch (Exception e) {
 					logger.debug(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
@@ -641,22 +579,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("KGS_VIBRATE") == 0) {
 				try {
-					String data[] = arr[i].split("\\s");
-					String fileName = null;
-					if (data.length > 1)
-						fileName = data[1].replace("\"", "");
-
-					if (fileName != null) {
-						// OVERRIDES CONFIGURATION DEFINITION OF FULLSCREEN
-						if (fileName.equalsIgnoreCase("SI") || fileName.equalsIgnoreCase("YES")
-								|| fileName.equalsIgnoreCase("TRUE"))
-							EEGControl.kgsVibrate = true;
-						else
-							EEGControl.kgsVibrate = false;
-					} else {
-						// IGNORE MALFORMED FULLSCREEN
-						continue;
-					}
+					EEGControl.kgsVibrate = ProtocolUtils.trueFalseLine(arr[i]);
 				} catch (Exception e) {
 					logger.debug(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
@@ -665,22 +588,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("USE_MATRIX") == 0) {
 				try {
-					String data[] = arr[i].split("\\s");
-					String fileName = null;
-					if (data.length > 1)
-						fileName = data[1].replace("\"", "");
-
-					if (fileName != null) {
-						// OVERRIDES CONFIGURATION DEFINITION OF FULLSCREEN
-						if (fileName.equalsIgnoreCase("SI") || fileName.equalsIgnoreCase("YES")
-								|| fileName.equalsIgnoreCase("TRUE"))
-							EEGControl.useMatrixProtocol = true;
-						else
-							EEGControl.useMatrixProtocol = false;
-					} else {
-						// IGNORE MALFORMED FULLSCREEN
-						continue;
-					}
+					EEGControl.useMatrixProtocol = ProtocolUtils.trueFalseLine(arr[i]);;
 				} catch (Exception e) {
 					logger.debug(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
@@ -689,22 +597,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("USE_EEG") == 0) {
 				try {
-					String data[] = arr[i].split("\\s");
-					String fileName = null;
-					if (data.length > 1)
-						fileName = data[1].replace("\"", "");
-
-					if (fileName != null) {
-						// OVERRIDES CONFIGURATION DEFINITION OF FULLSCREEN
-						if (fileName.equalsIgnoreCase("SI") || fileName.equalsIgnoreCase("YES")
-								|| fileName.equalsIgnoreCase("TRUE"))
-							EEGControl.useEEGProtocol = true;
-						else
-							EEGControl.useEEGProtocol = false;
-					} else {
-						// IGNORE MALFORMED FULLSCREEN
-						continue;
-					}
+					EEGControl.useEEGProtocol = ProtocolUtils.trueFalseLine(arr[i]);
 				} catch (Exception e) {
 					logger.debug(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
@@ -713,22 +606,16 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("USE_GLOVE") == 0) {
 				try {
-					String data[] = arr[i].split("\\s");
-					String fileName = null;
-					if (data.length > 1)
-						fileName = data[1].replace("\"", "");
-
-					if (fileName != null) {
-						// OVERRIDES CONFIGURATION DEFINITION OF FULLSCREEN
-						if (fileName.equalsIgnoreCase("SI") || fileName.equalsIgnoreCase("YES")
-								|| fileName.equalsIgnoreCase("TRUE"))
-							EEGControl.useGloveProtocol = true;
-						else
-							EEGControl.useGloveProtocol = false;
-					} else {
-						// IGNORE MALFORMED FULLSCREEN
-						continue;
-					}
+					EEGControl.useGloveProtocol = ProtocolUtils.trueFalseLine(arr[i]);
+				} catch (Exception e) {
+					logger.debug(
+							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
+									+ e.getMessage());
+					check = false;
+				}
+			} else if (anal.indexOf("USE_MULTI") == 0) {
+				try {
+					EEGControl.useMultiStimulator = ProtocolUtils.trueFalseLine(arr[i]);
 				} catch (Exception e) {
 					logger.debug(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
@@ -739,42 +626,14 @@ public class EEGControl extends Application
 
 			// TEST COMMANDS
 			else if (anal.indexOf("LANZAR") == 0) {
-				int a = arr[i].indexOf(" \"");
-				int b = arr[i].indexOf("\"", a + 2);
-				if (a >= 5 && b > 0) {
-					// logger.debug("a:"+a+", b:"+b);
-					EventBean lanzarEvent = new EventBean("LANZAR", arr[i].substring(a + 2, b));
-
-					String mediaSample = EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE
-							+ lanzarEvent.getFile();
-
-					System.out.println(mediaSample);
-
-					File file = new File(mediaSample);
-					if (file.exists()) {
-						events.add(lanzarEvent);
-						continue;
-					} else {
-						Alert alert = new Alert(AlertType.ERROR);
-						alert.setTitle("Error");
-						alert.setContentText(
-								"No se encuentra el fichero de vídeo " + lanzarEvent.getFile());
-						alert.show();
-						sc.close();
-						return false;
-					}
-				} else {
-					logger.debug("Error en l�nea " + i + " del protocolo: " + arr[i].substring(a)
-							.trim());
-					check = false;
-				}
+				check = createMultimediaEvent(arr[i], i, EventEnum.LANZAR, MediaTypeEnum.VIDEO, sc);
 			} else if (anal.indexOf("INICIAR") == 0) {
 				try {
 					String data[] = arr[i].split("\\s");
 					String fileName = null;
 					if (data.length > 1)
 						fileName = data[1].replace("\"", "");
-					EventBean lanzarEvent = new EventBean("INICIAR", fileName);
+					EventBean lanzarEvent = new EventBean(EventEnum.INICIAR, fileName);
 
 					if (fileName != null) {
 						String mediaIniciar =
@@ -785,7 +644,6 @@ public class EEGControl extends Application
 						if (file.exists()) {
 							initalImage = lanzarEvent.getFile();
 							events.add(lanzarEvent);
-							continue;
 						} else {
 							Alert alert = new Alert(AlertType.ERROR);
 							alert.setTitle("Error");
@@ -797,7 +655,6 @@ public class EEGControl extends Application
 						}
 					} else {
 						events.add(lanzarEvent);
-						continue;
 					}
 				} catch (Exception e) {
 					logger.debug(
@@ -807,7 +664,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("TARGET") == 0) {
 				try {
-					EventBean lanzarEvent = new EventBean("TARGET", 0);
+					EventBean lanzarEvent = new EventBean(EventEnum.TARGET, 0);
 					events.add(lanzarEvent);
 				} catch (Exception e) {
 					logger.debug(
@@ -817,7 +674,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("FAIL") == 0) {
 				try {
-					EventBean lanzarEvent = new EventBean("FAIL", 0);
+					EventBean lanzarEvent = new EventBean(EventEnum.FAIL, 0);
 					events.add(lanzarEvent);
 				} catch (Exception e) {
 					logger.debug(
@@ -827,7 +684,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("CLICKSTOP") == 0) {
 				try {
-					EventBean lanzarEvent = new EventBean("CLICKSTOP", 0);
+					EventBean lanzarEvent = new EventBean(EventEnum.CLICKSTOP, 0);
 					events.add(lanzarEvent);
 				} catch (Exception e) {
 					logger.debug(
@@ -837,7 +694,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("SPACESTOP") == 0) {
 				try {
-					EventBean lanzarEvent = new EventBean("SPACESTOP", 0);
+						EventBean lanzarEvent = new EventBean(EventEnum.SPACESTOP, 0);
 					events.add(lanzarEvent);
 				} catch (Exception e) {
 					logger.debug(
@@ -851,7 +708,7 @@ public class EEGControl extends Application
 					String fileName = null;
 					if (data.length > 1)
 						fileName = data[1].replace("\"", "");
-					EventBean lanzarEvent = new EventBean("ESTIM_OLD", fileName);
+					EventBean lanzarEvent = new EventBean(EventEnum.ESTIM_OLD, fileName);
 
 					if (fileName != null) {
 						if (!fileName.contains(".")) {
@@ -897,89 +754,15 @@ public class EEGControl extends Application
 					check = false;
 				}
 			} else if (anal.indexOf("MOSTRAR") == 0) {
-				// TODO: IMAGES ARE REPEATED, TRY TO AVOID EXTRA MEMORY STORAGE BY USING MAPS
-				try {
-					String data[] = arr[i].split("\\s");
-					String fileName = null;
-					if (data.length > 1) {
-						fileName = data[1].replace("\"", "");
-
-						if (!fileName.contains("."))
-							fileName = fileName + ".bmp";
-						EventBean mostrarEvent = new EventBean("MOSTRAR", fileName);
-						mostrarEvent.setMediaReference(fileName);
-						if (checkMediaReference(fileName)) {
-							if (!createMediaReference(fileName, null, MediaTypeEnum.IMAGE)) {
-								sc.close();
-								return false;
-							}
-						}
-						events.add(mostrarEvent);
-						continue;
-					} else {
-						String errorMsg =
-								"Error en línea " + (i + 1) + " del protocolo: " + arr[i].trim()
-										+ ", No hay fichero de imagen indicado. ";
-						logger.error(errorMsg);
-						showErrorDialog(errorMsg);
-						sc.close();
-						return false;
-
-					}
-				} catch (Exception e) {
-					logger.debug("Error en l�nea " + (i + 1) + " del protocolo: " + arr[i].trim()
-							+ ", Error: " + e.getMessage());
-					check = false;
-				}
+				check = createMultimediaEvent(arr[i], i, EventEnum.MOSTRAR, MediaTypeEnum.IMAGE, sc);
 			} else if (anal.indexOf("SONAR") == 0) {
-				// TODO: SOUNDS ARE REPEATED, TRY TO AVOID EXTRA MEMORY STORAGE BY USING MAPS
-				try {
-					String data[] = arr[i].split("\\s");
-					String fileNameSound = null;
-					if (data.length > 1) {
-						fileNameSound = data[1].replace("\"", "");
-						if (!fileNameSound.contains(".")) {
-							fileNameSound = fileNameSound + ".wav";
-						}
-						EventBean soundEvent = new EventBean("SONAR", fileNameSound);
-
-						soundEvent.setMediaReference(fileNameSound);
-						String fileNameImage = null;
-						MediaTypeEnum mediaTypeEnum = MediaTypeEnum.SOUND;
-						if (checkMediaReference(fileNameSound)) {
-							if (data.length > 2) {
-								fileNameImage = data[2].replace("\"", "");
-								if (!fileNameImage.contains(".")) {
-									fileNameImage = fileNameImage + ".bmp";
-								}
-								mediaTypeEnum = MediaTypeEnum.SOUND_IMAGE;
-							}
-							if (!createMediaReference(fileNameSound, fileNameImage,
-									mediaTypeEnum)) {
-								sc.close();
-								return false;
-							}
-						}
-						events.add(soundEvent);
-						continue;
-					} else {
-						String errorMsg =
-								"Error en línea " + (i + 1) + " del protocolo: " + arr[i].trim()
-										+ ", No hay fichero de sonido indicado. ";
-						logger.error(errorMsg);
-						showErrorDialog(errorMsg);
-						sc.close();
-						return false;
-					}
-				} catch (Exception e) {
-					logger.debug("Error en l�nea " + (i + 1) + " del protocolo: " + arr[i].trim()
-							+ ", Error: " + e.getMessage());
-					check = false;
-				}
+				check = createMultimediaEvent(arr[i], i, EventEnum.SONAR, MediaTypeEnum.SOUND, sc);
+			} else if (anal.indexOf(EventEnum.MULTI.getCode()) == 0){
+				check = createMultimediaEvent(arr[i], i, EventEnum.MULTI, MediaTypeEnum.IMAGE, sc);
 			} else if (arr[i].indexOf("MARCAR") == 0) {
 				try {
 					int t = Integer.parseInt(arr[i].substring(7).trim());
-					events.add(new EventBean("MARCAR", t));
+					events.add(new EventBean(EventEnum.MARCAR, t));
 					storeMark(t);
 					continue;
 				} catch (NumberFormatException e) {
@@ -992,7 +775,7 @@ public class EEGControl extends Application
 			} else if (arr[i].indexOf("ESPERAR") == 0) {
 				try {
 					int t = Integer.parseInt(arr[i].substring(8).trim());
-					events.add(new EventBean("ESPERAR", t));
+					events.add(new EventBean(EventEnum.ESPERAR, t));
 					continue;
 				} catch (NumberFormatException e) {
 					check = false;
@@ -1004,7 +787,7 @@ public class EEGControl extends Application
 			} else if (anal.indexOf("VIBRAR") == 0) {
 				try {
 					String params = arr[i].substring(7).trim();
-					EventBean lanzarEvent = new EventBean("VIBRAR", params);
+					EventBean lanzarEvent = new EventBean(EventEnum.VIBRAR, params);
 					events.add(lanzarEvent);
 
 				} catch (Exception e) {
@@ -1015,7 +798,7 @@ public class EEGControl extends Application
 				}
 			} else if (arr[i].indexOf("TERMINAR") == 0) {
 				try {
-					events.add(new EventBean("TERMINAR", 0));
+					events.add(new EventBean(EventEnum.TERMINAR, 0));
 					continue;
 				} catch (NumberFormatException e) {
 					check = false;
@@ -1025,7 +808,7 @@ public class EEGControl extends Application
 					check = false;
 				}
 			} else if (arr[i].indexOf("TACTIL") == 0) {
-				events.add(new EventBean("TACTIL", 0));
+				events.add(new EventBean(EventEnum.TACTIL, 0));
 				continue;
 			}
 		}
@@ -1226,6 +1009,32 @@ public class EEGControl extends Application
 	 */
 	private boolean createMediaReference(String fileNamePrimary, String fileNameImage,
 			MediaTypeEnum mediaTypeEnum) {
+		// First check file extension
+		switch(mediaTypeEnum) {
+			case IMAGE: {
+				if (!fileNamePrimary.contains("."))
+					fileNamePrimary = fileNamePrimary + ".bmp";
+				break;
+			}
+			case SOUND: {
+				if (!fileNamePrimary.contains("."))
+					fileNamePrimary = fileNamePrimary + ".wav";
+				break;
+			}
+			case SOUND_IMAGE: {
+				if (!fileNamePrimary.contains("."))
+					fileNamePrimary = fileNamePrimary + ".wav";
+				if (!fileNameImage.contains("."))
+					fileNameImage = fileNameImage + ".bmp";
+				break;
+			}
+			case VIDEO: {
+				if (!fileNamePrimary.contains("."))
+					fileNamePrimary = fileNamePrimary + ".mp4";
+				break;
+			}
+		}
+
 		String fileNamePrimaryAbs =
 				EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE + fileNamePrimary;
 		File file = new File(fileNamePrimaryAbs);
@@ -1253,7 +1062,7 @@ public class EEGControl extends Application
 				}
 				Image mediaImage = new Image(file1.toURI().toString());
 				MediaBean mediaBean = new MediaBean(mediaSound, mediaImage, mediaTypeEnum);
-				medias.put(fileNamePrimary, mediaBean);
+				medias.put(fileNamePrimary+"_"+fileNameImage, mediaBean);
 				break;
 			}
 			case IMAGE: {
@@ -1270,6 +1079,82 @@ public class EEGControl extends Application
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Creates a MultimediaEventBean of type eventType with the appropriate MediaBean as Primary,
+	 * if the MultimediaEventBean contains an image, is the imageFile, if contains a sound, is the
+	 * soundFile (and also the fileNameImage for the image to show meanwhile the sound is playing)
+	 *
+	 * @param line, The whole line of the protocol file
+	 * @param line_num, The line number of the protocol file
+	 * @param eventType, The type of event to create
+	 * @param mediaTypeEnum, The type of media depending on the event, can be IMAGE, SOUND, SOUND_IMAGE or VIDEO. In case of SOUND, the fileNameImage is evaluated and the mediaTypeEnum can be chaged to SOUND_IMAGE
+	 * @param sc
+	 * @return false if an error is found
+	 */
+	private boolean createMultimediaEvent(String line, int line_num,  EventEnum eventType,
+			MediaTypeEnum mediaTypeEnum, Scanner sc) {
+		try {
+			String data[] = line.split("\\s");
+			String fileName = null;
+			String fileNameSecondary = null;
+			if (data.length > 1) {
+				fileName = data[1].replace("\"", "");
+				switch (mediaTypeEnum) {
+					case VIDEO: {
+						fileName = fileName.contains(".") ? fileName : fileName + ".mp4";
+						break;
+					}
+					case IMAGE: {
+						fileName = fileName.contains(".") ? fileName : fileName + ".bmp";
+						break;
+					}
+					case SOUND: {
+						fileName = fileName.contains(".") ? fileName : fileName + ".wav";
+						break;
+					}
+					case SOUND_IMAGE: {
+						fileName = fileName.contains(".") ? fileName : fileName + ".wav";
+						break;
+					}
+
+				}
+
+				EventBean multimediaEvent = new EventBean(eventType, fileName);
+				String mediaReference = fileName;
+				if (checkMediaReference(fileName)) {
+					if (data.length > 2) {
+						fileNameSecondary = data[2].replace("\"", "");
+						if (!fileNameSecondary.contains(".")) {
+							fileNameSecondary = fileNameSecondary + ".bmp";
+						}
+						mediaReference = fileName + "_" + fileNameSecondary;
+						mediaTypeEnum = MediaTypeEnum.SOUND_IMAGE;
+					}
+
+					if (!createMediaReference(fileName, null, mediaTypeEnum)) {
+						sc.close();
+						return false;
+					}
+				}
+				multimediaEvent.setMediaReference(mediaReference);
+				events.add(multimediaEvent);
+				return true;
+			} else {
+				String errorMsg =
+						"Error en línea " + (line_num + 1) + " del protocolo: " + line.trim()
+								+ ", No hay fichero de "+mediaTypeEnum.getDescription()+" indicado. ";
+				logger.error(errorMsg);
+				showErrorDialog(errorMsg);
+				sc.close();
+				return false;
+			}
+		} catch (Exception e) {
+			logger.debug("Error en línea " + (line_num + 1) + " del protocolo: " + line.trim()
+					+ ", Error: " + e.getMessage());
+			return false;
+		}
 	}
 
 	private void showErrorDialog(String message) {
