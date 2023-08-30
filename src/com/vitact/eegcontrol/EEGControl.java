@@ -1183,7 +1183,20 @@ public class EEGControl extends Application
 				}
 				multimediaEvent.setMediaReference(mediaReference);
 				if(eventType == EventEnum.MULTI){
-					multimediaEvent.setLength(multistimulatorWaitStimImageInSecs);
+					int waitSecs = multistimulatorWaitStimImageInSecs;
+					if(data.length > 2){
+						try{
+							waitSecs = Integer.parseInt(data[2].replace("\"", ""));
+						}catch(NumberFormatException e){
+							logger.error("Error en línea " + (line_num + 1) + " del protocolo: " + line.trim()
+									+ ", No se puede parsear el tiempo de espera indicado en segundos, debe ser un entero. ");
+							showErrorDialog("Error en línea " + (line_num + 1) + " del protocolo: " + line.trim()
+									+ ", No se puede parsear el tiempo de espera indicado en segundos, debe ser un entero. ");
+							sc.close();
+							return false;
+						}
+					}
+					multimediaEvent.setLength(waitSecs);
 				}
 				events.add(multimediaEvent);
 				return true;
