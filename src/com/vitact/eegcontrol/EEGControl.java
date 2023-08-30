@@ -9,7 +9,7 @@ import java.io.*;
 import java.util.*;
 import javafx.application.*;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
+import javafx.fxml.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -43,6 +43,7 @@ public class EEGControl extends Application
 	public static final String STUDY_BASE_DIR = "estudios";
 	public static String BASE_FILE = "c://";
 	public static final Boolean USE_FULL_STUDY_DATA = false;
+	public static final String DEFAULT_VERSION="4.0";
 
 	ArrayList<EventBean> events = new ArrayList<EventBean>();
 	HashMap<String, MediaBean> medias = new HashMap<String, MediaBean>();
@@ -59,6 +60,7 @@ public class EEGControl extends Application
 	SerialPort comMatrix;
 	SerialPort comEEG;
 	SerialPort comGlove;
+	SerialPort comMulti;
 	Stage primaryStage;
 	String protocolName = null;
 	Stage stageProtocol;
@@ -76,6 +78,9 @@ public class EEGControl extends Application
 	boolean correctStimulus = false;
 	static int matrixDimension = 28;
 	static boolean waitingForSpace = false;
+	static String multistimulatorCommand = "s";
+	static int multistimulatorWaitStimImageInSecs = 3;
+	static String version = DEFAULT_VERSION;
 	EEGProtocolProgressController protocolController = null;
 	BorderPane rootProtocol = null;
 	BorderPane labelBorderPane = null;
@@ -90,7 +95,7 @@ public class EEGControl extends Application
 
 	public static Properties properties = new Properties();
 
-	public EEGControl() {
+		public EEGControl() {
 		String names[] = {"0000", "02"};
 		reloadLoggers(names);
 		logger = LogManager.getLogger(this.getClass().getName());
@@ -110,6 +115,15 @@ public class EEGControl extends Application
 						.equalsIgnoreCase("true");
 				showVideoController = properties.getProperty("showVideoController", "false")
 						.equalsIgnoreCase("true");
+				multistimulatorCommand = properties.getProperty("multistimulatorCommand", "s");
+				version = properties.getProperty("version", DEFAULT_VERSION);
+				try {
+					multistimulatorWaitStimImageInSecs = Integer.parseInt(
+							properties.getProperty("multistimulatorWaitStimImageInSecs", "3"));
+				} catch (NumberFormatException e) {
+					logger.error(
+							"Error en fichero de configuración: multistiulatorWaitStimImageInSecs debe ser numérico");
+				}
 				try {
 					matrixDimension = Integer.parseInt(
 							properties.getProperty("matrixDimension", "28"));
@@ -174,7 +188,7 @@ public class EEGControl extends Application
 			GridPane root = (GridPane) loader.load();
 			EEGPortsViewController controller = ((EEGPortsViewController) loader.getController());
 			controller.setPadre(this);
-			Scene scene = new Scene(root, 500, 220);
+			Scene scene = new Scene(root, 500, 265);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			Stage stage = new Stage();
 			stage.setTitle("Configuración de Puertos");
@@ -186,6 +200,7 @@ public class EEGControl extends Application
 					comMatrix = controller.getComMatrix();
 					comEEG = controller.getComEEG();
 					comGlove = controller.getComGlove();
+					comMulti = controller.getComMulti();
 					doReusePorts = controller.getCbPorts().isSelected();
 					portsLoaded();
 				}
@@ -204,6 +219,8 @@ public class EEGControl extends Application
 			logger.debug("Puerto EEG: " + comEEG.getDescriptivePortName());
 		if (comGlove != null)
 			logger.debug("Puerto Guante: " + comGlove.getDescriptivePortName());
+		if (comMulti != null)
+			logger.debug("Puerto Multi-Estimulador: " + comGlove.getDescriptivePortName());
 
 		/*
 		 * if (comMatrix != null)
@@ -252,6 +269,23 @@ public class EEGControl extends Application
 				return;
 			}
 		}
+		if (comMulti != null) {
+			comMulti.setComPortParameters(MATRIX_BAUDRATE, 8, SerialPort.ONE_STOP_BIT,
+					SerialPort.NO_PARITY);
+			boolean portOpen = comMulti.openPort();
+			if (portOpen)
+				logger.debug("Multistimulator port ready");
+			else {
+				logger.debug("Multistimulator port IS NOT ready");
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Error");
+				alert.setContentText(
+						"No se puede abrir la comunicación con el multiestimulador, reinicie el programa.");
+				alert.show();
+				return;
+			}
+		}
+
 
 		logger.debug("Sistema preparado...");
 
@@ -315,7 +349,7 @@ public class EEGControl extends Application
 		rootProtocol = new BorderPane();
 
 		executer = new ProtocolThread(controller.list, events, medias, marks, estims, estNull,
-				comEEG, comMatrix, comGlove, controller.timeT, this);
+				comEEG, comMatrix, comGlove, comMulti, controller.timeT, this);
 		executer.addListener(this);
 
 		if (comMatrix != null) {
@@ -335,6 +369,17 @@ public class EEGControl extends Application
 				alert.setTitle("Error");
 				alert.setContentText(
 						"El puerto de comunicación con el guante está cerrado, apague y encienda la matriz.");
+				alert.show();
+				stageProtocol.close();
+				return;
+			}
+		}
+		if (comMulti != null) {
+			if (!comMulti.isOpen()) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Error");
+				alert.setContentText(
+						"El puerto de comunicación con el multistimulador está cerrado, apague y encienda el dispositivo.");
 				alert.show();
 				stageProtocol.close();
 				return;
@@ -759,6 +804,7 @@ public class EEGControl extends Application
 				check = createMultimediaEvent(arr[i], i, EventEnum.SONAR, MediaTypeEnum.SOUND, sc);
 			} else if (anal.indexOf(EventEnum.MULTI.getCode()) == 0){
 				check = createMultimediaEvent(arr[i], i, EventEnum.MULTI, MediaTypeEnum.IMAGE, sc);
+
 			} else if (arr[i].indexOf("MARCAR") == 0) {
 				try {
 					int t = Integer.parseInt(arr[i].substring(7).trim());
@@ -1096,7 +1142,7 @@ public class EEGControl extends Application
 	private boolean createMultimediaEvent(String line, int line_num,  EventEnum eventType,
 			MediaTypeEnum mediaTypeEnum, Scanner sc) {
 		try {
-			String data[] = line.split("\\s");
+			String[] data = line.split("\\s");
 			String fileName = null;
 			String fileNameSecondary = null;
 			if (data.length > 1) {
@@ -1110,10 +1156,7 @@ public class EEGControl extends Application
 						fileName = fileName.contains(".") ? fileName : fileName + ".bmp";
 						break;
 					}
-					case SOUND: {
-						fileName = fileName.contains(".") ? fileName : fileName + ".wav";
-						break;
-					}
+					case SOUND:
 					case SOUND_IMAGE: {
 						fileName = fileName.contains(".") ? fileName : fileName + ".wav";
 						break;
@@ -1139,6 +1182,9 @@ public class EEGControl extends Application
 					}
 				}
 				multimediaEvent.setMediaReference(mediaReference);
+				if(eventType == EventEnum.MULTI){
+					multimediaEvent.setLength(multistimulatorWaitStimImageInSecs);
+				}
 				events.add(multimediaEvent);
 				return true;
 			} else {

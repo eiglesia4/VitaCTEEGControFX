@@ -145,7 +145,7 @@
                 <Label id="lLastProtocolName" fx:id="lLastProtocolName" BorderPane.alignment="CENTER_LEFT" />
             </center>
          <right>
-            <Label text="v 3.0" BorderPane.alignment="CENTER" />
+            <Label fx:id="lVersion" text="v 4.0" BorderPane.alignment="CENTER" />
          </right>
         </BorderPane>
     </bottom>

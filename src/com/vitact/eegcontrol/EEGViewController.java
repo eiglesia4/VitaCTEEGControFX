@@ -34,6 +34,8 @@ public class EEGViewController {
 	Label lStudy;
 	@FXML
 	Button bRelauchProtocol;
+	@FXML
+	Label lVersion;
 
 	public EEGViewController() {
 		logger = LogManager.getLogger(this.getClass().getName());
@@ -49,6 +51,7 @@ public class EEGViewController {
 				loadLastStudy(loggerNames);
 			}
 		}
+		lVersion.setText("Versión: " +EEGControl.version);
 	}
 
 	@FXML

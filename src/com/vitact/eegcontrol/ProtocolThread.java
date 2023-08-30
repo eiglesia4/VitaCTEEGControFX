@@ -40,10 +40,11 @@ class ProtocolThread extends NotifyingThread {
 	SerialPort comEEG;
 	SerialPort comMatrix;
 	SerialPort comGlove;
+	SerialPort comMulti;
 	byte[] zeros = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	Logger loggerProtocol = null;
-	Logger loggerEvent = null;
-	Logger logger = null;
+	Logger loggerProtocol;
+	Logger loggerEvent;
+	Logger logger;
 	boolean useOldProtocol = false;
 	boolean multimediaFlag = true;
 	EEGControl padre;
@@ -53,7 +54,7 @@ class ProtocolThread extends NotifyingThread {
 	Label playTime;
 
 	@SuppressWarnings("unused")
-	private final Set<ThreadCompleteListener> listeners = new CopyOnWriteArraySet<ThreadCompleteListener>();
+	private final Set<ThreadCompleteListener> listeners = new CopyOnWriteArraySet<>();
 
 	/*
 	 * byte[] estimNULL = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -68,20 +69,17 @@ class ProtocolThread extends NotifyingThread {
 	 * byte[][] estimInsub;
 	 */
 
-	byte[] charInt = {'?'};
 	EstimulusBean defaultStimulus, nullStimulus;
 	String stimInsubInt = "0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0 , 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0 , 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0 , 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0, 0, 240, 240, 0";
 	String stimNullInt = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
 	int eventCounter = 0;
 	boolean vibrate = false;
-	Timeline flasher = null;
-	Image whiteImage = null;
+	Image whiteImage;
 	AnimationTimer timer = null;
-	ScheduledExecutorService timerXcutor;
 
 	public ProtocolThread(ListView<EventBean> l, ArrayList<EventBean> ev,
 			HashMap<String, MediaBean> medias, List<Integer> ma, ArrayList<EstimulusBean> es,
-			EstimulusBean eN, SerialPort cEEG, SerialPort cMatr, SerialPort cGlove, Label ti,
+			EstimulusBean eN, SerialPort cEEG, SerialPort cMatr, SerialPort cGlove, SerialPort cMulti, Label ti,
 			EEGControl padre) {
 		logger = LogManager.getLogger(this.getClass().getName());
 		loggerProtocol = LogManager.getLogger("ProtocolLog");
@@ -96,6 +94,7 @@ class ProtocolThread extends NotifyingThread {
 		comEEG = cEEG;
 		comMatrix = cMatr;
 		comGlove = cGlove;
+		comMulti = cMulti;
 		timeT = ti;
 		this.medias = medias;
 
@@ -351,31 +350,23 @@ class ProtocolThread extends NotifyingThread {
 					}
 					break;
 				}
-				case MOSTRAR: {
-					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
-					checkForTimer();
-					MediaBean mediaBean = medias.get(e.getMediaReference());
-					if (mediaBean != null) {
-						multimediaFlag = false;
-						Platform.runLater(new Runnable() {
-							@Override
-							public void run() {
-								if (mediaBean.getImage() != null)
-									EEGControl.addImage(padre.getRootProtocol(),
-											mediaBean.getImage());
-								else
-									EEGControl.addImage(padre.getRootProtocol(), e.getFile(),
-											false);
-								multimediaFlag = true;
-							}
-						});
-						try {
-							waitForMultimediaFlagImage();
-						} catch (TimeoutException e1) {
-							notifyError("No se ha podido cargar la imagen " + e.getMediaReference(),
-									null);
+				case MULTI: {
+					loggerProtocol.info(e.getTipo().getCode() + " " + e.getMediaReference() + " " + e.getLength());
+					// First send command
+					Thread t1 = new Thread(new Runnable() {
+						public void run() {
+							sendMultistimulator();
 						}
-					}
+					});
+					t1.start();
+					// Wait for time between stim and image
+					accTime += e.getLength();
+					waitFor(accTime);
+					// Then Show image
+					executeShowImage(e);
+				}
+				case MOSTRAR: {
+					executeShowImage(e);
 					break;
 				}
 				case SONAR: {
@@ -414,18 +405,21 @@ class ProtocolThread extends NotifyingThread {
 					long multimediaInit = System.currentTimeMillis();
 					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					checkForTimer();
-					multimediaFlag = false;
-					addVideo(this.padre.getRootProtocol(), e.getFile());
-					try {
-						waitForMultimediaFlagVideo();
-					} catch (TimeoutException e1) {
-						notifyError("No se ha podido cargar el video " + e.getFile(), null);
-						setStop(true);
-						break;
+					MediaBean mediaBean = medias.get(e.getMediaReference());
+					if (mediaBean != null) {
+						multimediaFlag = false;
+						addVideo(this.padre.getRootProtocol(), mediaBean.getVideo());
+						try {
+							waitForMultimediaFlagVideo();
+						} catch (TimeoutException e1) {
+							notifyError("No se ha podido cargar el video " + e.getFile(), null);
+							setStop(true);
+							break;
+						}
+						long multimediaStart = System.currentTimeMillis();
+						accTime = accTime + (multimediaStart - multimediaInit);
+						loggerProtocol.info("LANZADO " + e.getFile());
 					}
-					long multimediaStart = System.currentTimeMillis();
-					accTime = accTime + (multimediaStart - multimediaInit);
-					loggerProtocol.info("LANZADO " + e.getFile());
 
 					break;
 				}
@@ -647,13 +641,33 @@ class ProtocolThread extends NotifyingThread {
 					sendStrGlove(t);
 
 				} else {
-					logger.error("The comunications with the glove is closed.");
+					logger.error("The communications with the glove are closed.");
 					return;
 				}
 			}
 		} else {
 			loggerProtocol.info(
 					"ESTIMULO TACTIL A GUANTE NO ENVIADO DEBIDO A CONFIGURACI�N DEL PROTOCOLO");
+		}
+	}
+
+	public void sendMultistimulator() {
+		if (EEGControl.useMultiStimulator) {
+			if (comMulti != null) {
+				if (comMulti.isOpen()) {
+					String t = EEGControl.multistimulatorCommand;
+					loggerProtocol.info("ENVIADO COMANDO " + t + " AL MULTISTIMULADOR ");
+
+					sendStrMulti(t);
+
+				} else {
+					logger.error("The communications with the multistimulator are closed.");
+					return;
+				}
+			}
+		} else {
+			loggerProtocol.info(
+					"COMANDO A MULTIESTIMULADOR NO ENVIADO DEBIDO A CONFIGURACIÓN DEL PROTOCOLO");
 		}
 	}
 
@@ -740,6 +754,10 @@ class ProtocolThread extends NotifyingThread {
 		comGlove.writeBytes(t.getBytes(), t.getBytes().length);
 	}
 
+	void sendStrMulti(String t) {
+		comMulti.writeBytes(t.getBytes(), t.getBytes().length);
+	}
+
 	boolean sendNULL() {
 		// comMatrix.writeBytes(charInt, 1);
 		byte[] bytesInt = "?".getBytes();
@@ -768,6 +786,10 @@ class ProtocolThread extends NotifyingThread {
 			notifyError("Error al cargar el fichero de video " + fileName, e1);
 			return;
 		}
+		addVideo(pane, media);
+	}
+
+	private void addVideo(BorderPane pane, Media media) {
 		logger.debug("Trying to load video " + media.getSource());
 		MediaPlayer mediaPlayer = new MediaPlayer(media);
 		mediaPlayer.setAutoPlay(false);
@@ -840,6 +862,33 @@ class ProtocolThread extends NotifyingThread {
 			}
 		});
 
+	}
+
+	private void executeShowImage(EventBean e) {
+		loggerProtocol.info(e.getTipo().getCode() + " " + e.getMediaReference());
+		checkForTimer();
+		MediaBean mediaBean = medias.get(e.getMediaReference());
+		if (mediaBean != null) {
+			multimediaFlag = false;
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					if (mediaBean.getImage() != null)
+						EEGControl.addImage(padre.getRootProtocol(),
+								mediaBean.getImage());
+					else
+						EEGControl.addImage(padre.getRootProtocol(), e.getFile(),
+								false);
+					multimediaFlag = true;
+				}
+			});
+			try {
+				waitForMultimediaFlagImage();
+			} catch (TimeoutException e1) {
+				notifyError("No se ha podido cargar la imagen " + e.getMediaReference(),
+						null);
+			}
+		}
 	}
 
 	private void notifyError(String message, Throwable th) {

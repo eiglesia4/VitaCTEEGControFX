@@ -150,9 +150,9 @@ public class EEGPortsViewController {
 		this.comMatrix = comMatrix;
 	}
 
-	public SerialPort getComGlove() {
-		return comGlove;
-	}
+	public SerialPort getComGlove() { return comGlove; }
+
+	public SerialPort getComMulti() { return comMulti; }
 
 	public void setComGlove(SerialPort comGlove) {
 		this.comGlove = comGlove;

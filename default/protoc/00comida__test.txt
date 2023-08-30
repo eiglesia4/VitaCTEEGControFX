@@ -1,0 +1,18 @@
+FULLSCREEN true	
+USE_MATRIX true
+USE_GLOVE true
+USE_EEG true	
+CENTER_MOUSE true	
+KGS_VIBRATE false	
+USE_SPACEKEY false
+USE_MULTI true
+	
+INICIAR inicio-experimento.png	
+ESPERAR 2000	
+	
+MOSTRAR	negro.bmp
+MARCAR	3
+ESPERAR	2000
+MULTI	sonrisa
+MARCAR	1
+TERMINAR
