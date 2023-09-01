@@ -79,7 +79,7 @@ public class EEGControl extends Application
 	static int matrixDimension = 28;
 	static boolean waitingForSpace = false;
 	static String multistimulatorCommand = "s";
-	static int multistimulatorWaitStimImageInSecs = 3;
+	static int multistimulatorWaitStimImageInMillis = 3000;
 	static String version = DEFAULT_VERSION;
 	EEGProtocolProgressController protocolController = null;
 	BorderPane rootProtocol = null;
@@ -92,6 +92,8 @@ public class EEGControl extends Application
 	ProtocolBean protocolBean;
 	ProtocolThread executer = null;
 	Label label = new Label("PULSA EL RATON PARA CONTINUAR");
+	int multiStimulationMillisPlaying =0;
+
 
 	public static Properties properties = new Properties();
 
@@ -118,8 +120,8 @@ public class EEGControl extends Application
 				multistimulatorCommand = properties.getProperty("multistimulatorCommand", "s");
 				version = properties.getProperty("version", DEFAULT_VERSION);
 				try {
-					multistimulatorWaitStimImageInSecs = Integer.parseInt(
-							properties.getProperty("multistimulatorWaitStimImageInSecs", "3"));
+					multistimulatorWaitStimImageInMillis = Integer.parseInt(
+							properties.getProperty("multistimulatorWaitStimImageInMillis", "300"));
 				} catch (NumberFormatException e) {
 					logger.error(
 							"Error en fichero de configuración: multistiulatorWaitStimImageInSecs debe ser numérico");
@@ -245,11 +247,7 @@ public class EEGControl extends Application
 				logger.debug("Matrix port ready");
 			else {
 				logger.debug("Matrix port IS NOT ready");
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setContentText(
-						"No se puede abrir la comunicación con la matriz, reinicie el programa.");
-				alert.show();
+				showErrorDialog("No se puede abrir la comunicación con la matriz, reinicie el programa.");
 				return;
 			}
 		}
@@ -261,11 +259,7 @@ public class EEGControl extends Application
 				logger.debug("Glove port ready");
 			else {
 				logger.debug("glove port IS NOT ready");
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setContentText(
-						"No se puede abrir la comunicación con el guante, reinicie el programa.");
-				alert.show();
+				showErrorDialog("No se puede abrir la comunicación con el guante, reinicie el programa.");
 				return;
 			}
 		}
@@ -277,11 +271,8 @@ public class EEGControl extends Application
 				logger.debug("Multistimulator port ready");
 			else {
 				logger.debug("Multistimulator port IS NOT ready");
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setContentText(
+				showErrorDialog(
 						"No se puede abrir la comunicación con el multiestimulador, reinicie el programa.");
-				alert.show();
 				return;
 			}
 		}
@@ -354,34 +345,24 @@ public class EEGControl extends Application
 
 		if (comMatrix != null) {
 			if (!comMatrix.isOpen()) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setContentText(
+				showErrorDialog(
 						"El puerto de comunicación con la matriz está cerrado, apague y encienda la matriz.");
-				alert.show();
 				stageProtocol.close();
 				return;
 			}
 		}
 		if (comGlove != null) {
 			if (!comGlove.isOpen()) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setContentText(
+				showErrorDialog(
 						"El puerto de comunicación con el guante está cerrado, apague y encienda la matriz.");
-				alert.show();
 				stageProtocol.close();
 				return;
 			}
 		}
 		if (comMulti != null) {
 			if (!comMulti.isOpen()) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setContentText(
+				showErrorDialog(
 						"El puerto de comunicación con el multistimulador está cerrado, apague y encienda el dispositivo.");
-				alert.show();
-				stageProtocol.close();
 				return;
 			}
 		}
@@ -678,7 +659,7 @@ public class EEGControl extends Application
 					String fileName = null;
 					if (data.length > 1)
 						fileName = data[1].replace("\"", "");
-					EventBean lanzarEvent = new EventBean(EventEnum.INICIAR, fileName);
+					EventBean lanzarEvent = new EventBean(EventEnum.INICIAR, fileName, i+1);
 
 					if (fileName != null) {
 						String mediaIniciar =
@@ -690,11 +671,7 @@ public class EEGControl extends Application
 							initalImage = lanzarEvent.getFile();
 							events.add(lanzarEvent);
 						} else {
-							Alert alert = new Alert(AlertType.ERROR);
-							alert.setTitle("Error");
-							alert.setContentText(
-									"No se encuentra la imagen " + lanzarEvent.getFile());
-							alert.show();
+							showErrorDialog("No se encuentra la imagen " + lanzarEvent.getFile());
 							sc.close();
 							return false;
 						}
@@ -709,7 +686,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("TARGET") == 0) {
 				try {
-					EventBean lanzarEvent = new EventBean(EventEnum.TARGET, 0);
+					EventBean lanzarEvent = new EventBean(EventEnum.TARGET, 0, i+1);
 					events.add(lanzarEvent);
 				} catch (Exception e) {
 					logger.debug(
@@ -719,7 +696,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("FAIL") == 0) {
 				try {
-					EventBean lanzarEvent = new EventBean(EventEnum.FAIL, 0);
+					EventBean lanzarEvent = new EventBean(EventEnum.FAIL, 0, i+1);
 					events.add(lanzarEvent);
 				} catch (Exception e) {
 					logger.debug(
@@ -729,7 +706,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("CLICKSTOP") == 0) {
 				try {
-					EventBean lanzarEvent = new EventBean(EventEnum.CLICKSTOP, 0);
+					EventBean lanzarEvent = new EventBean(EventEnum.CLICKSTOP, 0, i+1);
 					events.add(lanzarEvent);
 				} catch (Exception e) {
 					logger.debug(
@@ -739,7 +716,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("SPACESTOP") == 0) {
 				try {
-						EventBean lanzarEvent = new EventBean(EventEnum.SPACESTOP, 0);
+					EventBean lanzarEvent = new EventBean(EventEnum.SPACESTOP, 0, i+1);
 					events.add(lanzarEvent);
 				} catch (Exception e) {
 					logger.debug(
@@ -753,7 +730,7 @@ public class EEGControl extends Application
 					String fileName = null;
 					if (data.length > 1)
 						fileName = data[1].replace("\"", "");
-					EventBean lanzarEvent = new EventBean(EventEnum.ESTIM_OLD, fileName);
+					EventBean lanzarEvent = new EventBean(EventEnum.ESTIM_OLD, fileName, i+1);
 
 					if (fileName != null) {
 						if (!fileName.contains(".")) {
@@ -777,11 +754,7 @@ public class EEGControl extends Application
 							events.add(lanzarEvent);
 							continue;
 						} else {
-							Alert alert = new Alert(AlertType.ERROR);
-							alert.setTitle("Error");
-							alert.setContentText(
-									"No se encuentra la imagen " + lanzarEvent.getFile());
-							alert.show();
+							showErrorDialog("No se encuentra la imagen " + lanzarEvent.getFile());
 							sc.close();
 							return false;
 						}
@@ -808,7 +781,7 @@ public class EEGControl extends Application
 			} else if (arr[i].indexOf("MARCAR") == 0) {
 				try {
 					int t = Integer.parseInt(arr[i].substring(7).trim());
-					events.add(new EventBean(EventEnum.MARCAR, t));
+					events.add(new EventBean(EventEnum.MARCAR, t, i+1));
 					storeMark(t);
 					continue;
 				} catch (NumberFormatException e) {
@@ -821,19 +794,35 @@ public class EEGControl extends Application
 			} else if (arr[i].indexOf("ESPERAR") == 0) {
 				try {
 					int t = Integer.parseInt(arr[i].substring(8).trim());
-					events.add(new EventBean(EventEnum.ESPERAR, t));
-					continue;
+
+					if(multiStimulationMillisPlaying > 0 && t < multiStimulationMillisPlaying)
+					{
+						String error = "Error en línea " + (i + 1) + " del protocolo: " + arr[i] +
+								"El tiempo de espera definido "+arr[i].substring(7).trim()+
+								" es menor que tiempo de ejecución del multiestimulador ("+
+								multiStimulationMillisPlaying+").";
+						showErrorDialog(error);
+						sc.close();
+						check = false;
+					}
+					// Really if multiStimulationMillisPlaying is 0, it means that the multiestimulator is not used
+					// but if in use, we have to take into account that its waiting time will be used
+					// so, the real time to wait is the time defined in the protocol minus the time of the multiestimulator
+					t = t - multiStimulationMillisPlaying;
+					// Now reset the time of the multiestimulator
+					multiStimulationMillisPlaying =0;
+
+					events.add(new EventBean(EventEnum.ESPERAR, t, i+1));
 				} catch (NumberFormatException e) {
-					check = false;
-					logger.error(
-							"Error en l�nea " + i + " del protocolo: " + arr[i].substring(7).trim()
+					showErrorDialog("Error en l�nea " + i + " del protocolo: " + arr[i].substring(7).trim()
 									+ " no es un entero");
+					sc.close();
 					check = false;
 				}
 			} else if (anal.indexOf("VIBRAR") == 0) {
 				try {
 					String params = arr[i].substring(7).trim();
-					EventBean lanzarEvent = new EventBean(EventEnum.VIBRAR, params);
+					EventBean lanzarEvent = new EventBean(EventEnum.VIBRAR, params, i+1);
 					events.add(lanzarEvent);
 
 				} catch (Exception e) {
@@ -844,7 +833,7 @@ public class EEGControl extends Application
 				}
 			} else if (arr[i].indexOf("TERMINAR") == 0) {
 				try {
-					events.add(new EventBean(EventEnum.TERMINAR, 0));
+					events.add(new EventBean(EventEnum.TERMINAR, 0, i+1));
 					continue;
 				} catch (NumberFormatException e) {
 					check = false;
@@ -854,7 +843,7 @@ public class EEGControl extends Application
 					check = false;
 				}
 			} else if (arr[i].indexOf("TACTIL") == 0) {
-				events.add(new EventBean(EventEnum.TACTIL, 0));
+				events.add(new EventBean(EventEnum.TACTIL, 0, i+1));
 				continue;
 			}
 		}
@@ -1164,7 +1153,7 @@ public class EEGControl extends Application
 
 				}
 
-				EventBean multimediaEvent = new EventBean(eventType, fileName);
+				EventBean multimediaEvent = new EventBean(eventType, fileName, line_num+1);
 				String mediaReference = fileName;
 				if (checkMediaReference(fileName)) {
 					if (data.length > 2) {
@@ -1183,19 +1172,19 @@ public class EEGControl extends Application
 				}
 				multimediaEvent.setMediaReference(mediaReference);
 				if(eventType == EventEnum.MULTI){
-					int waitSecs = multistimulatorWaitStimImageInSecs;
+					int waitSecs = multistimulatorWaitStimImageInMillis;
+
 					if(data.length > 2){
 						try{
 							waitSecs = Integer.parseInt(data[2].replace("\"", ""));
 						}catch(NumberFormatException e){
-							logger.error("Error en línea " + (line_num + 1) + " del protocolo: " + line.trim()
-									+ ", No se puede parsear el tiempo de espera indicado en segundos, debe ser un entero. ");
 							showErrorDialog("Error en línea " + (line_num + 1) + " del protocolo: " + line.trim()
 									+ ", No se puede parsear el tiempo de espera indicado en segundos, debe ser un entero. ");
 							sc.close();
 							return false;
 						}
 					}
+					multiStimulationMillisPlaying = waitSecs;
 					multimediaEvent.setLength(waitSecs);
 				}
 				events.add(multimediaEvent);
@@ -1204,7 +1193,6 @@ public class EEGControl extends Application
 				String errorMsg =
 						"Error en línea " + (line_num + 1) + " del protocolo: " + line.trim()
 								+ ", No hay fichero de "+mediaTypeEnum.getDescription()+" indicado. ";
-				logger.error(errorMsg);
 				showErrorDialog(errorMsg);
 				sc.close();
 				return false;
@@ -1217,6 +1205,7 @@ public class EEGControl extends Application
 	}
 
 	private void showErrorDialog(String message) {
+		logger.error(message);
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("Error");
 		alert.setContentText(message);

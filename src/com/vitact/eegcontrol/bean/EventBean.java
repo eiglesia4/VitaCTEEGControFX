@@ -9,17 +9,20 @@ public class EventBean {
 	String file;
 	Image img;
 	String mediaReference;
+	int lineInProtocol;
 
-	public EventBean(EventEnum t, int l) {
+	public EventBean(EventEnum t, int l, int lineInProtocol) {
 		tipo = t;
 		length = l;
 		file = "";
+		this.lineInProtocol = lineInProtocol;
 	}
 
-	public EventBean(EventEnum t, String f) {
+	public EventBean(EventEnum t, String f, int lineInProtocol) {
 		tipo = t;
 		length = -1;
 		file = f;
+		this.lineInProtocol = lineInProtocol;
 	}
 
 	public String toString() {
@@ -30,6 +33,10 @@ public class EventBean {
 		sb.append(" ");
 		sb.append(getFile());
 		return sb.toString();
+	}
+
+	public int getLineInProtocol() {
+		return lineInProtocol;
 	}
 
 	public EventEnum getTipo() {
