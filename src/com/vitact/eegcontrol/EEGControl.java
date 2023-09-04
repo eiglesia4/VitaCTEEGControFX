@@ -30,6 +30,7 @@ public class EEGControl extends Application
 	static Logger logger = null;
 	private final int EEG_BAUDRATE = 1200;
 	private final int MATRIX_BAUDRATE = 115200; // 9600;
+	private final int MULTI_BAUDRATE = 9600; // 9600;
 	public static final long STIMULUS_TIME_MILIS = 3000;
 	public static final long END_PROTOCOL_WAIT_MILIS = 5000;
 	public static final long MULTIMEDIA_TIMEOUT = 15000;
@@ -92,8 +93,9 @@ public class EEGControl extends Application
 	ProtocolBean protocolBean;
 	ProtocolThread executer = null;
 	Label label = new Label("PULSA EL RATON PARA CONTINUAR");
-	int multiStimulationMillisPlaying =0;
+	int multiStimulationMillisPlaying = 0;
 
+	public static boolean USE_MEDIABEAN = true;
 
 	public static Properties properties = new Properties();
 
@@ -121,7 +123,7 @@ public class EEGControl extends Application
 				version = properties.getProperty("version", DEFAULT_VERSION);
 				try {
 					multistimulatorWaitStimImageInMillis = Integer.parseInt(
-							properties.getProperty("multistimulatorWaitStimImageInMillis", "300"));
+							properties.getProperty("multistimulatorWaitStimImageInMillis", "3000"));
 				} catch (NumberFormatException e) {
 					logger.error(
 							"Error en fichero de configuración: multistiulatorWaitStimImageInSecs debe ser numérico");
@@ -222,7 +224,7 @@ public class EEGControl extends Application
 		if (comGlove != null)
 			logger.debug("Puerto Guante: " + comGlove.getDescriptivePortName());
 		if (comMulti != null)
-			logger.debug("Puerto Multi-Estimulador: " + comGlove.getDescriptivePortName());
+			logger.debug("Puerto Multi-Estimulador: " + comMulti.getDescriptivePortName());
 
 		/*
 		 * if (comMatrix != null)
@@ -264,7 +266,7 @@ public class EEGControl extends Application
 			}
 		}
 		if (comMulti != null) {
-			comMulti.setComPortParameters(MATRIX_BAUDRATE, 8, SerialPort.ONE_STOP_BIT,
+			comMulti.setComPortParameters(MULTI_BAUDRATE, 8, SerialPort.ONE_STOP_BIT,
 					SerialPort.NO_PARITY);
 			boolean portOpen = comMulti.openPort();
 			if (portOpen)
@@ -333,6 +335,8 @@ public class EEGControl extends Application
 		if (showFullScreen) {
 			stageProtocol.setFullScreen(true);
 			stageProtocol.setFullScreenExitHint("");
+		} else {
+			stageProtocol.setFullScreen(false);
 		}
 		// stageProtocol.getScene().setCursor(Cursor.NONE);
 

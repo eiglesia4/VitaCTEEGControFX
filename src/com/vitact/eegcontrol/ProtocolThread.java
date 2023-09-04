@@ -465,6 +465,7 @@ class ProtocolThread extends NotifyingThread {
 				case TERMINAR: {
 					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					checkForTimer();
+					closePorts();
 					setStop(true);
 					break;
 				}
@@ -755,7 +756,15 @@ class ProtocolThread extends NotifyingThread {
 	}
 
 	void sendStrMulti(String t) {
-		comMulti.writeBytes(t.getBytes(), t.getBytes().length);
+		if(comMulti.isOpen()) {
+			comMulti.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
+			logger.warn("Sending to multistimulator: #" + t + "#");
+			comMulti.writeBytes(t.getBytes(), t.length());
+			//portInUse.closePort();
+		} else {
+			logger.error("The communications with the multistimulator are closed.");
+			return;
+		}
 	}
 
 	boolean sendNULL() {
@@ -873,7 +882,7 @@ class ProtocolThread extends NotifyingThread {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					if (mediaBean.getImage() != null)
+					if (mediaBean.getImage() != null && EEGControl.USE_MEDIABEAN)
 						EEGControl.addImage(padre.getRootProtocol(),
 								mediaBean.getImage());
 					else
@@ -982,6 +991,33 @@ class ProtocolThread extends NotifyingThread {
 				return String.format("%d:%02d:%02d", elapsedHours, elapsedMinutes, elapsedSeconds);
 			} else {
 				return String.format("%02d:%02d", elapsedMinutes, elapsedSeconds);
+			}
+		}
+	}
+
+	private void closePorts() {
+		if (comMatrix != null) {
+			if (comMatrix.isOpen()) {
+				comMatrix.closePort();
+				comMatrix = null;
+			}
+		}
+		if (comEEG != null) {
+			if (comEEG.isOpen()) {
+				comEEG.closePort();
+				comEEG = null;
+			}
+		}
+		if (comGlove != null) {
+			if (comGlove.isOpen()) {
+				comGlove.closePort();
+				comGlove = null;
+			}
+		}
+		if (comMulti != null) {
+			if (comMulti.isOpen()) {
+				comMulti.closePort();
+				comMulti = null;
 			}
 		}
 	}
