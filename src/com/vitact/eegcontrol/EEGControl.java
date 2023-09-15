@@ -80,7 +80,7 @@ public class EEGControl extends Application
 	static int matrixDimension = 28;
 	static boolean waitingForSpace = false;
 	static String multistimulatorCommand = "s";
-	static int multistimulatorWaitStimImageInMillis = 3000;
+	static int multistimulatorWaitStimImageInMillis = 100;
 	static String version = DEFAULT_VERSION;
 	EEGProtocolProgressController protocolController = null;
 	BorderPane rootProtocol = null;
@@ -123,7 +123,7 @@ public class EEGControl extends Application
 				version = properties.getProperty("version", DEFAULT_VERSION);
 				try {
 					multistimulatorWaitStimImageInMillis = Integer.parseInt(
-							properties.getProperty("multistimulatorWaitStimImageInMillis", "3000"));
+							properties.getProperty("multistimulatorWaitStimImageInMillis", "100"));
 				} catch (NumberFormatException e) {
 					logger.error(
 							"Error en fichero de configuración: multistiulatorWaitStimImageInSecs debe ser numérico");

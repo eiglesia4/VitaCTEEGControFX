@@ -802,3 +802,15 @@ fecha=30-5-2021 08:32:13
 [investigador]
 investigador=null
 
+[sujeto]
+studyCode=c005
+nombre=null
+apellidos=null
+edad=null
+sexo=null
+[estudio]
+estudio=00comida__test.txt
+fecha=30-5-2021 08:32:13
+[investigador]
+investigador=null
+
