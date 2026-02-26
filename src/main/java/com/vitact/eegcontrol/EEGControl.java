@@ -842,6 +842,7 @@ public class EEGControl extends Application
 				events.add(new EventBean(EventEnum.TACTIL, 0, i+1));
 				continue;
 			}
+			if (!check) break;
 		}
 		sc.close();
 		setProtocolBean(myBean);
@@ -1203,6 +1204,6 @@ public class EEGControl extends Application
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("Error");
 		alert.setContentText(message);
-		alert.show();
+		alert.showAndWait();
 	}
 }

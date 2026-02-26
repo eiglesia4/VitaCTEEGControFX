@@ -798,77 +798,83 @@ class ProtocolThread extends NotifyingThread {
 
 	private void addVideo(BorderPane pane, Media media) {
 		logger.debug("Trying to load video " + media.getSource());
-		MediaPlayer mediaPlayer = new MediaPlayer(media);
-		mediaPlayer.setAutoPlay(false);
-		MediaView mediaView = new MediaView(mediaPlayer);
+		Platform.runLater(() -> {
+			MediaPlayer mediaPlayer = new MediaPlayer(media);
+			mediaPlayer.setAutoPlay(false);
+			MediaView mediaView = new MediaView(mediaPlayer);
 
-		pane.getScene().getWindow().setOnHidden(e -> {
-			mediaPlayer.stop();
-			setStop(true);
-		});
-		// create mediaView and add media player to the viewer
-		mediaPlayer.setOnReady(new Runnable() {
-			@Override
-			public void run() {
-				pane.getChildren().removeAll();
-
-				VBox mvPane = new VBox();
-				mvPane.getChildren().add(mediaView);
-				mvPane.setStyle("-fx-background-color: black;");
-				mvPane.setAlignment(Pos.CENTER);
-				pane.setCenter(mvPane);
-				logger.debug("Media Ready. Trying to run video ");
-
-				if (EEGControl.showVideoController) {
-					HBox mediaBar = new HBox();
-					mediaBar.setAlignment(Pos.CENTER);
-					mediaBar.setPadding(new Insets(5, 10, 5, 10));
-					BorderPane.setAlignment(mediaBar, Pos.CENTER);
-					// Add spacer
-					Label spacer = new Label("   ");
-					mediaBar.getChildren().add(spacer);
-
-					// Add Time label
-					Label timeLabel = new Label("Time: ");
-					timeLabel.setTextFill(Color.WHITE);
-					mediaBar.getChildren().add(timeLabel);
-
-					// Add time slider
-					timeSlider = new Slider();
-					HBox.setHgrow(timeSlider, Priority.ALWAYS);
-					timeSlider.setMinWidth(50);
-					timeSlider.setMaxWidth(Double.MAX_VALUE);
-					mediaBar.getChildren().add(timeSlider);
-
-					// Add Play label
-					playTime = new Label();
-					playTime.setTextFill(Color.WHITE);
-					playTime.setPrefWidth(130);
-					playTime.setMinWidth(50);
-					mediaBar.getChildren().add(playTime);
-
-					duration = mediaPlayer.getMedia().getDuration();
-					updateValues(mediaPlayer);
-
-					padre.getRootProtocol().setBottom(mediaBar);
-				}
-
-				mediaPlayer.play();
-
+			mediaPlayer.setOnError(() -> {
+				logger.error("MediaPlayer error: " + mediaPlayer.getError());
 				multimediaFlag = true;
+			});
 
-				mediaPlayer.setOnEndOfMedia(() -> {
-					mediaPlayer.dispose();
-				});
-			}
+			pane.getScene().getWindow().setOnHidden(e -> {
+				mediaPlayer.stop();
+				setStop(true);
+			});
+			// create mediaView and add media player to the viewer
+			mediaPlayer.setOnReady(new Runnable() {
+				@Override
+				public void run() {
+					pane.getChildren().removeAll();
+
+					VBox mvPane = new VBox();
+					mvPane.getChildren().add(mediaView);
+					mvPane.setStyle("-fx-background-color: black;");
+					mvPane.setAlignment(Pos.CENTER);
+					pane.setCenter(mvPane);
+					logger.debug("Media Ready. Trying to run video ");
+
+					if (EEGControl.showVideoController) {
+						HBox mediaBar = new HBox();
+						mediaBar.setAlignment(Pos.CENTER);
+						mediaBar.setPadding(new Insets(5, 10, 5, 10));
+						BorderPane.setAlignment(mediaBar, Pos.CENTER);
+						// Add spacer
+						Label spacer = new Label("   ");
+						mediaBar.getChildren().add(spacer);
+
+						// Add Time label
+						Label timeLabel = new Label("Time: ");
+						timeLabel.setTextFill(Color.WHITE);
+						mediaBar.getChildren().add(timeLabel);
+
+						// Add time slider
+						timeSlider = new Slider();
+						HBox.setHgrow(timeSlider, Priority.ALWAYS);
+						timeSlider.setMinWidth(50);
+						timeSlider.setMaxWidth(Double.MAX_VALUE);
+						mediaBar.getChildren().add(timeSlider);
+
+						// Add Play label
+						playTime = new Label();
+						playTime.setTextFill(Color.WHITE);
+						playTime.setPrefWidth(130);
+						playTime.setMinWidth(50);
+						mediaBar.getChildren().add(playTime);
+
+						duration = mediaPlayer.getMedia().getDuration();
+						updateValues(mediaPlayer);
+
+						padre.getRootProtocol().setBottom(mediaBar);
+					}
+
+					mediaPlayer.play();
+
+					multimediaFlag = true;
+
+					mediaPlayer.setOnEndOfMedia(() -> {
+						mediaPlayer.dispose();
+					});
+				}
+			});
+
+			mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
+				public void invalidated(Observable ov) {
+					updateValues(mediaPlayer);
+				}
+			});
 		});
-
-		mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
-			public void invalidated(Observable ov) {
-				updateValues(mediaPlayer);
-			}
-		});
-
 	}
 
 	private void executeShowImage(EventBean e) {
