@@ -256,3 +256,7 @@
 /estudios/*
 /~$otocolo_User Guide.docx
 /Tokens.txt
+
+# Claude Code
+CLAUDE.md
+.claude/
