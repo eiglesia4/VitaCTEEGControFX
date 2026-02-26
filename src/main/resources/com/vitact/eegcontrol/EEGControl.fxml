@@ -19,7 +19,7 @@
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../../../resources/images/eeg_icon.png" />
+                                        <Image url="@../../../images/eeg_icon.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
@@ -28,7 +28,7 @@
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../../../resources/images/eeg_icon_reload.png" />
+                                        <Image url="@../../../images/eeg_icon_reload.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
@@ -44,7 +44,7 @@
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../../../resources/images/glasses_icon.png" />
+                                        <Image url="@../../../images/glasses_icon.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
@@ -53,7 +53,7 @@
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../../../resources/images/new_icon.png" />
+                                        <Image url="@../../../images/new_icon.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
@@ -62,7 +62,7 @@
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@../../../resources/images/continue_icon.png" />
+                                        <Image url="@../../../images/continue_icon.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
@@ -88,7 +88,7 @@
                     <center>
                         <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
                             <image>
-                                <Image url="@../../../resources/images/Logo_Vitact_Cuadrado_transparente.png" />
+                                <Image url="@../../../images/Logo_Vitact_Cuadrado_transparente.png" />
                             </image>
                         </ImageView>
                     </center>
