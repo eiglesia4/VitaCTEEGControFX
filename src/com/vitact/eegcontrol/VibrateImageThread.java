@@ -2,8 +2,6 @@ package com.vitact.eegcontrol;
 
 import java.io.File;
 
-import com.vitact.eegcontrol.opencv.OpenCVTransform;
-
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 
@@ -20,9 +18,7 @@ public class VibrateImageThread extends Thread
 		    + EEGControl.MULTIMEDIA_FILE_BASE + "white.png";
 
 		File file = new File(mediaIniciar);
-		whiteImage = new Image(file.toURI().toString(),
-		                       OpenCVTransform.OLD_STIM_VIDEO_WIDTH,
-		                       OpenCVTransform.OLD_STIM_VIDEO_HEIGHT, false, false);
+		whiteImage = new Image(file.toURI().toString(), 48, 32, false, false);
 
 	}
 

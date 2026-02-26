@@ -3,7 +3,7 @@
     <option name="ALTERNATIVE_JRE_PATH" value="20" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <envs>
-      <env name="DYLD_LIBRARY_PATH" value="/usr/local/Cellar/opencv/4.10.0/lib/:$PROJECT_DIR$/lib/:$DYLD_LIBRARY_PATH" />
+      <env name="DYLD_LIBRARY_PATH" value="$PROJECT_DIR$/lib/:$DYLD_LIBRARY_PATH" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.vitact.eegcontrol.EEGControl" />
     <module name="VitaCTEEGControFX" />

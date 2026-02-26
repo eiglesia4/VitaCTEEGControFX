@@ -2,7 +2,6 @@ package com.vitact.eegcontrol;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.vitact.eegcontrol.bean.*;
-import com.vitact.eegcontrol.opencv.OpenCVTransform;
 import com.vitact.eegcontrol.type.EventEnum;
 import java.awt.*;
 import java.io.*;
@@ -103,8 +102,7 @@ class ProtocolThread extends NotifyingThread {
 		String mediaIniciar = EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE + "white.png";
 
 		File file = new File(mediaIniciar);
-		whiteImage = new Image(file.toURI().toString(), OpenCVTransform.OLD_STIM_VIDEO_WIDTH,
-				OpenCVTransform.OLD_STIM_VIDEO_HEIGHT, false, false);
+		whiteImage = new Image(file.toURI().toString(), 48, 32, false, false);
 
 	}
 

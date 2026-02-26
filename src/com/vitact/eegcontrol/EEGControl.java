@@ -2,7 +2,6 @@ package com.vitact.eegcontrol;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.vitact.eegcontrol.bean.*;
-import com.vitact.eegcontrol.opencv.OpenCVTransform;
 import com.vitact.eegcontrol.type.*;
 import com.vitact.eegcontrol.utils.ProtocolUtils;
 import java.io.*;
@@ -23,8 +22,6 @@ import javafx.scene.text.Font;
 import javafx.stage.*;
 import javax.swing.*;
 import org.apache.logging.log4j.*;
-import org.opencv.core.Core;
-
 public class EEGControl extends Application
 		implements ThreadCompleteListener, EventHandler<KeyEvent> {
 	static Logger logger = null;
@@ -747,13 +744,8 @@ public class EEGControl extends Application
 
 						File file = new File(mediaIniciar);
 						if (file.exists()) {
-							@SuppressWarnings("unused")
-							OpenCVTransform transform = new OpenCVTransform();
 							Image image = new Image(file.toURI().toString(),
-									OpenCVTransform.OLD_STIM_VIDEO_WIDTH,
-									OpenCVTransform.OLD_STIM_VIDEO_HEIGHT, false, false);
-							//							lanzarEvent.setImg(transform.getEdgesOpenCV(image, OpenCVTransform.OLD_STIM_VIDEO_WIDTH,
-							//                                      OpenCVTransform.OLD_STIM_VIDEO_HEIGHT));
+									48, 32, false, false);
 							lanzarEvent.setImg(image);
 							events.add(lanzarEvent);
 							continue;
@@ -1004,8 +996,6 @@ public class EEGControl extends Application
 	}
 
 	public static void main(String[] args) {
-		// load the native OpenCV library
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		launch(args);
 	}
 
