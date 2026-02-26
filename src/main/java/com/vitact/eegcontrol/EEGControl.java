@@ -36,7 +36,7 @@ public class EEGControl extends Application
 	public static final String MULTIMEDIA_FILE_BASE = "default/Multimedia/";
 	public static final String PROTOCOL_FILE_BASE = "default/protoc/";
 	public static final String STIMULUS_FILE_BASE = "default/stim/";
-	public static final String IMAGE_RESOURCES_FILE_BASE = "bin/resources/images/";
+	public static final String IMAGE_RESOURCES_FILE_BASE = "target/classes/images/";
 	public static final String CONFIG_FILE = "default/properties.ini";
 	public static final String STUDY_BASE_DIR = "estudios";
 	public static String BASE_FILE = "c://";
@@ -370,7 +370,7 @@ public class EEGControl extends Application
 
 		// ImageView imageView = new
 		// ImageView("file:///Users/eiglesia/Temp/lord-jerome.jpg");
-		String imageName = "file://" + BASE_FILE + "bin/resources/images/inicio-experimento.png";
+		String imageName = "file://" + BASE_FILE + IMAGE_RESOURCES_FILE_BASE + "inicio-experimento.png";
 		ImageView imageView = new ImageView(imageName);
 		rootProtocol.setStyle("-fx-background-color: black;");
 		rootProtocol.setCenter(imageView);
