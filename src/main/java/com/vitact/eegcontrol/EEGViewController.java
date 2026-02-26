@@ -84,6 +84,10 @@ public class EEGViewController {
 	public void startExperiment(ActionEvent event) {
 		String[] studyAndProtocol = {"0000", "02"};
 		padre.reloadLoggers(studyAndProtocol);
+		if (studyBean == null) {
+			studyBean = new StudyBean();
+			studyBean.setStudyName("QUICK_RUN");
+		}
 		executeExperiment(event);
 	}
 
