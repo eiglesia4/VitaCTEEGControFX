@@ -1,18 +1,18 @@
 package com.vitact.eegcontrol;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
-
-import com.vitact.eegcontrol.opencv.OpenCVTransform;
+import com.github.sarxos.webcam.Webcam;
 
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -33,13 +33,13 @@ public class CameraController
 	@FXML
 	private ImageView imCanny;
 	private ScheduledExecutorService timer;
-	// the OpenCV object that realizes the video capture
-	private VideoCapture capture = new VideoCapture();
-	// a flag to change the button behavior
+	private Webcam webcam;
 	private boolean cameraActive = false;
-	// the id of the camera to be used
 	private static int cameraId = 0;
 	Image whiteImage = null;
+
+	private static final int STIM_WIDTH = 48;
+	private static final int STIM_HEIGHT = 32;
 
 	@FXML
 	public void initialize()
@@ -49,8 +49,7 @@ public class CameraController
 
 		File file = new File(mediaIniciar);
 		whiteImage = new Image(file.toURI().toString(),
-		                       OpenCVTransform.OLD_STIM_VIDEO_WIDTH,
-		                       OpenCVTransform.OLD_STIM_VIDEO_HEIGHT, false, false);
+		                       STIM_WIDTH, STIM_HEIGHT, false, false);
 
 		loadCamsAct(null);
 		Platform.runLater(new Runnable()
@@ -61,43 +60,21 @@ public class CameraController
 				startCamera(null);
 			}
 		});
-		
 	}
-	
+
 	@FXML
 	protected void loadCamsAct(ActionEvent event)
 	{
 		camSelector.getItems().clear();
-		boolean hasCamera = false;
-		int number = 0;
-		while (true)
+		java.util.List<Webcam> webcams = Webcam.getWebcams();
+		for (int i = 0; i < webcams.size(); i++)
 		{
-			try
-			{
-				capture.open(number);
-			}
-			catch (Exception e)
-			{
-				// No more cams
-				break;
-			}
-			if (!capture.isOpened())
-			{
-				break;
-			}
-			else
-			{
-				camSelector.getItems().add(number);
-				number++;
-				capture.release();
-				hasCamera = true;
-			}
+			camSelector.getItems().add(i);
 		}
 		loadCams.setText("Recargar Cámaras");
 		loadCams.setDisable(true);
-		if(hasCamera)
+		if (!webcams.isEmpty())
 			camSelector.getSelectionModel().selectFirst();
-
 	}
 
 	@FXML
@@ -106,11 +83,16 @@ public class CameraController
 		cameraId = camSelector.getValue();
 		if (!this.cameraActive)
 		{
-			// start the video capture
-			this.capture.open(cameraId);
+			java.util.List<Webcam> webcams = Webcam.getWebcams();
+			if (cameraId >= webcams.size())
+			{
+				System.err.println("Camera ID out of range...");
+				return;
+			}
+			webcam = webcams.get(cameraId);
+			webcam.open();
 
-			// is the video stream available?
-			if (this.capture.isOpened())
+			if (webcam.isOpen())
 			{
 				this.cameraActive = true;
 
@@ -121,21 +103,18 @@ public class CameraController
 					@Override
 					public void run()
 					{
-						// effectively grab and process a single frame
-						Mat frame = grabFrame();
-						// Show bigImage
-						Image imageToShow = OpenCVTransform.mat2Image(frame);
+						BufferedImage frame = grabFrame();
+						if (frame == null) return;
+						// Show original image
+						Image imageToShow = SwingFXUtils.toFXImage(frame, null);
 						updateImageView(imOrig, imageToShow);
-						// convert and show the frame
-						Mat mini = new Mat(32, 48, frame.type());
-						int interpolation = Imgproc.INTER_CUBIC;
-						Imgproc.resize(frame, mini, mini.size(), 0, 0, interpolation);
-						Mat canny = new Mat();
-						Imgproc.Canny(mini, canny, 127, 200);
-						Core.bitwise_not(canny, canny);
+						// Resize to stim size, apply Canny edge detection, invert
+						BufferedImage mini = resizeImage(frame, STIM_WIDTH, STIM_HEIGHT);
+						BufferedImage canny = cannyEdgeDetect(mini, 127, 200);
+						invertImage(canny);
 
 						if(counter % 2 == 0)
-							imageToShow = OpenCVTransform.mat2Image(canny);
+							imageToShow = SwingFXUtils.toFXImage(canny, null);
 						else
 							imageToShow = whiteImage;
 						updateImageView(imCanny, imageToShow);
@@ -147,62 +126,167 @@ public class CameraController
 				this.timer.scheduleAtFixedRate(frameGrabber, 0, 33,
 				                               TimeUnit.MILLISECONDS);
 
-				// update the button content
 				this.button.setText("Stop Camera");
 				loadCams.setDisable(true);
 			}
 			else
 			{
-				// log the error
 				System.err.println("Impossible to open the camera connection...");
 			}
 		}
 		else
 		{
-			// the camera is not active at this point
 			this.cameraActive = false;
-			// update again the button content
 			this.button.setText("Start Camera");
 			this.loadCams.setDisable(false);
-
-			// stop the timer
 			this.stopAcquisition();
 		}
 	}
 
 	/**
-	 * Get a frame from the opened video stream (if any)
-	 *
-	 * @return the {@link Mat} to show
+	 * Grab a frame from the webcam and convert to grayscale
 	 */
-	private Mat grabFrame()
+	private BufferedImage grabFrame()
 	{
-		// init everything
-		Mat frame = new Mat();
-
-		// check if the capture is open
-		if (this.capture.isOpened())
+		if (webcam != null && webcam.isOpen())
 		{
 			try
 			{
-				// read the current frame
-				this.capture.read(frame);
-
-				// if the frame is not empty, process it
-				if (!frame.empty())
-				{
-					Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2GRAY);
-				}
-
+				BufferedImage colorFrame = webcam.getImage();
+				if (colorFrame == null) return null;
+				// Convert to grayscale
+				BufferedImage gray = new BufferedImage(
+					colorFrame.getWidth(), colorFrame.getHeight(),
+					BufferedImage.TYPE_BYTE_GRAY);
+				Graphics2D g = gray.createGraphics();
+				g.drawImage(colorFrame, 0, 0, null);
+				g.dispose();
+				return gray;
 			}
 			catch (Exception e)
 			{
-				// log the error
 				System.err.println("Exception during the image elaboration: " + e);
 			}
 		}
+		return null;
+	}
 
-		return frame;
+	/**
+	 * Resize a BufferedImage to the given dimensions
+	 */
+	private static BufferedImage resizeImage(BufferedImage src, int width, int height)
+	{
+		BufferedImage resized = new BufferedImage(width, height, src.getType());
+		Graphics2D g = resized.createGraphics();
+		g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
+		                   java.awt.RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		g.drawImage(src, 0, 0, width, height, null);
+		g.dispose();
+		return resized;
+	}
+
+	/**
+	 * Pure Java Canny edge detection for small grayscale images.
+	 * Produces a binary (0 or 255) output image.
+	 */
+	private static BufferedImage cannyEdgeDetect(BufferedImage grayImg, int lowThreshold, int highThreshold)
+	{
+		int w = grayImg.getWidth();
+		int h = grayImg.getHeight();
+		byte[] pixels = ((DataBufferByte) grayImg.getRaster().getDataBuffer()).getData();
+
+		// 1. Gaussian blur (3x3 kernel)
+		double[] blurred = new double[w * h];
+		double[][] kernel = {
+			{1/16.0, 2/16.0, 1/16.0},
+			{2/16.0, 4/16.0, 2/16.0},
+			{1/16.0, 2/16.0, 1/16.0}
+		};
+		for (int y = 1; y < h - 1; y++) {
+			for (int x = 1; x < w - 1; x++) {
+				double sum = 0;
+				for (int ky = -1; ky <= 1; ky++)
+					for (int kx = -1; kx <= 1; kx++)
+						sum += (pixels[(y + ky) * w + (x + kx)] & 0xFF) * kernel[ky + 1][kx + 1];
+				blurred[y * w + x] = sum;
+			}
+		}
+
+		// 2. Sobel gradients
+		double[] magnitude = new double[w * h];
+		double[] direction = new double[w * h];
+		for (int y = 1; y < h - 1; y++) {
+			for (int x = 1; x < w - 1; x++) {
+				double gx = -blurred[(y-1)*w+(x-1)] + blurred[(y-1)*w+(x+1)]
+				           -2*blurred[y*w+(x-1)]    + 2*blurred[y*w+(x+1)]
+				           -blurred[(y+1)*w+(x-1)]   + blurred[(y+1)*w+(x+1)];
+				double gy = -blurred[(y-1)*w+(x-1)] - 2*blurred[(y-1)*w+x] - blurred[(y-1)*w+(x+1)]
+				           +blurred[(y+1)*w+(x-1)]  + 2*blurred[(y+1)*w+x] + blurred[(y+1)*w+(x+1)];
+				magnitude[y * w + x] = Math.sqrt(gx * gx + gy * gy);
+				direction[y * w + x] = Math.atan2(gy, gx);
+			}
+		}
+
+		// 3. Non-maximum suppression
+		double[] suppressed = new double[w * h];
+		for (int y = 1; y < h - 1; y++) {
+			for (int x = 1; x < w - 1; x++) {
+				double angle = direction[y * w + x] * 180.0 / Math.PI;
+				if (angle < 0) angle += 180;
+				double q, r;
+				if ((angle < 22.5) || (angle >= 157.5)) {
+					q = magnitude[y * w + (x + 1)];
+					r = magnitude[y * w + (x - 1)];
+				} else if (angle < 67.5) {
+					q = magnitude[(y + 1) * w + (x - 1)];
+					r = magnitude[(y - 1) * w + (x + 1)];
+				} else if (angle < 112.5) {
+					q = magnitude[(y + 1) * w + x];
+					r = magnitude[(y - 1) * w + x];
+				} else {
+					q = magnitude[(y - 1) * w + (x - 1)];
+					r = magnitude[(y + 1) * w + (x + 1)];
+				}
+				double mag = magnitude[y * w + x];
+				suppressed[y * w + x] = (mag >= q && mag >= r) ? mag : 0;
+			}
+		}
+
+		// 4. Double threshold + hysteresis
+		BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
+		byte[] output = ((DataBufferByte) result.getRaster().getDataBuffer()).getData();
+		// Mark strong and weak edges
+		byte STRONG = (byte) 255;
+		byte WEAK = (byte) 128;
+		for (int i = 0; i < w * h; i++) {
+			if (suppressed[i] >= highThreshold) output[i] = STRONG;
+			else if (suppressed[i] >= lowThreshold) output[i] = WEAK;
+			else output[i] = 0;
+		}
+		// Hysteresis: promote weak edges connected to strong edges
+		for (int y = 1; y < h - 1; y++) {
+			for (int x = 1; x < w - 1; x++) {
+				if (output[y * w + x] == WEAK) {
+					boolean hasStrong = false;
+					for (int dy = -1; dy <= 1 && !hasStrong; dy++)
+						for (int dx = -1; dx <= 1 && !hasStrong; dx++)
+							if (output[(y + dy) * w + (x + dx)] == STRONG)
+								hasStrong = true;
+					output[y * w + x] = hasStrong ? STRONG : 0;
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Invert a grayscale image in place (255 - pixel)
+	 */
+	private static void invertImage(BufferedImage img)
+	{
+		byte[] pixels = ((DataBufferByte) img.getRaster().getDataBuffer()).getData();
+		for (int i = 0; i < pixels.length; i++)
+			pixels[i] = (byte) (255 - (pixels[i] & 0xFF));
 	}
 
 	/**
@@ -214,37 +298,29 @@ public class CameraController
 		{
 			try
 			{
-				// stop the timer
 				this.timer.shutdown();
 				this.timer.awaitTermination(33, TimeUnit.MILLISECONDS);
 			}
 			catch (InterruptedException e)
 			{
-				// log any exception
 				System.err
 				  .println("Exception in stopping the frame capture, trying to release the camera now... "
 				      + e);
 			}
 		}
 
-		if (this.capture.isOpened())
+		if (this.webcam != null && this.webcam.isOpen())
 		{
-			// release the camera
-			this.capture.release();
+			this.webcam.close();
 		}
 	}
 
 	/**
 	 * Update the {@link ImageView} in the JavaFX main thread
-	 * 
-	 * @param view
-	 *          the {@link ImageView} to update
-	 * @param image
-	 *          the {@link Image} to show
 	 */
 	private void updateImageView(ImageView view, Image image)
 	{
-		OpenCVTransform.onFXThread(view.imageProperty(), image);
+		Platform.runLater(() -> view.imageProperty().set(image));
 	}
 
 	/**
