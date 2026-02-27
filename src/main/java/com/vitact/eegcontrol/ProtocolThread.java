@@ -46,6 +46,7 @@ class ProtocolThread extends NotifyingThread {
 	Logger logger;
 	boolean useOldProtocol = false;
 	boolean multimediaFlag = true;
+	volatile boolean videoEndFlag = true;
 	EEGControl padre;
 
 	Duration duration;
@@ -460,6 +461,17 @@ class ProtocolThread extends NotifyingThread {
 					waitFor(accTime);
 					break;
 				}
+				case ESPERAR_VIDEO: {
+					loggerProtocol.info(e.getTipo().getCode());
+					if (!videoEndFlag) {
+						logger.debug("ESPERAR_VIDEO: video still playing, waiting for it to end");
+						waitForVideoEnd();
+					} else {
+						logger.debug("ESPERAR_VIDEO: video already ended, continuing");
+					}
+					accTime = System.currentTimeMillis();
+					break;
+				}
 				case TERMINAR: {
 					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					checkForTimer();
@@ -511,6 +523,12 @@ class ProtocolThread extends NotifyingThread {
 
 	private void waitFor(long t) {
 		while (System.currentTimeMillis() < t) {
+			toMin2(System.currentTimeMillis() - initTime);
+		}
+	}
+
+	private void waitForVideoEnd() {
+		while (!videoEndFlag) {
 			toMin2(System.currentTimeMillis() - initTime);
 		}
 	}
@@ -798,6 +816,7 @@ class ProtocolThread extends NotifyingThread {
 
 	private void addVideo(BorderPane pane, Media media) {
 		logger.debug("Trying to load video " + media.getSource());
+		videoEndFlag = false;
 		Platform.runLater(() -> {
 			MediaPlayer mediaPlayer = new MediaPlayer(media);
 			mediaPlayer.setAutoPlay(false);
@@ -805,6 +824,7 @@ class ProtocolThread extends NotifyingThread {
 
 			mediaPlayer.setOnError(() -> {
 				logger.error("MediaPlayer error: " + mediaPlayer.getError());
+				videoEndFlag = true;
 				multimediaFlag = true;
 			});
 
@@ -864,6 +884,7 @@ class ProtocolThread extends NotifyingThread {
 					multimediaFlag = true;
 
 					mediaPlayer.setOnEndOfMedia(() -> {
+						videoEndFlag = true;
 						mediaPlayer.dispose();
 					});
 				}

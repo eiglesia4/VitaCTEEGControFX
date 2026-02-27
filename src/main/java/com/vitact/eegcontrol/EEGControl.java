@@ -787,6 +787,8 @@ public class EEGControl extends Application
 									+ " no es un entero");
 					check = false;
 				}
+			} else if (anal.indexOf("ESPERAR_VIDEO") == 0) {
+				events.add(new EventBean(EventEnum.ESPERAR_VIDEO, 0, i+1));
 			} else if (arr[i].indexOf("ESPERAR") == 0) {
 				try {
 					int t = Integer.parseInt(arr[i].substring(8).trim());
