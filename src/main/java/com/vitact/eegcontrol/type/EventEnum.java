@@ -8,6 +8,7 @@ public enum EventEnum {
 	MARCAR("MARCAR", "Envia una marca al EEG"),
 	ESPERAR("ESPERAR", "Esperar un tiempo determinado"),
 	ESPERAR_VIDEO("ESPERAR_VIDEO", "Espera a que termine el vídeo en reproducción"),
+	PARAR_VIDEO("PARAR_VIDEO", "Detiene el vídeo en reproducción"),
 	VIBRAR("VIBRAR", "Vibrar, uso del guante vibrador"),
 	TERMINAR("TERMINAR", "Termina el protocolo"),
 	TACTIL("TACTIL", "Estimulación táctil"),

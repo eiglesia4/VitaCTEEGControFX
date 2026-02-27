@@ -37,6 +37,7 @@ Los eventos se ejecutan en el orden en el que se escriben en el fichero de proto
 | SPACESTOP | Suspende la ejecución del protocolo hasta pulsar la tecla espacio. No detiene el temporizador. | No tiene |
 | ESPERAR | Espera X milisegundos para ejecutar el siguiente comando del protocolo. | 1.- Milisegs. espera (obligatorio) |
 | ESPERAR_VIDEO | Espera a que termine el vídeo actualmente en reproducción. Si el vídeo ya ha terminado cuando se alcanza este comando, continúa inmediatamente. Útil cuando la duración del vídeo es mayor que la suma de los ESPERAR entre el LANZAR y este comando. | No tiene |
+| PARAR_VIDEO | Detiene inmediatamente el vídeo en reproducción y libera sus recursos. Si no hay ningún vídeo en reproducción, no hace nada. Útil cuando se quiere cortar un vídeo en un momento determinado del protocolo. | No tiene |
 | ESTIM_OLD | Muestra en pantalla la imagen definida tras una transformación de tamaño 28x28. La imagen debe ser en blanco y negro. No se detectan bordes, se muestra entera. | 1.- Imagen a mostrar (obligatorio) |
 | KGS | Muestra en pantalla la imagen definida tras una transformación de tamaño 48x32. La imagen debe ser en blanco y negro. No se detectan bordes, se muestra entera. | 1.- Imagen a mostrar (obligatorio) |
 | LANZAR | Muestra un vídeo | 1.- Video a mostrar (obligatorio) |
