@@ -16,7 +16,6 @@ public class MediaBean {
 	public MediaBean(Media sound, Image image, MediaTypeEnum mediaType) {
 		this.mediaType = mediaType;
 		this.sound = sound;
-		this.mediaPlayer = new MediaPlayer(sound);
 		this.image = image;
 	}
 
@@ -28,7 +27,6 @@ public class MediaBean {
 	public MediaBean(Media video, MediaTypeEnum mediaType) {
 		this.mediaType = mediaType;
 		this.video = video;
-		this.mediaPlayer = new MediaPlayer(video);
 	}
 
 	public MediaTypeEnum getMediaType() {

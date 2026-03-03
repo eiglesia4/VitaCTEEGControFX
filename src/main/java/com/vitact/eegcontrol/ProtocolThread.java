@@ -856,7 +856,7 @@ class ProtocolThread extends NotifyingThread {
 			mediaPlayer.setOnReady(new Runnable() {
 				@Override
 				public void run() {
-					pane.getChildren().removeAll();
+					pane.getChildren().clear();
 
 					VBox mvPane = new VBox();
 					mvPane.getChildren().add(mediaView);
