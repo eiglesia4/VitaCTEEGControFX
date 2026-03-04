@@ -408,7 +408,7 @@ class ProtocolThread extends NotifyingThread {
 					MediaBean mediaBean = medias.get(e.getMediaReference());
 					if (mediaBean != null) {
 						multimediaFlag = false;
-						addVideo(this.padre.getRootProtocol(), mediaBean.getVideo());
+						addVideo(this.padre.getRootProtocol(), mediaBean);
 						try {
 							waitForMultimediaFlagVideo();
 						} catch (TimeoutException e1) {
@@ -477,10 +477,9 @@ class ProtocolThread extends NotifyingThread {
 					loggerProtocol.info(e.getTipo().getCode());
 					MediaPlayer player = currentVideoPlayer;
 					if (player != null) {
-						logger.debug("PARAR_VIDEO: stopping current video");
+						logger.debug("PARAR_VIDEO: pausing current video");
 						Platform.runLater(() -> {
-							player.stop();
-							player.dispose();
+							player.pause();
 							currentVideoPlayer = null;
 							videoEndFlag = true;
 						});
@@ -818,105 +817,106 @@ class ProtocolThread extends NotifyingThread {
 		return true;
 	}
 
-	private void addVideo(BorderPane pane, String fileName) {
-		String mediaSample = EEGControl.BASE_FILE + EEGControl.MULTIMEDIA_FILE_BASE + fileName;
-
-		File file = new File(mediaSample);
-		Media media = null;
-		try {
-			media = new Media(file.toURI().toString());
-		} catch (Exception e1) {
-			notifyError("Error al cargar el fichero de video " + fileName, e1);
-			return;
-		}
-		addVideo(pane, media);
-	}
-
-	private void addVideo(BorderPane pane, Media media) {
-		logger.debug("Trying to load video " + media.getSource());
+	private void addVideo(BorderPane pane, MediaBean mediaBean) {
+		logger.debug("Trying to load video " + mediaBean.getVideo().getSource());
 		videoEndFlag = false;
 		Platform.runLater(() -> {
-			MediaPlayer mediaPlayer = new MediaPlayer(media);
+			boolean firstPlay = !mediaBean.isVideoInitialized();
+			MediaView mediaView;
+			MediaPlayer mediaPlayer = mediaBean.getMediaPlayer();
+
+			if (firstPlay) {
+				// First play: use the pre-validated MediaPlayer, create MediaView
+				mediaBean.setVideoInitialized(true);
+				mediaView = new MediaView(mediaPlayer);
+				mediaBean.setMediaView(mediaView);
+				mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
+					public void invalidated(Observable ov) {
+						updateValues(mediaBean.getMediaPlayer());
+					}
+				});
+				logger.debug("First play of video " + mediaBean.getVideo().getSource());
+			} else {
+				// Replay: reuse both MediaPlayer and MediaView.
+				// Use pause+seek instead of stop to keep the GStreamer pipeline alive.
+				// stop() tears down the pipeline and on Windows the video sink
+				// doesn't always reconnect, causing video freeze with audio OK.
+				mediaView = mediaBean.getMediaView();
+				if (mediaView.getParent() != null) {
+					((Pane) mediaView.getParent()).getChildren().remove(mediaView);
+				}
+				mediaPlayer.pause();
+				mediaPlayer.seek(Duration.ZERO);
+				logger.debug("Replaying video (reusing player, pause+seek) " + mediaBean.getVideo().getSource());
+			}
+
 			currentVideoPlayer = mediaPlayer;
-			mediaPlayer.setAutoPlay(false);
-			MediaView mediaView = new MediaView(mediaPlayer);
 
 			mediaPlayer.setOnError(() -> {
-				logger.error("MediaPlayer error: " + mediaPlayer.getError());
+				logger.error("MediaPlayer error: " + mediaBean.getMediaPlayer().getError());
 				currentVideoPlayer = null;
 				videoEndFlag = true;
 				multimediaFlag = true;
 			});
 
 			pane.getScene().getWindow().setOnHidden(e -> {
-				mediaPlayer.stop();
+				mediaBean.getMediaPlayer().stop();
 				setStop(true);
 			});
-			// create mediaView and add media player to the viewer
-			mediaPlayer.setOnReady(new Runnable() {
-				@Override
-				public void run() {
-					pane.getChildren().clear();
 
-					VBox mvPane = new VBox();
-					mvPane.getChildren().add(mediaView);
-					mvPane.setStyle("-fx-background-color: black;");
-					mvPane.setAlignment(Pos.CENTER);
-					pane.setCenter(mvPane);
-					logger.debug("Media Ready. Trying to run video ");
-
-					if (EEGControl.showVideoController) {
-						HBox mediaBar = new HBox();
-						mediaBar.setAlignment(Pos.CENTER);
-						mediaBar.setPadding(new Insets(5, 10, 5, 10));
-						BorderPane.setAlignment(mediaBar, Pos.CENTER);
-						// Add spacer
-						Label spacer = new Label("   ");
-						mediaBar.getChildren().add(spacer);
-
-						// Add Time label
-						Label timeLabel = new Label("Time: ");
-						timeLabel.setTextFill(Color.WHITE);
-						mediaBar.getChildren().add(timeLabel);
-
-						// Add time slider
-						timeSlider = new Slider();
-						HBox.setHgrow(timeSlider, Priority.ALWAYS);
-						timeSlider.setMinWidth(50);
-						timeSlider.setMaxWidth(Double.MAX_VALUE);
-						mediaBar.getChildren().add(timeSlider);
-
-						// Add Play label
-						playTime = new Label();
-						playTime.setTextFill(Color.WHITE);
-						playTime.setPrefWidth(130);
-						playTime.setMinWidth(50);
-						mediaBar.getChildren().add(playTime);
-
-						duration = mediaPlayer.getMedia().getDuration();
-						updateValues(mediaPlayer);
-
-						padre.getRootProtocol().setBottom(mediaBar);
-					}
-
-					mediaPlayer.play();
-
-					multimediaFlag = true;
-
-					mediaPlayer.setOnEndOfMedia(() -> {
-						currentVideoPlayer = null;
-						videoEndFlag = true;
-						mediaPlayer.dispose();
-					});
-				}
+			// On end of media: pause instead of stop to keep the pipeline alive
+			mediaPlayer.setOnEndOfMedia(() -> {
+				currentVideoPlayer = null;
+				videoEndFlag = true;
+				mediaBean.getMediaPlayer().pause();
 			});
 
-			mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
-				public void invalidated(Observable ov) {
-					updateValues(mediaPlayer);
-				}
-			});
+			setupAndPlayVideo(pane, mediaView, mediaPlayer);
 		});
+	}
+
+	private void setupAndPlayVideo(BorderPane pane, MediaView mediaView, MediaPlayer mediaPlayer) {
+		pane.getChildren().clear();
+
+		VBox mvPane = new VBox();
+		mvPane.getChildren().add(mediaView);
+		mvPane.setStyle("-fx-background-color: black;");
+		mvPane.setAlignment(Pos.CENTER);
+		pane.setCenter(mvPane);
+		logger.debug("Media Ready. Trying to run video ");
+
+		if (EEGControl.showVideoController) {
+			HBox mediaBar = new HBox();
+			mediaBar.setAlignment(Pos.CENTER);
+			mediaBar.setPadding(new Insets(5, 10, 5, 10));
+			BorderPane.setAlignment(mediaBar, Pos.CENTER);
+			Label spacer = new Label("   ");
+			mediaBar.getChildren().add(spacer);
+
+			Label timeLabel = new Label("Time: ");
+			timeLabel.setTextFill(Color.WHITE);
+			mediaBar.getChildren().add(timeLabel);
+
+			timeSlider = new Slider();
+			HBox.setHgrow(timeSlider, Priority.ALWAYS);
+			timeSlider.setMinWidth(50);
+			timeSlider.setMaxWidth(Double.MAX_VALUE);
+			mediaBar.getChildren().add(timeSlider);
+
+			playTime = new Label();
+			playTime.setTextFill(Color.WHITE);
+			playTime.setPrefWidth(130);
+			playTime.setMinWidth(50);
+			mediaBar.getChildren().add(playTime);
+
+			duration = mediaPlayer.getMedia().getDuration();
+			updateValues(mediaPlayer);
+
+			padre.getRootProtocol().setBottom(mediaBar);
+		}
+
+		mediaPlayer.play();
+		multimediaFlag = true;
 	}
 
 	private void executeShowImage(EventBean e) {

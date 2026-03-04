@@ -16,7 +16,10 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.animation.PauseTransition;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.*;
@@ -434,20 +437,7 @@ public class EEGControl extends Application
 			}
 		});
 		stageProtocol.setOnShown(e -> {
-
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Confirmation Dialog");
-			alert.setContentText("Pulse [OK] para iniciar la ejecución del protocolo.");
-
-			Optional<ButtonType> result = alert.showAndWait();
-			if (result.get() == ButtonType.OK) {
-				logger.info("OK to Start Protocol");
-				alert.close();
-				executer.start();
-			} else {
-				stageProtocol.hide();
-				stageProtocol = null;
-			}
+			validateAndStartProtocol(0);
 		});
 
 		try {
@@ -459,6 +449,105 @@ public class EEGControl extends Application
 			logger.error("Error launching the protocol Stage: " + e1.getMessage());
 		}
 
+	}
+
+	/**
+	 * Validates that all pre-created video MediaPlayers have loaded correctly.
+	 * Uses a non-blocking retry with PauseTransition for players not yet ready.
+	 * On success, shows the confirmation dialog to start the protocol.
+	 * On error, shows the error and closes the protocol stage.
+	 */
+	private void validateAndStartProtocol(int attempt) {
+		// Check for errors — retry up to 2 times per video before giving up
+		for (Map.Entry<String, MediaBean> entry : medias.entrySet()) {
+			MediaBean mb = entry.getValue();
+			if (mb.getMediaType() == MediaTypeEnum.VIDEO && mb.getMediaPlayer() != null) {
+				MediaPlayer mp = mb.getMediaPlayer();
+				if (mp.getError() != null) {
+					if (mb.getLoadRetries() < 2) {
+						mb.incrementLoadRetries();
+						logger.warn("Video '" + entry.getKey() + "' failed to load (attempt "
+								+ mb.getLoadRetries() + "/2): " + mp.getError().getMessage()
+								+ ". Retrying...");
+						mp.dispose();
+						MediaPlayer newMp = new MediaPlayer(mb.getVideo());
+						newMp.setAutoPlay(false);
+						mb.setMediaPlayer(newMp);
+						// Restart validation from scratch for the new player
+						PauseTransition pause = new PauseTransition(Duration.millis(200));
+						pause.setOnFinished(ev -> validateAndStartProtocol(0));
+						pause.play();
+						return;
+					}
+					String errorMsg = "Error al cargar el vídeo '" + entry.getKey()
+							+ "' tras " + mb.getLoadRetries() + " reintentos: " + mp.getError().getMessage();
+					logger.error(errorMsg);
+					Platform.runLater(() -> {
+						showErrorDialog(errorMsg);
+						if (stageProtocol != null) {
+							stageProtocol.hide();
+							stageProtocol = null;
+						}
+					});
+					return;
+				}
+			}
+		}
+
+		// Check all video players are ready
+		boolean allReady = true;
+		for (Map.Entry<String, MediaBean> entry : medias.entrySet()) {
+			MediaBean mb = entry.getValue();
+			if (mb.getMediaType() == MediaTypeEnum.VIDEO && mb.getMediaPlayer() != null) {
+				if (mb.getMediaPlayer().getStatus() != MediaPlayer.Status.READY) {
+					logger.debug("Video '" + entry.getKey() + "' not yet ready, status: " + mb.getMediaPlayer().getStatus());
+					allReady = false;
+					break;
+				}
+			}
+		}
+
+		if (!allReady) {
+			if (attempt >= 50) { // 50 * 100ms = 5 seconds timeout
+				Platform.runLater(() -> {
+					showErrorDialog("Timeout esperando a que los vídeos se carguen. Inténtelo de nuevo.");
+					if (stageProtocol != null) {
+						stageProtocol.hide();
+						stageProtocol = null;
+					}
+				});
+				return;
+			}
+			PauseTransition pause = new PauseTransition(Duration.millis(100));
+			pause.setOnFinished(ev -> validateAndStartProtocol(attempt + 1));
+			pause.play();
+			return;
+		}
+
+		logger.info("All " + medias.values().stream().filter(m -> m.getMediaType() == MediaTypeEnum.VIDEO).count()
+				+ " video players validated and ready");
+
+		// Always defer to Platform.runLater to ensure we are outside any
+		// animation/layout processing context (PauseTransition, setOnShown, etc.)
+		Platform.runLater(this::showConfirmationAndStart);
+	}
+
+	private void showConfirmationAndStart() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Confirmation Dialog");
+		alert.setContentText("Pulse [OK] para iniciar la ejecución del protocolo.");
+		alert.setOnHidden(dialogEvent -> {
+			if (alert.getResult() == ButtonType.OK) {
+				logger.info("OK to Start Protocol");
+				executer.start();
+			} else {
+				if (stageProtocol != null) {
+					stageProtocol.hide();
+					stageProtocol = null;
+				}
+			}
+		});
+		alert.show();
 	}
 
 	@SuppressWarnings("unused")
@@ -1108,6 +1197,10 @@ public class EEGControl extends Application
 			case VIDEO: {
 				Media mediaVideo = new Media(file.toURI().toString());
 				MediaBean mediaBean = new MediaBean(mediaVideo, mediaTypeEnum);
+				MediaPlayer mp = new MediaPlayer(mediaVideo);
+				mp.setAutoPlay(false);
+				mediaBean.setMediaPlayer(mp);
+				logger.info("Pre-created MediaPlayer for video: " + fileNamePrimary);
 				medias.put(fileNamePrimary, mediaBean);
 				break;
 			}
@@ -1208,6 +1301,11 @@ public class EEGControl extends Application
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("Error");
 		alert.setContentText(message);
-		alert.showAndWait();
+		try {
+			alert.showAndWait();
+		} catch (IllegalStateException e) {
+			logger.warn("showAndWait not allowed in current context, using non-blocking show()");
+			alert.show();
+		}
 	}
 }

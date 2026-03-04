@@ -12,6 +12,9 @@ public class MediaBean {
 	Media video;
 	Image image;
 	MediaPlayer mediaPlayer;
+	MediaView mediaView;
+	boolean videoInitialized = false;
+	int loadRetries = 0;
 
 	public MediaBean(Media sound, Image image, MediaTypeEnum mediaType) {
 		this.mediaType = mediaType;
@@ -67,6 +70,30 @@ public class MediaBean {
 
 	public void setMediaPlayer(MediaPlayer mediaPlayer) {
 		this.mediaPlayer = mediaPlayer;
+	}
+
+	public MediaView getMediaView() {
+		return mediaView;
+	}
+
+	public void setMediaView(MediaView mediaView) {
+		this.mediaView = mediaView;
+	}
+
+	public int getLoadRetries() {
+		return loadRetries;
+	}
+
+	public void incrementLoadRetries() {
+		this.loadRetries++;
+	}
+
+	public boolean isVideoInitialized() {
+		return videoInitialized;
+	}
+
+	public void setVideoInitialized(boolean videoInitialized) {
+		this.videoInitialized = videoInitialized;
 	}
 
 }
