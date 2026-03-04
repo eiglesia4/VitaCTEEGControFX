@@ -17,6 +17,7 @@ Thumbs.db
 
 # Runtime data
 /estudios/*
+/default/Mult*
 /CurrentExperiment.log
 /CurrentExperiment_Events.log
 /EEGControl.log
