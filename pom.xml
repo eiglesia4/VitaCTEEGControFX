@@ -88,7 +88,7 @@
         <dependency>
             <groupId>uk.co.caprica</groupId>
             <artifactId>vlcj</artifactId>
-            <version>4.8.4</version>
+            <version>4.12.1</version>
         </dependency>
         <dependency>
             <groupId>uk.co.caprica</groupId>
