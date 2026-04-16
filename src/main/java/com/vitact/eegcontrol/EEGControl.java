@@ -16,10 +16,12 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.animation.PauseTransition;
+import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurface;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.*;
@@ -92,6 +94,7 @@ public class EEGControl extends Application
 	StudyBean studyBean;
 	ProtocolBean protocolBean;
 	ProtocolThread executer = null;
+	static MediaPlayerFactory mediaPlayerFactory;
 	Label label = new Label("PULSA EL RATON PARA CONTINUAR");
 	int multiStimulationMillisPlaying = 0;
 
@@ -106,6 +109,14 @@ public class EEGControl extends Application
 
 		EEGControl.BASE_FILE = System.getProperty("user.dir") + "/";
 		logger.info("BAse dir " + EEGControl.BASE_FILE);
+
+		// Initialize VLCJ MediaPlayerFactory
+		try {
+			mediaPlayerFactory = new MediaPlayerFactory();
+			logger.info("VLCJ MediaPlayerFactory initialized successfully");
+		} catch (Exception e) {
+			logger.error("Failed to initialize VLCJ. Is VLC installed?", e);
+		}
 
 		File file = new File(CONFIG_FILE);
 		if (!file.exists()) {
@@ -452,35 +463,16 @@ public class EEGControl extends Application
 	}
 
 	/**
-	 * Validates that all pre-created video MediaPlayers have loaded correctly.
-	 * Uses a non-blocking retry with PauseTransition for players not yet ready.
-	 * On success, shows the confirmation dialog to start the protocol.
-	 * On error, shows the error and closes the protocol stage.
+	 * Validates that all pre-created VLCJ video players were initialized correctly.
+	 * VLC is more resilient than JavaFX MediaPlayer — file existence was already
+	 * validated in createMediaReference, so we just verify player creation succeeded.
 	 */
 	private void validateAndStartProtocol(int attempt) {
-		// Check for errors — retry up to 2 times per video before giving up
 		for (Map.Entry<String, MediaBean> entry : medias.entrySet()) {
 			MediaBean mb = entry.getValue();
-			if (mb.getMediaType() == MediaTypeEnum.VIDEO && mb.getMediaPlayer() != null) {
-				MediaPlayer mp = mb.getMediaPlayer();
-				if (mp.getError() != null) {
-					if (mb.getLoadRetries() < 2) {
-						mb.incrementLoadRetries();
-						logger.warn("Video '" + entry.getKey() + "' failed to load (attempt "
-								+ mb.getLoadRetries() + "/2): " + mp.getError().getMessage()
-								+ ". Retrying...");
-						mp.dispose();
-						MediaPlayer newMp = new MediaPlayer(mb.getVideo());
-						newMp.setAutoPlay(false);
-						mb.setMediaPlayer(newMp);
-						// Restart validation from scratch for the new player
-						PauseTransition pause = new PauseTransition(Duration.millis(200));
-						pause.setOnFinished(ev -> validateAndStartProtocol(0));
-						pause.play();
-						return;
-					}
-					String errorMsg = "Error al cargar el vídeo '" + entry.getKey()
-							+ "' tras " + mb.getLoadRetries() + " reintentos: " + mp.getError().getMessage();
+			if (mb.getMediaType() == MediaTypeEnum.VIDEO) {
+				if (mb.getVlcPlayer() == null) {
+					String errorMsg = "Error: no se pudo crear el reproductor VLCJ para '" + entry.getKey() + "'";
 					logger.error(errorMsg);
 					Platform.runLater(() -> {
 						showErrorDialog(errorMsg);
@@ -494,41 +486,9 @@ public class EEGControl extends Application
 			}
 		}
 
-		// Check all video players are ready
-		boolean allReady = true;
-		for (Map.Entry<String, MediaBean> entry : medias.entrySet()) {
-			MediaBean mb = entry.getValue();
-			if (mb.getMediaType() == MediaTypeEnum.VIDEO && mb.getMediaPlayer() != null) {
-				if (mb.getMediaPlayer().getStatus() != MediaPlayer.Status.READY) {
-					logger.debug("Video '" + entry.getKey() + "' not yet ready, status: " + mb.getMediaPlayer().getStatus());
-					allReady = false;
-					break;
-				}
-			}
-		}
-
-		if (!allReady) {
-			if (attempt >= 50) { // 50 * 100ms = 5 seconds timeout
-				Platform.runLater(() -> {
-					showErrorDialog("Timeout esperando a que los vídeos se carguen. Inténtelo de nuevo.");
-					if (stageProtocol != null) {
-						stageProtocol.hide();
-						stageProtocol = null;
-					}
-				});
-				return;
-			}
-			PauseTransition pause = new PauseTransition(Duration.millis(100));
-			pause.setOnFinished(ev -> validateAndStartProtocol(attempt + 1));
-			pause.play();
-			return;
-		}
-
 		logger.info("All " + medias.values().stream().filter(m -> m.getMediaType() == MediaTypeEnum.VIDEO).count()
-				+ " video players validated and ready");
+				+ " VLCJ video players validated and ready");
 
-		// Always defer to Platform.runLater to ensure we are outside any
-		// animation/layout processing context (PauseTransition, setOnShown, etc.)
 		Platform.runLater(this::showConfirmationAndStart);
 	}
 
@@ -997,15 +957,33 @@ public class EEGControl extends Application
 	}
 
 	private void doClean() {
+		releaseVideoPlayers();
 		rootProtocol = null;
 		stageProtocol = null;
 		protocolController = null;
 		events = new ArrayList<EventBean>();
+		medias = new HashMap<String, MediaBean>();
 		estims = new ArrayList<EstimulusBean>();
 		initalImage = null;
-		// System.out.println(Runtime.getRuntime().totalMemory() -
-		// Runtime.getRuntime().freeMemory());
 		System.gc();
+	}
+
+	private void releaseVideoPlayers() {
+		for (MediaBean mb : medias.values()) {
+			if (mb.getMediaType() == MediaTypeEnum.VIDEO && mb.getVlcPlayer() != null) {
+				mb.getVlcPlayer().release();
+				mb.setVlcPlayer(null);
+			}
+		}
+	}
+
+	@Override
+	public void stop() {
+		releaseVideoPlayers();
+		if (mediaPlayerFactory != null) {
+			mediaPlayerFactory.release();
+			mediaPlayerFactory = null;
+		}
 	}
 
 	@Override
@@ -1195,12 +1173,19 @@ public class EEGControl extends Application
 				break;
 			}
 			case VIDEO: {
-				Media mediaVideo = new Media(file.toURI().toString());
-				MediaBean mediaBean = new MediaBean(mediaVideo, mediaTypeEnum);
-				MediaPlayer mp = new MediaPlayer(mediaVideo);
-				mp.setAutoPlay(false);
-				mediaBean.setMediaPlayer(mp);
-				logger.info("Pre-created MediaPlayer for video: " + fileNamePrimary);
+				if (mediaPlayerFactory == null) {
+					showErrorDialog("VLCJ no inicializado. ¿Está VLC instalado?");
+					return false;
+				}
+				String videoPath = file.getAbsolutePath();
+				MediaBean mediaBean = new MediaBean(videoPath, mediaTypeEnum);
+				EmbeddedMediaPlayer vlcPlayer = mediaPlayerFactory.mediaPlayers().newEmbeddedMediaPlayer();
+				ImageView imageView = new ImageView();
+				imageView.setPreserveRatio(true);
+				vlcPlayer.videoSurface().set(new ImageViewVideoSurface(imageView));
+				mediaBean.setVlcPlayer(vlcPlayer);
+				mediaBean.setVideoImageView(imageView);
+				logger.info("Pre-created VLCJ player for video: " + fileNamePrimary);
 				medias.put(fileNamePrimary, mediaBean);
 				break;
 			}

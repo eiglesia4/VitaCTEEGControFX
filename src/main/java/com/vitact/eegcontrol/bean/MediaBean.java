@@ -2,18 +2,22 @@ package com.vitact.eegcontrol.bean;
 
 import com.vitact.eegcontrol.type.MediaTypeEnum;
 import javafx.scene.image.Image;
-import javafx.scene.media.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.media.Media;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 public class MediaBean {
 	public static String SOUND_DEFAULT_IMAGE = "soundDefaultImage.png";
 
 	MediaTypeEnum mediaType;
 	Media sound;
-	Media video;
 	Image image;
-	MediaPlayer mediaPlayer;
-	MediaView mediaView;
-	boolean videoInitialized = false;
+
+	// VLCJ video fields
+	String videoPath;
+	EmbeddedMediaPlayer vlcPlayer;
+	ImageView videoImageView;
+	boolean vlcPlayerReady = false;
 	int loadRetries = 0;
 
 	public MediaBean(Media sound, Image image, MediaTypeEnum mediaType) {
@@ -27,9 +31,9 @@ public class MediaBean {
 		this.image = image;
 	}
 
-	public MediaBean(Media video, MediaTypeEnum mediaType) {
+	public MediaBean(String videoPath, MediaTypeEnum mediaType) {
 		this.mediaType = mediaType;
-		this.video = video;
+		this.videoPath = videoPath;
 	}
 
 	public MediaTypeEnum getMediaType() {
@@ -48,12 +52,12 @@ public class MediaBean {
 		this.sound = sound;
 	}
 
-	public Media getVideo() {
-		return video;
+	public String getVideoPath() {
+		return videoPath;
 	}
 
-	public void setVideo(Media video) {
-		this.video = video;
+	public void setVideoPath(String videoPath) {
+		this.videoPath = videoPath;
 	}
 
 	public Image getImage() {
@@ -64,20 +68,20 @@ public class MediaBean {
 		this.image = image;
 	}
 
-	public MediaPlayer getMediaPlayer() {
-		return mediaPlayer;
+	public EmbeddedMediaPlayer getVlcPlayer() {
+		return vlcPlayer;
 	}
 
-	public void setMediaPlayer(MediaPlayer mediaPlayer) {
-		this.mediaPlayer = mediaPlayer;
+	public void setVlcPlayer(EmbeddedMediaPlayer vlcPlayer) {
+		this.vlcPlayer = vlcPlayer;
 	}
 
-	public MediaView getMediaView() {
-		return mediaView;
+	public ImageView getVideoImageView() {
+		return videoImageView;
 	}
 
-	public void setMediaView(MediaView mediaView) {
-		this.mediaView = mediaView;
+	public void setVideoImageView(ImageView videoImageView) {
+		this.videoImageView = videoImageView;
 	}
 
 	public int getLoadRetries() {
@@ -88,12 +92,12 @@ public class MediaBean {
 		this.loadRetries++;
 	}
 
-	public boolean isVideoInitialized() {
-		return videoInitialized;
+	public boolean isVlcPlayerReady() {
+		return vlcPlayerReady;
 	}
 
-	public void setVideoInitialized(boolean videoInitialized) {
-		this.videoInitialized = videoInitialized;
+	public void setVlcPlayerReady(boolean vlcPlayerReady) {
+		this.vlcPlayerReady = vlcPlayerReady;
 	}
 
 }

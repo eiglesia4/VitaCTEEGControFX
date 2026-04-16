@@ -10,20 +10,19 @@ import java.util.*;
 import java.util.concurrent.*;
 import javafx.animation.*;
 import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.beans.*;
-import javafx.geometry.Insets;
 import javafx.geometry.*;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.media.*;
-import javafx.scene.paint.Color;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import javafx.stage.Screen;
-import javafx.util.Duration;
 import org.apache.logging.log4j.*;
 
 class ProtocolThread extends NotifyingThread {
@@ -47,12 +46,8 @@ class ProtocolThread extends NotifyingThread {
 	boolean useOldProtocol = false;
 	boolean multimediaFlag = true;
 	volatile boolean videoEndFlag = true;
-	volatile MediaPlayer currentVideoPlayer = null;
+	volatile EmbeddedMediaPlayer currentVideoPlayer = null;
 	EEGControl padre;
-
-	Duration duration;
-	Slider timeSlider;
-	Label playTime;
 
 	@SuppressWarnings("unused")
 	private final Set<ThreadCompleteListener> listeners = new CopyOnWriteArraySet<>();
@@ -475,14 +470,12 @@ class ProtocolThread extends NotifyingThread {
 				}
 				case PARAR_VIDEO: {
 					loggerProtocol.info(e.getTipo().getCode());
-					MediaPlayer player = currentVideoPlayer;
+					EmbeddedMediaPlayer player = currentVideoPlayer;
 					if (player != null) {
-						logger.debug("PARAR_VIDEO: pausing current video");
-						Platform.runLater(() -> {
-							player.pause();
-							currentVideoPlayer = null;
-							videoEndFlag = true;
-						});
+						logger.debug("PARAR_VIDEO: stopping current video");
+						player.controls().stop();
+						currentVideoPlayer = null;
+						videoEndFlag = true;
 					} else {
 						logger.debug("PARAR_VIDEO: no video playing, continuing");
 					}
@@ -818,106 +811,70 @@ class ProtocolThread extends NotifyingThread {
 	}
 
 	private void addVideo(BorderPane pane, MediaBean mediaBean) {
-		logger.debug("Trying to load video " + mediaBean.getVideo().getSource());
+		logger.debug("Trying to load video " + mediaBean.getVideoPath());
 		videoEndFlag = false;
-		Platform.runLater(() -> {
-			boolean firstPlay = !mediaBean.isVideoInitialized();
-			MediaView mediaView;
-			MediaPlayer mediaPlayer = mediaBean.getMediaPlayer();
 
-			if (firstPlay) {
-				// First play: use the pre-validated MediaPlayer, create MediaView
-				mediaBean.setVideoInitialized(true);
-				mediaView = new MediaView(mediaPlayer);
-				mediaBean.setMediaView(mediaView);
-				mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
-					public void invalidated(Observable ov) {
-						updateValues(mediaBean.getMediaPlayer());
-					}
-				});
-				logger.debug("First play of video " + mediaBean.getVideo().getSource());
-			} else {
-				// Replay: reuse both MediaPlayer and MediaView.
-				// Use pause+seek instead of stop to keep the GStreamer pipeline alive.
-				// stop() tears down the pipeline and on Windows the video sink
-				// doesn't always reconnect, causing video freeze with audio OK.
-				mediaView = mediaBean.getMediaView();
-				if (mediaView.getParent() != null) {
-					((Pane) mediaView.getParent()).getChildren().remove(mediaView);
+		EmbeddedMediaPlayer vlcPlayer = mediaBean.getVlcPlayer();
+		ImageView imageView = mediaBean.getVideoImageView();
+
+		// Set up event listeners once per player
+		if (!mediaBean.isVlcPlayerReady()) {
+			mediaBean.setVlcPlayerReady(true);
+			vlcPlayer.events().addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
+				@Override
+				public void playing(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer) {
+					logger.debug("VLCJ playing: " + mediaBean.getVideoPath());
+					multimediaFlag = true;
 				}
-				mediaPlayer.pause();
-				mediaPlayer.seek(Duration.ZERO);
-				logger.debug("Replaying video (reusing player, pause+seek) " + mediaBean.getVideo().getSource());
+
+				@Override
+				public void finished(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer) {
+					logger.debug("VLCJ finished: " + mediaBean.getVideoPath());
+					currentVideoPlayer = null;
+					videoEndFlag = true;
+				}
+
+				@Override
+				public void error(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer) {
+					logger.error("VLCJ player error for: " + mediaBean.getVideoPath());
+					currentVideoPlayer = null;
+					videoEndFlag = true;
+					multimediaFlag = true;
+				}
+			});
+		}
+
+		currentVideoPlayer = vlcPlayer;
+
+		Platform.runLater(() -> {
+			pane.getChildren().clear();
+
+			// Remove from previous parent if replaying
+			if (imageView.getParent() != null) {
+				((Pane) imageView.getParent()).getChildren().remove(imageView);
 			}
 
-			currentVideoPlayer = mediaPlayer;
+			VBox mvPane = new VBox();
+			mvPane.getChildren().add(imageView);
+			mvPane.setStyle("-fx-background-color: black;");
+			mvPane.setAlignment(Pos.CENTER);
+			pane.setCenter(mvPane);
 
-			mediaPlayer.setOnError(() -> {
-				logger.error("MediaPlayer error: " + mediaBean.getMediaPlayer().getError());
-				currentVideoPlayer = null;
-				videoEndFlag = true;
-				multimediaFlag = true;
-			});
+			// Fit video to available space
+			imageView.fitWidthProperty().bind(pane.widthProperty());
+			imageView.fitHeightProperty().bind(pane.heightProperty());
+			imageView.setPreserveRatio(true);
 
 			pane.getScene().getWindow().setOnHidden(e -> {
-				mediaBean.getMediaPlayer().stop();
+				vlcPlayer.controls().stop();
 				setStop(true);
 			});
 
-			// On end of media: pause instead of stop to keep the pipeline alive
-			mediaPlayer.setOnEndOfMedia(() -> {
-				currentVideoPlayer = null;
-				videoEndFlag = true;
-				mediaBean.getMediaPlayer().pause();
-			});
-
-			setupAndPlayVideo(pane, mediaView, mediaPlayer);
+			logger.debug("Starting VLCJ playback: " + mediaBean.getVideoPath());
+			vlcPlayer.media().play(mediaBean.getVideoPath());
 		});
 	}
 
-	private void setupAndPlayVideo(BorderPane pane, MediaView mediaView, MediaPlayer mediaPlayer) {
-		pane.getChildren().clear();
-
-		VBox mvPane = new VBox();
-		mvPane.getChildren().add(mediaView);
-		mvPane.setStyle("-fx-background-color: black;");
-		mvPane.setAlignment(Pos.CENTER);
-		pane.setCenter(mvPane);
-		logger.debug("Media Ready. Trying to run video ");
-
-		if (EEGControl.showVideoController) {
-			HBox mediaBar = new HBox();
-			mediaBar.setAlignment(Pos.CENTER);
-			mediaBar.setPadding(new Insets(5, 10, 5, 10));
-			BorderPane.setAlignment(mediaBar, Pos.CENTER);
-			Label spacer = new Label("   ");
-			mediaBar.getChildren().add(spacer);
-
-			Label timeLabel = new Label("Time: ");
-			timeLabel.setTextFill(Color.WHITE);
-			mediaBar.getChildren().add(timeLabel);
-
-			timeSlider = new Slider();
-			HBox.setHgrow(timeSlider, Priority.ALWAYS);
-			timeSlider.setMinWidth(50);
-			timeSlider.setMaxWidth(Double.MAX_VALUE);
-			mediaBar.getChildren().add(timeSlider);
-
-			playTime = new Label();
-			playTime.setTextFill(Color.WHITE);
-			playTime.setPrefWidth(130);
-			playTime.setMinWidth(50);
-			mediaBar.getChildren().add(playTime);
-
-			duration = mediaPlayer.getMedia().getDuration();
-			updateValues(mediaPlayer);
-
-			padre.getRootProtocol().setBottom(mediaBar);
-		}
-
-		mediaPlayer.play();
-		multimediaFlag = true;
-	}
 
 	private void executeShowImage(EventBean e) {
 		loggerProtocol.info(e.getTipo().getCode() + " " + e.getMediaReference());
@@ -991,55 +948,6 @@ class ProtocolThread extends NotifyingThread {
 		});
 	}
 
-	protected void updateValues(MediaPlayer mp) {
-		if (playTime != null && timeSlider != null) {
-			Platform.runLater(new Runnable() {
-				@SuppressWarnings("deprecation")
-				public void run() {
-					Duration currentTime = mp.getCurrentTime();
-					playTime.setText(formatTime(currentTime, duration));
-					timeSlider.setDisable(duration.isUnknown());
-					if (!timeSlider.isDisabled() && duration.greaterThan(Duration.ZERO)
-							&& !timeSlider.isValueChanging()) {
-						timeSlider.setValue(currentTime.divide(duration).toMillis() * 100.0);
-					}
-				}
-			});
-		}
-	}
-
-	private static String formatTime(Duration elapsed, Duration duration) {
-		int intElapsed = (int) Math.floor(elapsed.toSeconds());
-		int elapsedHours = intElapsed / (60 * 60);
-		if (elapsedHours > 0) {
-			intElapsed -= elapsedHours * 60 * 60;
-		}
-		int elapsedMinutes = intElapsed / 60;
-		int elapsedSeconds = intElapsed - elapsedHours * 60 * 60 - elapsedMinutes * 60;
-
-		if (duration.greaterThan(Duration.ZERO)) {
-			int intDuration = (int) Math.floor(duration.toSeconds());
-			int durationHours = intDuration / (60 * 60);
-			if (durationHours > 0) {
-				intDuration -= durationHours * 60 * 60;
-			}
-			int durationMinutes = intDuration / 60;
-			int durationSeconds = intDuration - durationHours * 60 * 60 - durationMinutes * 60;
-			if (durationHours > 0) {
-				return String.format("%d:%02d:%02d/%d:%02d:%02d", elapsedHours, elapsedMinutes,
-						elapsedSeconds, durationHours, durationMinutes, durationSeconds);
-			} else {
-				return String.format("%02d:%02d/%02d:%02d", elapsedMinutes, elapsedSeconds,
-						durationMinutes, durationSeconds);
-			}
-		} else {
-			if (elapsedHours > 0) {
-				return String.format("%d:%02d:%02d", elapsedHours, elapsedMinutes, elapsedSeconds);
-			} else {
-				return String.format("%02d:%02d", elapsedMinutes, elapsedSeconds);
-			}
-		}
-	}
 
 	private void closePorts() {
 		if (comMatrix != null) {
