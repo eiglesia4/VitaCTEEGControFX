@@ -18,7 +18,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
@@ -47,6 +46,8 @@ class ProtocolThread extends NotifyingThread {
 	boolean multimediaFlag = true;
 	volatile boolean videoEndFlag = true;
 	volatile EmbeddedMediaPlayer currentVideoPlayer = null;
+	volatile boolean audioEndFlag = true;
+	volatile MediaPlayer currentAudioPlayer = null;
 	EEGControl padre;
 
 	@SuppressWarnings("unused")
@@ -193,7 +194,7 @@ class ProtocolThread extends NotifyingThread {
 					Robot robot = new Robot();
 					robot.mouseMove(screenX, screenY);
 				} catch (AWTException e) {
-					e.printStackTrace();
+					logger.error("No se ha podido centrar el ratón", e);
 				}
 			});
 		}
@@ -217,12 +218,9 @@ class ProtocolThread extends NotifyingThread {
 					checkForTimer();
 					if (e.getFile() != null) {
 						multimediaFlag = false;
-						Platform.runLater(new Runnable() {
-							@Override
-							public void run() {
-								EEGControl.addImage(padre.getRootProtocol(), e.getFile(), true);
-								multimediaFlag = true;
-							}
+						Platform.runLater(() -> {
+							EEGControl.addImage(padre.getRootProtocol(), e.getFile(), true);
+							multimediaFlag = true;
 						});
 						try {
 							waitForMultimediaFlagImage();
@@ -236,12 +234,7 @@ class ProtocolThread extends NotifyingThread {
 				case CLICKSTOP: {
 					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 					multimediaFlag = false;
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							padre.showClickLabel(e.getTipo()== EventEnum.CLICKSTOP);
-						}
-					});
+					Platform.runLater(() -> padre.showClickLabel(e.getTipo() == EventEnum.CLICKSTOP));
 					try {
 						waitForClickFlag();
 						// If needed possition the mouse in the center of the screen
@@ -254,7 +247,7 @@ class ProtocolThread extends NotifyingThread {
 									Robot robot = new Robot();
 									robot.mouseMove(screenX, screenY);
 								} catch (AWTException e1) {
-									e1.printStackTrace();
+									logger.error("No se ha podido centrar el ratón", e1);
 								}
 							});
 						}
@@ -316,13 +309,9 @@ class ProtocolThread extends NotifyingThread {
 						} else {
 
 							multimediaFlag = false;
-							Platform.runLater(new Runnable() {
-
-								@Override
-								public void run() {
-									EEGControl.addImage(padre.getRootProtocol(), e.getImg());
-									multimediaFlag = true;
-								}
+							Platform.runLater(() -> {
+								EEGControl.addImage(padre.getRootProtocol(), e.getImg());
+								multimediaFlag = true;
 							});
 							try {
 								waitForMultimediaFlagImage();
@@ -348,11 +337,7 @@ class ProtocolThread extends NotifyingThread {
 				case MULTI: {
 					loggerProtocol.info(e.getTipo().getCode() + " " + e.getMediaReference() + " " + e.getLength());
 					// First send command
-					Thread t1 = new Thread(new Runnable() {
-						public void run() {
-							sendMultistimulator();
-						}
-					});
+					Thread t1 = new Thread(this::sendMultistimulator);
 					t1.start();
 					// Wait for time between stim and image
 					accTime += e.getLength();
@@ -370,22 +355,44 @@ class ProtocolThread extends NotifyingThread {
 					MediaBean mediaBean = medias.get(e.getMediaReference());
 					if (mediaBean != null) {
 						multimediaFlag = false;
-						Platform.runLater(new Runnable() {
-							@Override
-							public void run() {
-								// ShowImage
-								if (mediaBean.getImage() != null)
-									EEGControl.addImage(padre.getRootProtocol(),
-											mediaBean.getImage());
-								else
-									EEGControl.addImage(padre.getRootProtocol(),
-											MediaBean.SOUND_DEFAULT_IMAGE, false);
-								// Play Sound
-								MediaPlayer mediaPlayer = new MediaPlayer(mediaBean.getSound());
-								mediaPlayer.play();
-								//mediaBean.getMediaPlayer().play();
+						// Stop previous audio (if any) so a new SONAR replaces it instead of overlapping
+						MediaPlayer previous = currentAudioPlayer;
+						if (previous != null) {
+							logger.debug("SONAR: stopping previous audio before playing new one");
+							previous.stop();
+							previous.dispose();
+							currentAudioPlayer = null;
+						}
+						audioEndFlag = false;
+						Platform.runLater(() -> {
+							// ShowImage
+							if (mediaBean.getImage() != null)
+								EEGControl.addImage(padre.getRootProtocol(), mediaBean.getImage());
+							else
+								EEGControl.addImage(padre.getRootProtocol(),
+										MediaBean.SOUND_DEFAULT_IMAGE, false);
+							// Play Sound
+							final MediaPlayer mediaPlayer = new MediaPlayer(mediaBean.getSound());
+							// End-of-media / error callbacks: only react if we are still the
+							// active player (a later SONAR may have replaced us already)
+							mediaPlayer.setOnEndOfMedia(() -> {
+								if (currentAudioPlayer == mediaPlayer) {
+									currentAudioPlayer = null;
+									audioEndFlag = true;
+								}
+								mediaPlayer.dispose();
+							});
+							mediaPlayer.setOnError(() -> {
+								logger.error("Audio MediaPlayer error: " + mediaPlayer.getError());
+								if (currentAudioPlayer == mediaPlayer) {
+									currentAudioPlayer = null;
+									audioEndFlag = true;
+								}
 								multimediaFlag = true;
-							}
+							});
+							currentAudioPlayer = mediaPlayer;
+							mediaPlayer.play();
+							multimediaFlag = true;
 						});
 						try {
 							waitForMultimediaFlagImage();
@@ -431,22 +438,14 @@ class ProtocolThread extends NotifyingThread {
 				case TACTIL: {
 					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 
-					Thread t1 = new Thread(new Runnable() {
-						public void run() {
-							sendEstim();
-						}
-					});
+					Thread t1 = new Thread(this::sendEstim);
 					t1.start();
 					break;
 				}
 				case VIBRAR: {
 					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 
-					Thread t1 = new Thread(new Runnable() {
-						public void run() {
-							sendGlove(e.getFile());
-						}
-					});
+					Thread t1 = new Thread(() -> sendGlove(e.getFile()));
 					t1.start();
 					break;
 				}
@@ -478,6 +477,32 @@ class ProtocolThread extends NotifyingThread {
 						videoEndFlag = true;
 					} else {
 						logger.debug("PARAR_VIDEO: no video playing, continuing");
+					}
+					accTime = System.currentTimeMillis();
+					break;
+				}
+				case ESPERAR_AUDIO: {
+					loggerProtocol.info(e.getTipo().getCode());
+					if (!audioEndFlag) {
+						logger.debug("ESPERAR_AUDIO: audio still playing, waiting for it to end");
+						waitForAudioEnd();
+					} else {
+						logger.debug("ESPERAR_AUDIO: audio already ended, continuing");
+					}
+					accTime = System.currentTimeMillis();
+					break;
+				}
+				case PARAR_AUDIO: {
+					loggerProtocol.info(e.getTipo().getCode());
+					MediaPlayer audioPlayer = currentAudioPlayer;
+					if (audioPlayer != null) {
+						logger.debug("PARAR_AUDIO: stopping current audio");
+						audioPlayer.stop();
+						audioPlayer.dispose();
+						currentAudioPlayer = null;
+						audioEndFlag = true;
+					} else {
+						logger.debug("PARAR_AUDIO: no audio playing, continuing");
 					}
 					accTime = System.currentTimeMillis();
 					break;
@@ -543,6 +568,12 @@ class ProtocolThread extends NotifyingThread {
 		}
 	}
 
+	private void waitForAudioEnd() {
+		while (!audioEndFlag) {
+			toMin2(System.currentTimeMillis() - initTime);
+		}
+	}
+
 	private void waitForMultimediaFlagVideo() throws TimeoutException {
 		long initFlag = System.currentTimeMillis();
 		while (!multimediaFlag) {
@@ -589,7 +620,7 @@ class ProtocolThread extends NotifyingThread {
 		else {
 			if (hours < 10)
 				b.append("0");
-			b.append(String.valueOf(hours));
+			b.append(hours);
 		}
 		b.append(":");
 		if (minutes == 0)
@@ -597,7 +628,7 @@ class ProtocolThread extends NotifyingThread {
 		else {
 			if (minutes < 10)
 				b.append("0");
-			b.append(String.valueOf(minutes));
+			b.append(minutes);
 		}
 		b.append(":");
 		if (seconds == 0)
@@ -605,7 +636,7 @@ class ProtocolThread extends NotifyingThread {
 		else {
 			if (seconds < 10)
 				b.append("0");
-			b.append(String.valueOf(seconds));
+			b.append(seconds);
 		}
 		return b.toString();
 	}
@@ -625,6 +656,9 @@ class ProtocolThread extends NotifyingThread {
 		}
 	}
 
+	/** Envía un estímulo táctil concreto de la lista de estímulos. Sin uso actualmente
+	 *  (el protocolo sólo usa {@link #sendEstim()}), se mantiene para el comando MARCAR con matriz. */
+	@SuppressWarnings("unused")
 	public void sendEstim(int m) {
 		if (EEGControl.useMatrixProtocol) {
 			if (comMatrix != null) {
@@ -643,14 +677,13 @@ class ProtocolThread extends NotifyingThread {
 						try {
 							wait(EEGControl.STIMULUS_TIME_MILIS);
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("Error esperando al estímulo táctil", e);
 						}
 					}
 
 					sendNULL();
 				} else {
 					logger.error("The comunications with the matrix is closed.");
-					return;
 				}
 			}
 		} else {
@@ -669,7 +702,6 @@ class ProtocolThread extends NotifyingThread {
 
 				} else {
 					logger.error("The communications with the glove are closed.");
-					return;
 				}
 			}
 		} else {
@@ -689,7 +721,6 @@ class ProtocolThread extends NotifyingThread {
 
 				} else {
 					logger.error("The communications with the multistimulator are closed.");
-					return;
 				}
 			}
 		} else {
@@ -710,14 +741,13 @@ class ProtocolThread extends NotifyingThread {
 						try {
 							wait(EEGControl.STIMULUS_TIME_MILIS);
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("Error esperando al estímulo táctil por defecto", e);
 						}
 					}
 
 					sendNULL();
 				} else {
 					logger.error("The comunications with the matrix is closed.");
-					return;
 				}
 			}
 		} else {
@@ -738,7 +768,7 @@ class ProtocolThread extends NotifyingThread {
 						try {
 							wait(readTimeout);
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("Error esperando datos de la matriz", e);
 						}
 						counter++;
 						if (counter * readTimeout > timeoutReadMillis) {
@@ -789,7 +819,6 @@ class ProtocolThread extends NotifyingThread {
 			//portInUse.closePort();
 		} else {
 			logger.error("The communications with the multistimulator are closed.");
-			return;
 		}
 	}
 
@@ -865,7 +894,7 @@ class ProtocolThread extends NotifyingThread {
 			imageView.fitHeightProperty().bind(pane.heightProperty());
 			imageView.setPreserveRatio(true);
 
-			pane.getScene().getWindow().setOnHidden(e -> {
+			pane.getScene().getWindow().setOnHidden(ignored -> {
 				vlcPlayer.controls().stop();
 				setStop(true);
 			});
@@ -882,17 +911,12 @@ class ProtocolThread extends NotifyingThread {
 		MediaBean mediaBean = medias.get(e.getMediaReference());
 		if (mediaBean != null) {
 			multimediaFlag = false;
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					if (mediaBean.getImage() != null && EEGControl.USE_MEDIABEAN)
-						EEGControl.addImage(padre.getRootProtocol(),
-								mediaBean.getImage());
-					else
-						EEGControl.addImage(padre.getRootProtocol(), e.getFile(),
-								false);
-					multimediaFlag = true;
-				}
+			Platform.runLater(() -> {
+				if (mediaBean.getImage() != null && EEGControl.USE_MEDIABEAN)
+					EEGControl.addImage(padre.getRootProtocol(), mediaBean.getImage());
+				else
+					EEGControl.addImage(padre.getRootProtocol(), e.getFile(), false);
+				multimediaFlag = true;
 			});
 			try {
 				waitForMultimediaFlagImage();
@@ -909,42 +933,39 @@ class ProtocolThread extends NotifyingThread {
 		else
 			logger.error(message, th);
 
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error Ejecutando Protocolo");
-				alert.setContentText(message);
+		Platform.runLater(() -> {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error Ejecutando Protocolo");
+			alert.setContentText(message);
 
-				if (th != null) {
-					// Create expandable Exception.
-					StringWriter sw = new StringWriter();
-					PrintWriter pw = new PrintWriter(sw);
-					th.printStackTrace(pw);
-					String exceptionText = sw.toString();
+			if (th != null) {
+				// Create expandable Exception.
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				th.printStackTrace(pw);
+				String exceptionText = sw.toString();
 
-					Label label = new Label("The exception stacktrace was:");
+				Label label = new Label("The exception stacktrace was:");
 
-					TextArea textArea = new TextArea(exceptionText);
-					textArea.setEditable(false);
-					textArea.setWrapText(true);
+				TextArea textArea = new TextArea(exceptionText);
+				textArea.setEditable(false);
+				textArea.setWrapText(true);
 
-					textArea.setMaxWidth(Double.MAX_VALUE);
-					textArea.setMaxHeight(Double.MAX_VALUE);
-					GridPane.setVgrow(textArea, Priority.ALWAYS);
-					GridPane.setHgrow(textArea, Priority.ALWAYS);
+				textArea.setMaxWidth(Double.MAX_VALUE);
+				textArea.setMaxHeight(Double.MAX_VALUE);
+				GridPane.setVgrow(textArea, Priority.ALWAYS);
+				GridPane.setHgrow(textArea, Priority.ALWAYS);
 
-					GridPane expContent = new GridPane();
-					expContent.setMaxWidth(Double.MAX_VALUE);
-					expContent.add(label, 0, 0);
-					expContent.add(textArea, 0, 1);
+				GridPane expContent = new GridPane();
+				expContent.setMaxWidth(Double.MAX_VALUE);
+				expContent.add(label, 0, 0);
+				expContent.add(textArea, 0, 1);
 
-					// Set expandable Exception into the dialog pane.
-					alert.getDialogPane().setExpandableContent(expContent);
-				}
-
-				alert.showAndWait();
+				// Set expandable Exception into the dialog pane.
+				alert.getDialogPane().setExpandableContent(expContent);
 			}
+
+			alert.showAndWait();
 		});
 	}
 

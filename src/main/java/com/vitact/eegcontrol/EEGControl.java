@@ -5,6 +5,7 @@ import com.vitact.eegcontrol.bean.*;
 import com.vitact.eegcontrol.type.*;
 import com.vitact.eegcontrol.utils.ProtocolUtils;
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 import javafx.application.*;
 import javafx.event.EventHandler;
@@ -18,21 +19,19 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
-import javafx.util.Duration;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurface;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.*;
-import javax.swing.*;
 import org.apache.logging.log4j.*;
 public class EEGControl extends Application
 		implements ThreadCompleteListener, EventHandler<KeyEvent> {
 	static Logger logger = null;
-	private final int EEG_BAUDRATE = 1200;
-	private final int MATRIX_BAUDRATE = 115200; // 9600;
-	private final int MULTI_BAUDRATE = 9600; // 9600;
+	private static final int EEG_BAUDRATE = 1200;
+	private static final int MATRIX_BAUDRATE = 115200; // 9600;
+	private static final int MULTI_BAUDRATE = 9600; // 9600;
 	public static final long STIMULUS_TIME_MILIS = 3000;
 	public static final long END_PROTOCOL_WAIT_MILIS = 5000;
 	public static final long MULTIMEDIA_TIMEOUT = 15000;
@@ -48,17 +47,12 @@ public class EEGControl extends Application
 	public static final Boolean USE_FULL_STUDY_DATA = false;
 	public static final String DEFAULT_VERSION="4.0";
 
-	ArrayList<EventBean> events = new ArrayList<EventBean>();
-	HashMap<String, MediaBean> medias = new HashMap<String, MediaBean>();
-	ArrayList<EstimulusBean> estims = new ArrayList<EstimulusBean>();
+	ArrayList<EventBean> events = new ArrayList<>();
+	HashMap<String, MediaBean> medias = new HashMap<>();
+	ArrayList<EstimulusBean> estims = new ArrayList<>();
 	EstimulusBean estNull;
-	boolean off = true;
-	JList<String> list;
-	long initTime;
-	List<Integer> marks = new ArrayList<Integer>();
-	int estimMatrix = 0;// 0 significa que no hay conexi�n ocn matrix
+	List<Integer> marks = new ArrayList<>();
 	int dimension;
-	boolean oldProtocol = false;
 
 	SerialPort comMatrix;
 	SerialPort comEEG;
@@ -103,7 +97,7 @@ public class EEGControl extends Application
 	public static Properties properties = new Properties();
 
 		public EEGControl() {
-		String names[] = {"0000", "02"};
+		String[] names = {"0000", "02"};
 		reloadLoggers(names);
 		logger = LogManager.getLogger(this.getClass().getName());
 
@@ -158,13 +152,13 @@ public class EEGControl extends Application
 	public void start(Stage primaryStage) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("EEGControl.fxml"));
-			BorderPane root = (BorderPane) loader.load();
-			mainController = ((EEGViewController) loader.getController());
+			BorderPane root = loader.load();
+			mainController = loader.getController();
 			mainController.setPadre(this);
 			Scene scene = new Scene(root, 500, 500);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			applyStylesheet(scene);
 			primaryStage.setScene(scene);
-			primaryStage.setOnCloseRequest(e -> Platform.exit());
+			primaryStage.setOnCloseRequest(ignored -> Platform.exit());
 			primaryStage.show();
 			this.primaryStage = primaryStage;
 		} catch (Exception e) {
@@ -200,17 +194,17 @@ public class EEGControl extends Application
 	private void loadPorts() {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("EEGPortsControl.fxml"));
-			GridPane root = (GridPane) loader.load();
-			EEGPortsViewController controller = ((EEGPortsViewController) loader.getController());
+			GridPane root = loader.load();
+			EEGPortsViewController controller = loader.getController();
 			controller.setPadre(this);
 			Scene scene = new Scene(root, 500, 265);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			applyStylesheet(scene);
 			Stage stage = new Stage();
 			stage.setTitle("Configuración de Puertos");
 
 			stage.setScene(scene);
 			stage.show();
-			stage.setOnHidden(e -> {
+			stage.setOnHidden(ignored -> {
 				if (controller.isConfigured()) {
 					comMatrix = controller.getComMatrix();
 					comEEG = controller.getComEEG();
@@ -299,21 +293,19 @@ public class EEGControl extends Application
 	private void loadBusinessLogic() {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("EEGProtocolProgress.fxml"));
-			BorderPane root = (BorderPane) loader.load();
-			protocolController = ((EEGProtocolProgressController) loader.getController());
+			BorderPane root = loader.load();
+			protocolController = loader.getController();
 			protocolController.setEvents(events);
 			Scene scene = new Scene(root, 400, 400);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			applyStylesheet(scene);
 			Stage stage = new Stage();
 			stage.setTitle("Progreso de la prueba");
 
 			if (showProtocolEvolWindow) {
 
 				stage.setScene(scene);
-				stage.setOnShown(e -> {
-					doBusinessLogic(protocolController);
-				});
-				stage.setOnHidden(e -> {
+				stage.setOnShown(ignored -> doBusinessLogic(protocolController));
+				stage.setOnHidden(ignored -> {
 					if (stageProtocol != null)
 						stageProtocol.close();
 				});
@@ -336,7 +328,10 @@ public class EEGControl extends Application
 	}
 
 	/**
-	 * @param controller
+	 * Abre la ventana de ejecución del protocolo y prepara el hilo que lo ejecuta.
+	 *
+	 * @param controller controlador de la ventana de progreso, del que se toman la lista de
+	 *                   eventos y la etiqueta de tiempo que el hilo va actualizando
 	 */
 	private void doBusinessLogic(EEGProtocolProgressController controller) {
 		logger.debug("Starting Protocol Execution");
@@ -435,21 +430,19 @@ public class EEGControl extends Application
 		});
 
 		stageProtocol.setScene(scene);
-		stageProtocol.setOnCloseRequest(e -> {
+		stageProtocol.setOnCloseRequest(ignored -> {
 			/* mediaPlayer.stop(); */
 			stageProtocol.hide();
 			stageProtocol = null;
 		});
-		stageProtocol.setOnHidden(e -> {
+		stageProtocol.setOnHidden(ignored -> {
 			System.out.println("Trying to stop");
 			if (executer != null) {
 				executer.setStop(true);
 				executer.checkForTimer();
 			}
 		});
-		stageProtocol.setOnShown(e -> {
-			validateAndStartProtocol(0);
-		});
+		stageProtocol.setOnShown(ignored -> validateAndStartProtocol());
 
 		try {
 			stageProtocol.show();
@@ -467,7 +460,7 @@ public class EEGControl extends Application
 	 * VLC is more resilient than JavaFX MediaPlayer — file existence was already
 	 * validated in createMediaReference, so we just verify player creation succeeded.
 	 */
-	private void validateAndStartProtocol(int attempt) {
+	private void validateAndStartProtocol() {
 		for (Map.Entry<String, MediaBean> entry : medias.entrySet()) {
 			MediaBean mb = entry.getValue();
 			if (mb.getMediaType() == MediaTypeEnum.VIDEO) {
@@ -496,7 +489,7 @@ public class EEGControl extends Application
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Confirmation Dialog");
 		alert.setContentText("Pulse [OK] para iniciar la ejecución del protocolo.");
-		alert.setOnHidden(dialogEvent -> {
+		alert.setOnHidden(ignored -> {
 			if (alert.getResult() == ButtonType.OK) {
 				logger.info("OK to Start Protocol");
 				executer.start();
@@ -521,7 +514,7 @@ public class EEGControl extends Application
 			return false;
 		}
 
-		List<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<>();
 		while (sc.hasNextLine()) {
 			lines.add(sc.nextLine());
 		}
@@ -529,7 +522,7 @@ public class EEGControl extends Application
 		String[] arr = lines.toArray(new String[0]);
 		for (int i = 0; i < arr.length; i++) {
 			arr[i] = arr[i].toUpperCase();
-			if (arr[i].length() == 0)
+			if (arr[i].isEmpty())
 				continue;
 			if (arr[i].charAt(0) == ';')
 				continue;
@@ -543,13 +536,13 @@ public class EEGControl extends Application
 				} catch (NumberFormatException e) {
 					check = false;
 					logger.error("Dimensi�n: Error en l�nea " + i + " del fichero de est�mulos: "
-							+ arr[i].substring(4, 5) + " no es un entero");
+							+ arr[i].charAt(4) + " no es un entero");
 					break;
 				}
 			}
 
 			if (arr[i].indexOf("EST") == 0) {
-				int t = 0;
+				int t;
 				try {
 					t = Integer.parseInt(
 							arr[i].substring(arr[i].indexOf('_') + 1, arr[i].indexOf(':')).trim());
@@ -588,8 +581,8 @@ public class EEGControl extends Application
 	}
 
 	private boolean checkProtocolFile(File p) {
-		events = new ArrayList<EventBean>();
-		estims = new ArrayList<EstimulusBean>();
+		events = new ArrayList<>();
+		estims = new ArrayList<>();
 
 		boolean check = true;
 		Scanner sc;
@@ -599,7 +592,7 @@ public class EEGControl extends Application
 			logger.error("No Protocol File found after check, something messy happened", e1);
 			return false;
 		}
-		List<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<>();
 		ProtocolBean myBean = new ProtocolBean();
 		myBean.setDateExecution(ProtocolBean.getDateString(new Date()));
 		myBean.setDescription(sc.nextLine());
@@ -614,7 +607,7 @@ public class EEGControl extends Application
 		for (int i = 0; i < arr.length; i++) {
 			String anal = arr[i].toUpperCase();
 			// COMMENTS WITH ; OR #, also ignore empty lines
-			if (arr[i].length() == 0 || arr[i].charAt(0) == ';' || arr[i].charAt(0) == '#')
+			if (arr[i].isEmpty() || arr[i].charAt(0) == ';' || arr[i].charAt(0) == '#')
 				continue;
 			// CONFIGURATION OF THE PROTOCOL
 			else if (anal.indexOf("FULLSCREEN") == 0) {
@@ -664,7 +657,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("USE_MATRIX") == 0) {
 				try {
-					EEGControl.useMatrixProtocol = ProtocolUtils.trueFalseLine(arr[i]);;
+					EEGControl.useMatrixProtocol = ProtocolUtils.trueFalseLine(arr[i]);
 				} catch (Exception e) {
 					logger.debug(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
@@ -705,7 +698,7 @@ public class EEGControl extends Application
 				check = createMultimediaEvent(arr[i], i, EventEnum.LANZAR, MediaTypeEnum.VIDEO, sc);
 			} else if (anal.indexOf("INICIAR") == 0) {
 				try {
-					String data[] = arr[i].split("\\s");
+					String[] data = arr[i].split("\\s");
 					String fileName = null;
 					if (data.length > 1)
 						fileName = data[1].replace("\"", "");
@@ -776,7 +769,7 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("ESTIM_OLD") == 0 || anal.indexOf("KGS") == 0) {
 				try {
-					String data[] = arr[i].split("\\s");
+					String[] data = arr[i].split("\\s");
 					String fileName = null;
 					if (data.length > 1)
 						fileName = data[1].replace("\"", "");
@@ -810,10 +803,9 @@ public class EEGControl extends Application
 						continue;
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
 					logger.debug(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].trim() + ", Error: "
-									+ e.getMessage());
+									+ e.getMessage(), e);
 					check = false;
 				}
 			} else if (anal.indexOf("MOSTRAR") == 0) {
@@ -830,7 +822,6 @@ public class EEGControl extends Application
 					storeMark(t);
 					continue;
 				} catch (NumberFormatException e) {
-					check = false;
 					logger.error(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].substring(7).trim()
 									+ " no es un entero");
@@ -840,6 +831,10 @@ public class EEGControl extends Application
 				events.add(new EventBean(EventEnum.ESPERAR_VIDEO, 0, i+1));
 			} else if (anal.indexOf("PARAR_VIDEO") == 0) {
 				events.add(new EventBean(EventEnum.PARAR_VIDEO, 0, i+1));
+			} else if (anal.indexOf("ESPERAR_AUDIO") == 0) {
+				events.add(new EventBean(EventEnum.ESPERAR_AUDIO, 0, i+1));
+			} else if (anal.indexOf("PARAR_AUDIO") == 0) {
+				events.add(new EventBean(EventEnum.PARAR_AUDIO, 0, i+1));
 			} else if (arr[i].indexOf("ESPERAR") == 0) {
 				try {
 					int t = Integer.parseInt(arr[i].substring(8).trim());
@@ -885,7 +880,6 @@ public class EEGControl extends Application
 					events.add(new EventBean(EventEnum.TERMINAR, 0, i+1));
 					continue;
 				} catch (NumberFormatException e) {
-					check = false;
 					logger.error(
 							"Error en l�nea " + i + " del protocolo: " + arr[i].substring(7).trim()
 									+ " no es un entero");
@@ -915,11 +909,11 @@ public class EEGControl extends Application
 			// load the FXML resource
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("CameraControl.fxml"));
 			// store the root element so that the controllers can use it
-			BorderPane rootElement1 = (BorderPane) loader.load();
+			BorderPane rootElement1 = loader.load();
 			// create and style a scene
 			Stage primaryStage1 = new Stage();
 			Scene scene = new Scene(rootElement1, 600, 600);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			applyStylesheet(scene);
 			// create the stage with the given title and the previously created
 			// scene
 			primaryStage1.setTitle("Canny Imager for KGS");
@@ -929,30 +923,23 @@ public class EEGControl extends Application
 
 			// set the proper behavior on closing the application
 			CameraController controller = loader.getController();
-			primaryStage1.setOnCloseRequest((new EventHandler<WindowEvent>() {
-				public void handle(WindowEvent we) {
-					controller.setClosed();
-				}
-			}));
+			primaryStage1.setOnCloseRequest(ignored -> controller.setClosed());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Error al abrir la ventana de cámara", e);
 		}
 	}
 
 	@Override
 	public void notifyOfThreadComplete(Thread thread) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				addImage(rootProtocol, "fin-experimento.png", true);
-				try {
-					Thread.sleep(EEGControl.END_PROTOCOL_WAIT_MILIS);
-				} catch (InterruptedException ex) {
-					logger.error("Error finalizando aplicación " + ex.getLocalizedMessage());
-				}
-				rootProtocol.getScene().getWindow().hide();
-				doClean();
+		Platform.runLater(() -> {
+			addImage(rootProtocol, "fin-experimento.png", true);
+			try {
+				Thread.sleep(EEGControl.END_PROTOCOL_WAIT_MILIS);
+			} catch (InterruptedException ex) {
+				logger.error("Error finalizando aplicación " + ex.getLocalizedMessage());
 			}
+			rootProtocol.getScene().getWindow().hide();
+			doClean();
 		});
 	}
 
@@ -961,9 +948,9 @@ public class EEGControl extends Application
 		rootProtocol = null;
 		stageProtocol = null;
 		protocolController = null;
-		events = new ArrayList<EventBean>();
-		medias = new HashMap<String, MediaBean>();
-		estims = new ArrayList<EstimulusBean>();
+		events = new ArrayList<>();
+		medias = new HashMap<>();
+		estims = new ArrayList<>();
 		initalImage = null;
 		System.gc();
 	}
@@ -998,7 +985,7 @@ public class EEGControl extends Application
 	}
 
 	public static void addImage(BorderPane pane, String fileName, boolean isResource) {
-		String imageStr = null;
+		String imageStr;
 
 		if (isResource)
 			imageStr = EEGControl.BASE_FILE + EEGControl.IMAGE_RESOURCES_FILE_BASE + fileName;
@@ -1019,13 +1006,13 @@ public class EEGControl extends Application
 	}
 
 	public static void addImage(BorderPane pane, Image imageToShow) {
+		if (imageToShow == null) {
+			logger.error("No hay imagen que mostrar");
+			return;
+		}
 		logger.debug("Showing image " + imageToShow.hashCode());
 
-		ImageView imageView = null;
-		if (imageToShow != null)
-			imageView = new ImageView(imageToShow);
-
-		EEGControl.addImage(pane, imageView);
+		EEGControl.addImage(pane, new ImageView(imageToShow));
 	}
 
 	private static void addImage(BorderPane pane, ImageView imageView) {
@@ -1055,7 +1042,7 @@ public class EEGControl extends Application
 	public void showClickLabel(boolean isClick) {
 		if (isClick) {
 			label.setText("PULSA EL RATON PARA CONTINUAR");
-			labelBorderPane.getScene().setOnMouseReleased(e -> {
+			labelBorderPane.getScene().setOnMouseReleased(ignored -> {
 				labelBorderPane.setVisible(false);
 				if (executer != null)
 					executer.multimediaFlag = true;
@@ -1091,10 +1078,6 @@ public class EEGControl extends Application
 		return rootProtocol;
 	}
 
-	public void setRootProtocol(BorderPane rootProtocol) {
-		this.rootProtocol = rootProtocol;
-	}
-
 	private boolean checkMediaReference(String mediaReference) {
 		return medias.get(mediaReference) == null;
 	}
@@ -1104,9 +1087,12 @@ public class EEGControl extends Application
 	 * the MediaBean contains an image, is the imageFile, if contains a sound, is the soundFile (and
 	 * also the fileNameImage for the image to show meanwhile the sound is playing)
 	 *
-	 * @param fileNamePrimary
-	 * @param fileNameImage
-	 * @param mediaTypeEnum
+	 * @param fileNamePrimary nombre del fichero principal (imagen, sonido o vídeo); si no lleva
+	 *                        extensión se le añade la propia del tipo de media
+	 * @param fileNameImage   nombre del fichero de imagen a mostrar mientras suena el sonido,
+	 *                        sólo se usa con SOUND_IMAGE, null en el resto de casos
+	 * @param mediaTypeEnum   tipo de media a crear: IMAGE, SOUND, SOUND_IMAGE o VIDEO
+	 * @return false si el fichero no existe o no se puede crear el reproductor
 	 */
 	private boolean createMediaReference(String fileNamePrimary, String fileNameImage,
 			MediaTypeEnum mediaTypeEnum) {
@@ -1202,17 +1188,15 @@ public class EEGControl extends Application
 	 * @param line_num, The line number of the protocol file
 	 * @param eventType, The type of event to create
 	 * @param mediaTypeEnum, The type of media depending on the event, can be IMAGE, SOUND, SOUND_IMAGE or VIDEO. In case of SOUND, the fileNameImage is evaluated and the mediaTypeEnum can be chaged to SOUND_IMAGE
-	 * @param sc
+	 * @param sc, The protocol file scanner, closed here when an error aborts the parsing
 	 * @return false if an error is found
 	 */
 	private boolean createMultimediaEvent(String line, int line_num,  EventEnum eventType,
 			MediaTypeEnum mediaTypeEnum, Scanner sc) {
 		try {
 			String[] data = line.split("\\s");
-			String fileName = null;
-			String fileNameSecondary = null;
 			if (data.length > 1) {
-				fileName = data[1].replace("\"", "");
+				String fileName = data[1].replace("\"", "");
 				switch (mediaTypeEnum) {
 					case VIDEO: {
 						fileName = fileName.contains(".") ? fileName : fileName + ".mp4";
@@ -1234,7 +1218,7 @@ public class EEGControl extends Application
 				String mediaReference = fileName;
 				if (checkMediaReference(fileName)) {
 					if (data.length > 2) {
-						fileNameSecondary = data[2].replace("\"", "");
+						String fileNameSecondary = data[2].replace("\"", "");
 						if (!fileNameSecondary.contains(".")) {
 							fileNameSecondary = fileNameSecondary + ".bmp";
 						}
@@ -1279,6 +1263,20 @@ public class EEGControl extends Application
 					+ ", Error: " + e.getMessage());
 			return false;
 		}
+	}
+
+	/**
+	 * Aplica la hoja de estilos de la aplicación a una escena, avisando si el recurso
+	 * no está disponible en el classpath en lugar de fallar con NullPointerException.
+	 *
+	 * @param scene la escena a la que aplicar los estilos
+	 */
+	private void applyStylesheet(Scene scene) {
+		URL css = getClass().getResource("application.css");
+		if (css != null)
+			scene.getStylesheets().add(css.toExternalForm());
+		else
+			logger.warn("No se encuentra application.css en el classpath");
 	}
 
 	private void showErrorDialog(String message) {

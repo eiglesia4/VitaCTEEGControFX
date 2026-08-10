@@ -1,0 +1,96 @@
+;==============================================================================
+; Protocolo de prueba EEGFX-25
+;
+; Verifica el comportamiento NO BLOQUEANTE de SONAR y los nuevos comandos
+; ESPERAR_AUDIO y PARAR_AUDIO.
+;
+; Ficheros de audio usados:
+;   - file_example_WAV_1MG.wav  (~34 segundos)
+;   - MOUSE.wav                 (~ 1 segundo)
+;
+; Resumen de los tests:
+;   TEST 1 — Reemplazo automático: el segundo SONAR debe cortar al primero.
+;   TEST 2 — ESPERAR_AUDIO: el protocolo espera a que termine el audio largo.
+;   TEST 3 — PARAR_AUDIO: el audio largo se corta antes de tiempo.
+;   TEST 4 — Control: SONAR no bloquea, el sonido termina solo.
+;
+; Para verificar visualmente cada bloque, MARCA 1..4 marca el inicio del test
+; correspondiente (visible en el log de eventos del estudio).
+;==============================================================================
+
+FULLSCREEN false
+USE_MATRIX false
+USE_EEG false
+CENTER_MOUSE false
+KGS_VIBRATE false
+USE_SPACEKEY false
+
+INICIAR inicio-experimento.png
+ESPERAR 3000
+
+;==============================================================================
+; TEST 1 — Reemplazo automático en SONAR
+;==============================================================================
+; Esperado:
+;   - Empieza file_example_WAV_1MG.wav (audio largo).
+;   - Tras 2 segundos, SONAR MOUSE.wav lo CORTA y solo se oye MOUSE.wav.
+;   - Duración total del bloque: ~3 segundos (no 34).
+;==============================================================================
+
+MOSTRAR Lenna.png
+MARCAR 1
+SONAR file_example_WAV_1MG.wav
+ESPERAR 2000
+SONAR MOUSE.wav
+ESPERAR 2000
+
+
+;==============================================================================
+; TEST 2 — ESPERAR_AUDIO
+;==============================================================================
+; Esperado:
+;   - Empieza file_example_WAV_1MG.wav (audio largo).
+;   - ESPERAR_AUDIO bloquea el protocolo hasta que el audio termine.
+;   - Duración total del bloque: ~34 segundos (la duración del WAV completo).
+;==============================================================================
+
+MOSTRAR Lenna.png
+MARCAR 2
+SONAR file_example_WAV_1MG.wav
+ESPERAR_AUDIO
+ESPERAR 1000
+
+
+;==============================================================================
+; TEST 3 — PARAR_AUDIO
+;==============================================================================
+; Esperado:
+;   - Empieza file_example_WAV_1MG.wav (audio largo).
+;   - Tras 2 segundos, PARAR_AUDIO lo CORTA inmediatamente.
+;   - El protocolo continúa sin esperar el resto del WAV.
+;   - Duración total del bloque: ~3 segundos (no 34).
+;==============================================================================
+
+MOSTRAR Lenna.png
+MARCAR 3
+SONAR file_example_WAV_1MG.wav
+ESPERAR 2000
+PARAR_AUDIO
+ESPERAR 1000
+
+
+;==============================================================================
+; TEST 4 — Control: SONAR sin nada detrás
+;==============================================================================
+; Esperado:
+;   - Empieza MOUSE.wav (~1s) y suena entero.
+;   - El ESPERAR posterior cubre la duración del audio sin bloquear.
+;   - El protocolo termina limpiamente.
+;==============================================================================
+
+MOSTRAR Lenna.png
+MARCAR 4
+SONAR MOUSE.wav
+ESPERAR 1500
+
+TERMINAR
