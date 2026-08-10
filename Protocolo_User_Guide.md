@@ -38,16 +38,48 @@ Los eventos se ejecutan en el orden en el que se escriben en el fichero de proto
 | ESPERAR | Espera X milisegundos para ejecutar el siguiente comando del protocolo. | 1.- Milisegs. espera (obligatorio) |
 | ESPERAR_VIDEO | Espera a que termine el vídeo actualmente en reproducción. Si el vídeo ya ha terminado cuando se alcanza este comando, continúa inmediatamente. Útil cuando la duración del vídeo es mayor que la suma de los ESPERAR entre el LANZAR y este comando. | No tiene |
 | PARAR_VIDEO | Detiene inmediatamente el vídeo en reproducción y libera sus recursos. Si no hay ningún vídeo en reproducción, no hace nada. Útil cuando se quiere cortar un vídeo en un momento determinado del protocolo. | No tiene |
+| ESPERAR_AUDIO | Espera a que termine el audio actualmente en reproducción. Si el audio ya ha terminado cuando se alcanza este comando, continúa inmediatamente. Útil cuando la duración del audio es mayor que la suma de los ESPERAR entre el SONAR y este comando. | No tiene |
+| PARAR_AUDIO | Detiene inmediatamente el audio en reproducción. Si no hay ningún audio en reproducción, no hace nada. Útil cuando se quiere cortar un audio en un momento determinado del protocolo. | No tiene |
 | ESTIM_OLD | Muestra en pantalla la imagen definida tras una transformación de tamaño 28x28. La imagen debe ser en blanco y negro. No se detectan bordes, se muestra entera. | 1.- Imagen a mostrar (obligatorio) |
 | KGS | Muestra en pantalla la imagen definida tras una transformación de tamaño 48x32. La imagen debe ser en blanco y negro. No se detectan bordes, se muestra entera. | 1.- Imagen a mostrar (obligatorio) |
 | LANZAR | Muestra un vídeo | 1.- Video a mostrar (obligatorio) |
 | MOSTRAR | Muestra una imagen | 1.- Imagen a mostrar (obligatorio) |
-| SONAR | Reproduce un sonido con una imagen de fondo. Si no se especifica imagen se reproduce el fichero soundDefaultImage.png | 1.- Sonido reproducir (obligatorio), 2.- Imagen mostrar (opcional) |
+| SONAR | Reproduce un sonido con una imagen de fondo. Si no se especifica imagen se reproduce el fichero soundDefaultImage.png. La reproducción es no bloqueante: el protocolo continúa inmediatamente. Si hay un audio sonando, se detiene antes de reproducir el nuevo. Para esperar a que termine, usar ESPERAR_AUDIO; para detenerlo, usar PARAR_AUDIO. | 1.- Sonido reproducir (obligatorio), 2.- Imagen mostrar (opcional) |
 | MARCAR | Envía una marca al EEG. Se reservan las marcas: 6 => Tecla espacio para estímulo correcto, 7 => Tecla espacio para estímulo incorrecto, 8 => Botón Izqdo / Tecla 1 / Tecla Z, 9 => Botón Dcho / Tecla 2 / Tecla M | 1.- Número de marca (obligatorio 1 a 9) |
 | VIBRAR | Envía un estímulo táctil al estimulador de VitaCT durante 3 segundos. | 1.- Imagen a mostrar (obligatorio) |
 | TACTIL | Envía un estímulo táctil al guante de Álvaro. El estímulo es una "imagen" que se envía como bytes. | 1.- Imagen a enviar (obligatorio) |
 | TARGET | RESERVADO. Para marcar en un protocolo que el multimedia a mostrar es el correcto | No tiene |
 | FAIL | RESERVADO. Para marcar en un protocolo que el multimedia a mostrar es el incorrecto | No tiene |
+
+## Formatos de audio soportados
+
+La reproducción de audio (comando `SONAR`) utiliza el motor de medios de JavaFX (`javafx.scene.media.MediaPlayer`). Esto determina qué formatos de fichero pueden usarse en los protocolos.
+
+### Formatos soportados
+
+| Formato | Extensión | Notas |
+|---------|-----------|-------|
+| WAV | `.wav` | **Solo PCM sin comprimir** (8 / 16 / 24 / 32 bits lineal). No se admiten variantes comprimidas como µ-law, A-law o ADPCM. |
+| MP3 | `.mp3` | MPEG-1 Layer 3. |
+| AIFF | `.aif`, `.aiff` | Solo PCM sin comprimir. |
+
+### Formatos NO soportados
+
+- AAC suelto (`.aac`, `.m4a`)
+- OGG / Vorbis / Opus
+- FLAC
+- WMA
+- WAV comprimido (µ-law, A-law, ADPCM, etc.)
+
+Si necesita usar uno de estos formatos, conviértalo previamente a WAV PCM o MP3 con una herramienta externa (por ejemplo, Audacity).
+
+### Extensión por defecto
+
+Si en el protocolo se escribe `SONAR misonido` sin extensión, la aplicación añade automáticamente `.wav`. Para usar otro formato, especifique la extensión completa: `SONAR misonido.mp3`.
+
+### Recomendación para potenciales evocados
+
+Para experimentos donde la precisión del instante de inicio del estímulo es crítica (por ejemplo, paradigmas P300 oddball), se recomienda **WAV PCM**: no introduce latencia de decodificación variable y es el formato ya usado en los protocolos existentes. MP3 introduce un pequeño retardo variable de decodificación que puede afectar al sincronismo si se está midiendo en decenas de milisegundos.
 
 ## Ejemplos de protocolo
 
