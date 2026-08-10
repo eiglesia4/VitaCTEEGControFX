@@ -377,12 +377,9 @@ public class EEGControl extends Application
 			}
 		}
 
-		// ImageView imageView = new
-		// ImageView("file:///Users/eiglesia/Temp/lord-jerome.jpg");
-		String imageName = "file://" + BASE_FILE + IMAGE_RESOURCES_FILE_BASE + "inicio-experimento.png";
-		ImageView imageView = new ImageView(imageName);
+		// Fondo negro del panel: evita que se vea el fondo por defecto de la escena
+		// en las zonas que la imagen centrada no cubre.
 		rootProtocol.setStyle("-fx-background-color: black;");
-		rootProtocol.setCenter(imageView);
 
 		if (initalImage != null)
 			addImage(rootProtocol, initalImage, false);
