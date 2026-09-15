@@ -47,6 +47,11 @@ public class EEGControl extends Application
 	public static final Boolean USE_FULL_STUDY_DATA = false;
 	public static final String DEFAULT_VERSION="4.0";
 
+	/** Prefijo de los iconos de ventana en el classpath; se completa con el tamaño. */
+	private static final String ICON_BASE = "/images/eeg_icon_";
+	/** Tamaños de icono a cargar. JavaFX escoge el mejor para cada contexto. */
+	private static final int[] ICON_SIZES = {16, 32, 48, 256};
+
 	ArrayList<EventBean> events = new ArrayList<>();
 	HashMap<String, MediaBean> medias = new HashMap<>();
 	ArrayList<EstimulusBean> estims = new ArrayList<>();
@@ -89,6 +94,8 @@ public class EEGControl extends Application
 	ProtocolBean protocolBean;
 	ProtocolThread executer = null;
 	static MediaPlayerFactory mediaPlayerFactory;
+	/** Caché del juego de iconos; se carga una sola vez en el primer uso. */
+	private static List<Image> appIcons = null;
 	Label label = new Label("PULSA EL RATON PARA CONTINUAR");
 	int multiStimulationMillisPlaying = 0;
 
@@ -157,6 +164,7 @@ public class EEGControl extends Application
 			mainController.setPadre(this);
 			Scene scene = new Scene(root, 500, 500);
 			applyStylesheet(scene);
+			applyIcon(primaryStage);
 			primaryStage.setScene(scene);
 			primaryStage.setOnCloseRequest(ignored -> Platform.exit());
 			primaryStage.show();
@@ -200,6 +208,7 @@ public class EEGControl extends Application
 			Scene scene = new Scene(root, 500, 265);
 			applyStylesheet(scene);
 			Stage stage = new Stage();
+			applyIcon(stage);
 			stage.setTitle("Configuración de Puertos");
 
 			stage.setScene(scene);
@@ -299,6 +308,7 @@ public class EEGControl extends Application
 			Scene scene = new Scene(root, 400, 400);
 			applyStylesheet(scene);
 			Stage stage = new Stage();
+			applyIcon(stage);
 			stage.setTitle("Progreso de la prueba");
 
 			if (showProtocolEvolWindow) {
@@ -337,6 +347,7 @@ public class EEGControl extends Application
 		logger.debug("Starting Protocol Execution");
 		// First open execution window
 		stageProtocol = new Stage();
+		applyIcon(stageProtocol);
 		stageProtocol.setTitle("Ejecución del protocolo " + protocolName);
 		if (showFullScreen) {
 			stageProtocol.setFullScreen(true);
@@ -486,6 +497,7 @@ public class EEGControl extends Application
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Confirmation Dialog");
 		alert.setContentText("Pulse [OK] para iniciar la ejecución del protocolo.");
+		applyIcon(alert);
 		alert.setOnHidden(ignored -> {
 			if (alert.getResult() == ButtonType.OK) {
 				logger.info("OK to Start Protocol");
@@ -909,6 +921,7 @@ public class EEGControl extends Application
 			BorderPane rootElement1 = loader.load();
 			// create and style a scene
 			Stage primaryStage1 = new Stage();
+			applyIcon(primaryStage1);
 			Scene scene = new Scene(rootElement1, 600, 600);
 			applyStylesheet(scene);
 			// create the stage with the given title and the previously created
@@ -1276,11 +1289,63 @@ public class EEGControl extends Application
 			logger.warn("No se encuentra application.css en el classpath");
 	}
 
+	/**
+	 * Carga una sola vez el juego de iconos de la aplicación desde el classpath. Se cargan
+	 * varios tamaños porque JavaFX elige el más adecuado según el contexto: la barra de
+	 * título, la barra de tareas y el conmutador Alt+Tab usan resoluciones distintas.
+	 * Los tamaños que falten se omiten con un aviso, sin impedir el arranque.
+	 *
+	 * @return los iconos disponibles, lista vacía si no se ha podido cargar ninguno
+	 */
+	private static List<Image> getAppIcons() {
+		if (appIcons == null) {
+			appIcons = new ArrayList<>();
+			for (int size : ICON_SIZES) {
+				String path = ICON_BASE + size + ".png";
+				try (InputStream is = EEGControl.class.getResourceAsStream(path)) {
+					if (is != null)
+						appIcons.add(new Image(is));
+					else
+						logger.warn("No se encuentra el icono " + path + " en el classpath");
+				} catch (IOException e) {
+					logger.warn("No se ha podido leer el icono " + path, e);
+				}
+			}
+			if (appIcons.isEmpty())
+				logger.error("No se ha cargado ningún icono de la aplicación; las ventanas "
+						+ "mostrarán el icono por defecto de Java");
+		}
+		return appIcons;
+	}
+
+	/**
+	 * Aplica el icono de la aplicación a una ventana.
+	 *
+	 * @param stage la ventana a la que aplicar el icono
+	 */
+	public static void applyIcon(Stage stage) {
+		if (stage != null)
+			stage.getIcons().addAll(getAppIcons());
+	}
+
+	/**
+	 * Aplica el icono de la aplicación a un diálogo. Los Alert tienen su propia ventana,
+	 * que de otro modo seguiría mostrando el icono por defecto de Java.
+	 *
+	 * @param alert el diálogo al que aplicar el icono
+	 */
+	public static void applyIcon(Alert alert) {
+		Scene scene = alert.getDialogPane().getScene();
+		if (scene != null && scene.getWindow() instanceof Stage stage)
+			applyIcon(stage);
+	}
+
 	private void showErrorDialog(String message) {
 		logger.error(message);
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("Error");
 		alert.setContentText(message);
+		applyIcon(alert);
 		try {
 			alert.showAndWait();
 		} catch (IllegalStateException e) {
