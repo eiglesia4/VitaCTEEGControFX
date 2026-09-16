@@ -36,6 +36,8 @@ public class EEGControl extends Application
 	private static final int MULTI_BAUDRATE = 9600; // 9600;
 	public static final long STIMULUS_TIME_MILIS = 3000;
 	public static final long END_PROTOCOL_WAIT_MILIS = 5000;
+	/** Plazo máximo de espera a que muera el hilo de un protocolo que se está abortando. */
+	public static final long PROTOCOL_STOP_TIMEOUT_MILIS = 5000;
 	public static final long MULTIMEDIA_TIMEOUT = 15000;
 	public static final long OLD_STIM_VIBRATION_MILIS = 33;
 
@@ -184,6 +186,7 @@ public class EEGControl extends Application
 	}
 
 	public void fileProtocolLoaded(File chosenFile) {
+		String previousProtocol = protocolName;
 		try {
 			protocolName = chosenFile.getName();
 		} catch (Exception e) {
@@ -191,6 +194,15 @@ public class EEGControl extends Application
 			return;
 		}
 		logger.debug("Protocolo seleccionado: " + chosenFile.getAbsolutePath());
+
+		// Solo puede ejecutarse un protocolo a la vez. Si quedara uno vivo hay que pararlo
+		// y esperar a que muera ANTES de parsear el nuevo: checkProtocolFile() reasigna la
+		// lista de eventos que el hilo está recorriendo y libera reproductores VLCJ nativos.
+		if (!stopRunningProtocol(previousProtocol)) {
+			showErrorDialog("No se ha podido detener el protocolo en ejecución. Cierre la "
+					+ "ventana de ejecución y vuelva a intentarlo.");
+			return;
+		}
 
 		if (!checkProtocolFile(chosenFile)) {
 			logger.debug("Programa terminado. Protocolo err�neo");
@@ -205,6 +217,53 @@ public class EEGControl extends Application
 			}
 		}
 
+	}
+
+	/**
+	 * Detiene el protocolo en ejecución, si lo hubiera, y espera a que su hilo termine.
+	 * <p>
+	 * Cargar un protocolo mientras otro corre no debería ocurrir nunca, pero si ocurre hay
+	 * que ordenarlo antes de seguir: {@code checkProtocolFile()} reasigna la lista de eventos
+	 * que el hilo está recorriendo y {@code resetMedias()} libera los reproductores VLCJ.
+	 * Liberar un reproductor nativo mientras renderiza no lanza excepción, tumba la JVM, y
+	 * por eso aquí se espera de verdad a que el hilo muera en lugar de solo pedirle que pare.
+	 *
+	 * @param previousProtocol nombre del protocolo que se estaba ejecutando, solo para el log
+	 * @return false si el hilo sigue vivo pasado el plazo, en cuyo caso no se debe continuar
+	 */
+	private boolean stopRunningProtocol(String previousProtocol) {
+		ProtocolThread running = executer;
+		if (running == null || !running.isAlive())
+			return true;
+
+		logger.warn("Se ha cargado el protocolo " + protocolName + " mientras " + previousProtocol
+				+ " seguía ejecutándose; se detiene el anterior");
+
+		running.setStop(true);
+		running.checkForTimer();
+		running.stopMedia();
+
+		if (stageProtocol != null) {
+			stageProtocol.hide();
+			stageProtocol = null;
+		}
+
+		try {
+			running.join(PROTOCOL_STOP_TIMEOUT_MILIS);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			logger.warn("Interrumpida la espera a que terminase el protocolo anterior", e);
+			return false;
+		}
+
+		if (running.isAlive()) {
+			logger.error("El protocolo anterior no ha terminado en "
+					+ PROTOCOL_STOP_TIMEOUT_MILIS + " ms; no se carga el nuevo para no liberar "
+					+ "reproductores que siguen en uso");
+			return false;
+		}
+		executer = null;
+		return true;
 	}
 
 	private void loadPorts() {
@@ -957,6 +1016,13 @@ public class EEGControl extends Application
 	public void notifyOfThreadComplete(Thread thread) {
 		final int generation = protocolGeneration;
 		Platform.runLater(() -> {
+			// Si mientras tanto se ha cargado otro protocolo, este cierre ya no le
+			// corresponde: pintar aquí la imagen de fin la mostraría sobre la ventana del
+			// protocolo nuevo.
+			if (generation != protocolGeneration) {
+				logger.debug("El protocolo ha sido reemplazado; se omite su cierre");
+				return;
+			}
 			addImage(rootProtocol, "fin-experimento.png", true);
 			// La espera se hacía con Thread.sleep sobre el hilo de JavaFX, que lo bloqueaba:
 			// la imagen de fin no llegaba a pintarse hasta que terminaba la espera, porque el

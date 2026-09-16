@@ -532,6 +532,29 @@ class ProtocolThread extends NotifyingThread {
 		// padrePane.getScene().getWindow().hide();
 	}
 
+	/**
+	 * Detiene el vídeo y el audio que estuvieran sonando. Pensado para abortar el protocolo
+	 * desde fuera: hay que dejar de renderizar antes de que se liberen los reproductores,
+	 * porque liberar un reproductor VLCJ en uso no lanza excepción, tumba la JVM.
+	 */
+	void stopMedia() {
+		EmbeddedMediaPlayer video = currentVideoPlayer;
+		if (video != null) {
+			logger.debug("stopMedia: deteniendo vídeo en curso");
+			video.controls().stop();
+			currentVideoPlayer = null;
+			videoEndFlag = true;
+		}
+		MediaPlayer audio = currentAudioPlayer;
+		if (audio != null) {
+			logger.debug("stopMedia: deteniendo audio en curso");
+			audio.stop();
+			audio.dispose();
+			currentAudioPlayer = null;
+			audioEndFlag = true;
+		}
+	}
+
 	public void checkForTimer() {
 		if (timer != null) {
 			timer.stop();
