@@ -428,7 +428,7 @@ public class EEGControl extends Application
 		rootProtocol = new BorderPane();
 
 		executer = new ProtocolThread(controller.list, events, medias, marks, estims, estNull,
-				comEEG, comMatrix, comGlove, comMulti, controller.timeT, this);
+				comEEG, comMatrix, comGlove, comMulti, this);
 		executer.addListener(this);
 
 		if (comMatrix != null) {
@@ -568,6 +568,9 @@ public class EEGControl extends Application
 		alert.setOnHidden(ignored -> {
 			if (alert.getResult() == ButtonType.OK) {
 				logger.info("OK to Start Protocol");
+				// El cronómetro va en la ventana principal, que siempre está abierta.
+				if (mainController != null)
+					mainController.startClock(executer);
 				executer.start();
 			} else {
 				if (stageProtocol != null) {
@@ -1056,6 +1059,8 @@ public class EEGControl extends Application
 	}
 
 	private void doClean() {
+		if (mainController != null)
+			mainController.stopClock();
 		rootProtocol = null;
 		stageProtocol = null;
 		protocolController = null;

@@ -26,13 +26,13 @@ import org.apache.logging.log4j.*;
 
 class ProtocolThread extends NotifyingThread {
 	ListView<EventBean> list;
-	Label timeT;
 	ArrayList<EventBean> events;
 	HashMap<String, MediaBean> medias;
 	ArrayList<EstimulusBean> estims;
 	EstimulusBean estNull;
 	List<Integer> marks;
-	long initTime;
+	/** Volatile: lo lee el cronómetro desde el hilo de JavaFX. */
+	volatile long initTime;
 	long accTime;
 	SerialPort comEEG;
 	SerialPort comMatrix;
@@ -76,8 +76,8 @@ class ProtocolThread extends NotifyingThread {
 
 	public ProtocolThread(ListView<EventBean> l, ArrayList<EventBean> ev,
 			HashMap<String, MediaBean> medias, List<Integer> ma, ArrayList<EstimulusBean> es,
-			EstimulusBean eN, SerialPort cEEG, SerialPort cMatr, SerialPort cGlove, SerialPort cMulti, Label ti,
-			EEGControl padre) {
+			EstimulusBean eN, SerialPort cEEG, SerialPort cMatr, SerialPort cGlove,
+			SerialPort cMulti, EEGControl padre) {
 		logger = LogManager.getLogger(this.getClass().getName());
 		loggerProtocol = LogManager.getLogger("ProtocolLog");
 		loggerEvent = LogManager.getLogger("EventsLog");
@@ -92,7 +92,6 @@ class ProtocolThread extends NotifyingThread {
 		comMatrix = cMatr;
 		comGlove = cGlove;
 		comMulti = cMulti;
-		timeT = ti;
 		this.medias = medias;
 
 		defaultStimulus = new EstimulusBean(1, EEGControl.matrixDimension, stimInsubInt);
@@ -583,37 +582,36 @@ class ProtocolThread extends NotifyingThread {
 	// mientras espera deja el hilo girando para siempre, doRun() nunca retorna y la
 	// limpieza de fin de protocolo no llega a ejecutarse.
 	private void waitFor(long t) {
+		// Espera activa a propósito: la precisión exigida es de milisegundos, así que no
+		// se puede dormir. onSpinWait() le dice a la CPU que esto es un bucle de espera.
 		while (System.currentTimeMillis() < t && !isStop()) {
-			toMin2(System.currentTimeMillis() - initTime);
+			Thread.onSpinWait();
 		}
 	}
 
 	private void waitForVideoEnd() {
 		while (!videoEndFlag && !isStop()) {
-			toMin2(System.currentTimeMillis() - initTime);
+			Thread.onSpinWait();
 		}
 	}
 
 	private void waitForAudioEnd() {
 		while (!audioEndFlag && !isStop()) {
-			toMin2(System.currentTimeMillis() - initTime);
+			Thread.onSpinWait();
 		}
 	}
 
 	private void waitForMultimediaFlagVideo() throws TimeoutException {
 		long initFlag = System.currentTimeMillis();
 		while (!multimediaFlag && !isStop()) {
-			toMin2(System.currentTimeMillis() - initTime);
 			if (System.currentTimeMillis() - initFlag > EEGControl.MULTIMEDIA_TIMEOUT)
 				throw new TimeoutException("No se ha podido cargar el contenido multimedia.");
-			// timeT.setText(toMin2(System.currentTimeMillis() - initTime) + "");
 		}
 	}
 
 	private void waitForMultimediaFlagImage() throws TimeoutException {
 		long multimediaInit = System.currentTimeMillis();
 		while (!multimediaFlag && !isStop()) {
-			toMin2(System.currentTimeMillis() - initTime);
 			if (System.currentTimeMillis() - multimediaInit > EEGControl.MULTIMEDIA_TIMEOUT) {
 				long multimediaStart = System.currentTimeMillis();
 				accTime = accTime + (multimediaStart - multimediaInit);
@@ -629,7 +627,7 @@ class ProtocolThread extends NotifyingThread {
 	private void waitForClickFlag() throws TimeoutException {
 		long multimediaInit = System.currentTimeMillis();
 		while (!multimediaFlag && !isStop()) {
-			toMin2(System.currentTimeMillis() - initTime);
+			Thread.onSpinWait();
 		}
 		long multimediaStart = System.currentTimeMillis();
 		accTime = accTime + (multimediaStart - multimediaInit);
