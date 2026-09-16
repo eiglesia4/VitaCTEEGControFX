@@ -51,6 +51,27 @@ Los eventos se ejecutan en el orden en el que se escriben en el fichero de proto
 | TARGET | RESERVADO. Para marcar en un protocolo que el multimedia a mostrar es el correcto | No tiene |
 | FAIL | RESERVADO. Para marcar en un protocolo que el multimedia a mostrar es el incorrecto | No tiene |
 
+## Nombres de fichero con espacios
+
+Los nombres de fichero deben ir **entre comillas dobles** siempre que contengan espacios:
+
+```
+MOSTRAR "MI IMAGEN.png"
+SONAR "mi sonido.wav" "imagen de fondo.bmp"
+LANZAR "video de prueba.mp4"
+```
+
+Sin comillas, el nombre se corta en el primer espacio y el fichero no se encuentra. Para nombres sin espacios las comillas son opcionales, aunque se recomiendan por coherencia.
+
+Afecta a `INICIAR`, `MOSTRAR`, `SONAR`, `LANZAR`, `MULTI`, `ESTIM_OLD` y `KGS`.
+
+Cuidado con `MULTI`: su segundo argumento son milisegundos de espera, **no** una imagen de fondo. La imagen de fondo como segundo argumento solo la admite `SONAR`.
+
+```
+MULTI "imagen.bmp" 300      ; 300 ms entre el estímulo y la imagen
+SONAR "sonido.wav" "fondo.bmp"
+```
+
 ## Formatos de audio soportados
 
 La reproducción de audio (comando `SONAR`) utiliza el motor de medios de JavaFX (`javafx.scene.media.MediaPlayer`). Esto determina qué formatos de fichero pueden usarse en los protocolos.

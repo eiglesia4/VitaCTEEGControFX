@@ -780,10 +780,10 @@ public class EEGControl extends Application
 				check = createMultimediaEvent(arr[i], i, EventEnum.LANZAR, MediaTypeEnum.VIDEO, sc);
 			} else if (anal.indexOf("INICIAR") == 0) {
 				try {
-					String[] data = arr[i].split("\\s");
+					String[] data = ProtocolUtils.tokenize(arr[i]);
 					String fileName = null;
 					if (data.length > 1)
-						fileName = data[1].replace("\"", "");
+						fileName = data[1];
 					EventBean lanzarEvent = new EventBean(EventEnum.INICIAR, fileName, i+1);
 
 					if (fileName != null) {
@@ -851,10 +851,10 @@ public class EEGControl extends Application
 				}
 			} else if (anal.indexOf("ESTIM_OLD") == 0 || anal.indexOf("KGS") == 0) {
 				try {
-					String[] data = arr[i].split("\\s");
+					String[] data = ProtocolUtils.tokenize(arr[i]);
 					String fileName = null;
 					if (data.length > 1)
-						fileName = data[1].replace("\"", "");
+						fileName = data[1];
 					EventBean lanzarEvent = new EventBean(EventEnum.ESTIM_OLD, fileName, i+1);
 
 					if (fileName != null) {
@@ -1230,6 +1230,11 @@ public class EEGControl extends Application
 				break;
 			}
 			case SOUND_IMAGE: {
+				if (fileNameImage == null) {
+					showErrorDialog("Error interno: se ha pedido sonido con imagen de fondo "
+							+ "para " + fileNamePrimary + " sin indicar la imagen.");
+					return false;
+				}
 				if (!fileNamePrimary.contains("."))
 					fileNamePrimary = fileNamePrimary + ".wav";
 				if (!fileNameImage.contains("."))
@@ -1315,9 +1320,10 @@ public class EEGControl extends Application
 	private boolean createMultimediaEvent(String line, int line_num,  EventEnum eventType,
 			MediaTypeEnum mediaTypeEnum, Scanner sc) {
 		try {
-			String[] data = line.split("\\s");
+			// tokenize() respeta las comillas: un nombre con espacios llega entero.
+			String[] data = ProtocolUtils.tokenize(line);
 			if (data.length > 1) {
-				String fileName = data[1].replace("\"", "");
+				String fileName = data[1];
 				switch (mediaTypeEnum) {
 					case VIDEO: {
 						fileName = fileName.contains(".") ? fileName : fileName + ".mp4";
@@ -1337,17 +1343,24 @@ public class EEGControl extends Application
 
 				EventBean multimediaEvent = new EventBean(eventType, fileName, line_num+1);
 				String mediaReference = fileName;
-				if (checkMediaReference(fileName)) {
-					if (data.length > 2) {
-						String fileNameSecondary = data[2].replace("\"", "");
-						if (!fileNameSecondary.contains(".")) {
-							fileNameSecondary = fileNameSecondary + ".bmp";
-						}
-						mediaReference = fileName + "_" + fileNameSecondary;
-						mediaTypeEnum = MediaTypeEnum.SOUND_IMAGE;
-					}
+				String fileNameSecondary = null;
 
-					if (!createMediaReference(fileName, null, mediaTypeEnum)) {
+				// Solo SONAR admite una imagen de fondo como segundo argumento. Antes esto se
+				// deducía de cuántos trozos daba el split, así que un nombre con espacios, o el
+				// tiempo de espera de MULTI, activaban SOUND_IMAGE por error.
+				if (eventType == EventEnum.SONAR && data.length > 2) {
+					fileNameSecondary = data[2];
+					if (!fileNameSecondary.contains(".")) {
+						fileNameSecondary = fileNameSecondary + ".bmp";
+					}
+					mediaReference = fileName + "_" + fileNameSecondary;
+					mediaTypeEnum = MediaTypeEnum.SOUND_IMAGE;
+				}
+
+				// Se comprueba la referencia real bajo la que se indexa el media, no el nombre
+				// del fichero: con SOUND_IMAGE la clave es "sonido_imagen".
+				if (checkMediaReference(mediaReference)) {
+					if (!createMediaReference(fileName, fileNameSecondary, mediaTypeEnum)) {
 						sc.close();
 						return false;
 					}
@@ -1358,7 +1371,7 @@ public class EEGControl extends Application
 
 					if(data.length > 2){
 						try{
-							waitSecs = Integer.parseInt(data[2].replace("\"", ""));
+							waitSecs = Integer.parseInt(data[2]);
 						}catch(NumberFormatException e){
 							showErrorDialog("Error en línea " + (line_num + 1) + " del protocolo: " + line.trim()
 									+ ", No se puede parsear el tiempo de espera indicado en segundos, debe ser un entero. ");
@@ -1380,8 +1393,13 @@ public class EEGControl extends Application
 				return false;
 			}
 		} catch (Exception e) {
-			logger.debug("Error en línea " + (line_num + 1) + " del protocolo: " + line.trim()
-					+ ", Error: " + e.getMessage());
+			// A nivel debug esto era invisible: el protocolo se rechazaba y la aplicación
+			// volvía al menú sin decir nada. Se registra como error y se avisa al operador.
+			String errorMsg = "Error en línea " + (line_num + 1) + " del protocolo: "
+					+ line.trim() + ", Error: " + e.getMessage();
+			logger.error(errorMsg, e);
+			showErrorDialog(errorMsg);
+			sc.close();
 			return false;
 		}
 	}
