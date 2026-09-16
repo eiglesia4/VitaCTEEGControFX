@@ -699,7 +699,10 @@ class ProtocolThread extends NotifyingThread {
 						return;
 					}
 					loggerProtocol.debug("ENVIADO EST�MULO T�CTIL " + m);
-					sendMSG(estims.get(m));
+					// Si la matriz no confirma no tiene sentido esperar el tiempo del
+					// estímulo ni mandar el NULL: waitFor2() ya ha marcado la parada.
+					if (!sendMSG(estims.get(m)))
+						return;
 					// waitFor(3000);
 					synchronized (this) {
 						try {
@@ -709,7 +712,12 @@ class ProtocolThread extends NotifyingThread {
 						}
 					}
 
-					sendNULL();
+					// El NULL apaga el estímulo. Si falla, la matriz puede quedarse
+					// energizada; waitFor2() ya habrá abortado el protocolo, pero conviene
+					// que quede constancia de por qué.
+					if (!sendNULL())
+						logger.error("No se ha podido apagar el estímulo táctil: la matriz "
+								+ "puede haber quedado activa");
 				} else {
 					logger.error("The comunications with the matrix is closed.");
 				}
@@ -763,7 +771,8 @@ class ProtocolThread extends NotifyingThread {
 				if (comMatrix.isOpen()) {
 					loggerProtocol.info("ENVIADO EST�MULO T�CTIL POR DEFECTO");
 
-					sendMSG(defaultStimulus);
+					if (!sendMSG(defaultStimulus))
+						return;
 					// waitFor(3000);
 					synchronized (this) {
 						try {
@@ -773,7 +782,12 @@ class ProtocolThread extends NotifyingThread {
 						}
 					}
 
-					sendNULL();
+					// El NULL apaga el estímulo. Si falla, la matriz puede quedarse
+					// energizada; waitFor2() ya habrá abortado el protocolo, pero conviene
+					// que quede constancia de por qué.
+					if (!sendNULL())
+						logger.error("No se ha podido apagar el estímulo táctil: la matriz "
+								+ "puede haber quedado activa");
 				} else {
 					logger.error("The comunications with the matrix is closed.");
 				}
@@ -784,6 +798,20 @@ class ProtocolThread extends NotifyingThread {
 		}
 	}
 
+	/**
+	 * Espera a que la matriz conteste con el carácter indicado. Si no llega dentro del
+	 * plazo, aborta el protocolo y avisa al operador.
+	 * <p>
+	 * El contrato es positivo, {@code true} = la matriz ha confirmado, igual que
+	 * {@link #sendMSG(EstimulusBean)} y {@link #sendNULL()}. IntelliJ avisa de que todas
+	 * las llamadas lo niegan, porque el único caso interesante es el fallo; invertirlo a
+	 * "ha fallado" rompería la coherencia con los otros dos y deja lógica negativa en las
+	 * condiciones compuestas del bucle de envío.
+	 *
+	 * @param c carácter de confirmación esperado
+	 * @return true si la matriz ha confirmado dentro del plazo
+	 */
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	boolean waitFor2(char c) {
 		InputStream in = comMatrix.getInputStream();
 		int counter = 0;
@@ -800,9 +828,18 @@ class ProtocolThread extends NotifyingThread {
 						}
 						counter++;
 						if (counter * readTimeout > timeoutReadMillis) {
-							logger.warn("Cansado de esperar " + c);
-							notifyError("No comunico con la matriz. ¿Está encendida?", null);
-							this.setStop(false);
+							logger.error("Timeout esperando '" + c + "' de la matriz tras "
+									+ timeoutReadMillis + " ms; se aborta el protocolo");
+							// Aquí había setStop(false), que limpiaba el flag en vez de
+							// ponerlo. Si la matriz no responde no habrá más estimulación
+							// táctil, así que continuar solo produce un registro que parece
+							// completo y no lo es: las marcas afirmarían estímulos que el
+							// sujeto nunca recibió.
+							setStop(true);
+							notifyError("No hay comunicación con la matriz. ¿Está encendida? "
+									+ "Se detiene el protocolo: sin matriz no se entregarían "
+									+ "los estímulos táctiles y el registro no sería válido.",
+									null);
 							in.close();
 							return false;
 						}
@@ -822,17 +859,27 @@ class ProtocolThread extends NotifyingThread {
 		}
 	}
 
-	void sendMSG(EstimulusBean est) {
+	/**
+	 * Envía un estímulo a la matriz. Los retornos de waitFor2() se ignoraban, de modo que un
+	 * timeout a mitad de protocolo seguía escribiendo el resto de la rejilla a un dispositivo
+	 * que no contestaba y la ejecución continuaba como si nada.
+	 *
+	 * @return false si la matriz no ha confirmado; el protocolo ya se ha marcado para parar
+	 */
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
+	boolean sendMSG(EstimulusBean est) {
 		// comMatrix.writeBytes(charInt, 1);
 		byte[] bytesInt = "?".getBytes();
 		comMatrix.writeBytes(bytesInt, bytesInt.length);
 		int dim = est.getDim();
-		waitFor2('!');
+		if (!waitFor2('!'))
+			return false;
 		for (int i = 0; i < 4; i++) {
 			comMatrix.writeBytes(Arrays.copyOfRange(est.getEstim(), dim * i, dim * (i + 1)), dim);
-			if (i != 3 && !useOldProtocol)
-				waitFor2('*');
+			if (i != 3 && !useOldProtocol && !waitFor2('*'))
+				return false;
 		}
+		return true;
 	}
 
 	void sendStrGlove(String t) {
@@ -850,6 +897,9 @@ class ProtocolThread extends NotifyingThread {
 		}
 	}
 
+	/** @return true si la matriz ha confirmado el estímulo nulo. Contrato positivo, ver
+	 *  {@link #waitFor2(char)}. */
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	boolean sendNULL() {
 		// comMatrix.writeBytes(charInt, 1);
 		byte[] bytesInt = "?".getBytes();
@@ -861,8 +911,8 @@ class ProtocolThread extends NotifyingThread {
 		for (int i = 0; i < 4; i++) {
 			comMatrix.writeBytes(
 					Arrays.copyOfRange(nullStimulus.getEstim(), dim * i, dim * (i + 1)), dim);
-			if (i != 3 && !useOldProtocol)
-				waitFor2('*');
+			if (i != 3 && !useOldProtocol && !waitFor2('*'))
+				return false;
 		}
 		return true;
 	}
