@@ -267,6 +267,12 @@ public class EEGViewController {
 	}
 
 	public void restartExperiment() {
+		// Reejecutar es una sesión nueva, no un reemplazo: se avanza el número de protocolo
+		// igual que hace continueStudy(), para no escribir sobre los ficheros de la
+		// ejecución anterior. El amplificador EEG sí registró aquella sesión, así que
+		// perder sus marcas dejaría el registro huérfano.
+		loggerNames = getLastStudyAndProtocol();
+		padre.reloadLoggers(loggerNames);
 		padre.fileProtocolLoaded(chosenFile);
 	}
 }
