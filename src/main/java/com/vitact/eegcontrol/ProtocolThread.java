@@ -556,27 +556,30 @@ class ProtocolThread extends NotifyingThread {
 		//		}
 	}
 
+	// Todos los bucles de espera comprueban isStop(): sin eso, interrumpir el protocolo
+	// mientras espera deja el hilo girando para siempre, doRun() nunca retorna y la
+	// limpieza de fin de protocolo no llega a ejecutarse.
 	private void waitFor(long t) {
-		while (System.currentTimeMillis() < t) {
+		while (System.currentTimeMillis() < t && !isStop()) {
 			toMin2(System.currentTimeMillis() - initTime);
 		}
 	}
 
 	private void waitForVideoEnd() {
-		while (!videoEndFlag) {
+		while (!videoEndFlag && !isStop()) {
 			toMin2(System.currentTimeMillis() - initTime);
 		}
 	}
 
 	private void waitForAudioEnd() {
-		while (!audioEndFlag) {
+		while (!audioEndFlag && !isStop()) {
 			toMin2(System.currentTimeMillis() - initTime);
 		}
 	}
 
 	private void waitForMultimediaFlagVideo() throws TimeoutException {
 		long initFlag = System.currentTimeMillis();
-		while (!multimediaFlag) {
+		while (!multimediaFlag && !isStop()) {
 			toMin2(System.currentTimeMillis() - initTime);
 			if (System.currentTimeMillis() - initFlag > EEGControl.MULTIMEDIA_TIMEOUT)
 				throw new TimeoutException("No se ha podido cargar el contenido multimedia.");
@@ -586,7 +589,7 @@ class ProtocolThread extends NotifyingThread {
 
 	private void waitForMultimediaFlagImage() throws TimeoutException {
 		long multimediaInit = System.currentTimeMillis();
-		while (!multimediaFlag) {
+		while (!multimediaFlag && !isStop()) {
 			toMin2(System.currentTimeMillis() - initTime);
 			if (System.currentTimeMillis() - multimediaInit > EEGControl.MULTIMEDIA_TIMEOUT) {
 				long multimediaStart = System.currentTimeMillis();
@@ -598,9 +601,11 @@ class ProtocolThread extends NotifyingThread {
 		accTime = accTime + (multimediaStart - multimediaInit);
 	}
 
+	// Sin timeout a propósito: espera una acción del sujeto y no se puede acotar por
+	// tiempo sin abortar experimentos legítimos. isStop() basta para poder interrumpirla.
 	private void waitForClickFlag() throws TimeoutException {
 		long multimediaInit = System.currentTimeMillis();
-		while (!multimediaFlag) {
+		while (!multimediaFlag && !isStop()) {
 			toMin2(System.currentTimeMillis() - initTime);
 		}
 		long multimediaStart = System.currentTimeMillis();
