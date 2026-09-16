@@ -141,7 +141,6 @@ public class EEGViewController {
 		bRelauchProtocol.setDisable(false);
 	}
 
-	@SuppressWarnings("finally")
 	private String[] getLastStudyAndProtocol() {
 		File f;
 		File[] paths;
@@ -178,12 +177,13 @@ public class EEGViewController {
 				}
 			}
 		} catch (Exception e) {
-			logger.warn("Error " + e.getMessage() + " loading last study file. Using first");
+			// Se registra la excepción completa: el mensaje suelto no basta para
+			// diagnosticar por qué no se ha podido leer el último estudio.
+			logger.warn("Error " + e.getMessage() + " loading last study file. Using first", e);
 			studyAndProtocol[0] = "0001";
 			studyAndProtocol[1] = "02";
-		} finally {
-			return studyAndProtocol;
 		}
+		return studyAndProtocol;
 	}
 
 	private void loadLastStudy(String[] routePath) {
