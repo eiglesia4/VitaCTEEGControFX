@@ -343,6 +343,7 @@ class ProtocolThread extends NotifyingThread {
 					waitFor(accTime);
 					// Then Show image
 					executeShowImage(e);
+					break;
 				}
 				case MOSTRAR: {
 					executeShowImage(e);
