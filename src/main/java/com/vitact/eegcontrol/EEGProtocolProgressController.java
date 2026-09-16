@@ -3,21 +3,17 @@ package com.vitact.eegcontrol;
 import java.util.ArrayList;
 
 import com.vitact.eegcontrol.bean.EventBean;
+import com.vitact.eegcontrol.type.EventEnum;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
 public class EEGProtocolProgressController
 {
 
 	@FXML
-	Label time;
-	@FXML
 	ListView<EventBean> list;
-	@FXML
-	Label timeT;
 
 	ArrayList<EventBean> events;
 
@@ -26,10 +22,15 @@ public class EEGProtocolProgressController
 	{
 		if(EEGControl.showProtocolEvolWindow)
 		{
-			list.getSelectionModel().selectedItemProperty().addListener(l -> {
-				if (list.getSelectionModel().getSelectedItem().getTipo().equals("TERMINAR"))
-					list.getScene().getWindow().hide();
-			});
+			// getTipo() devuelve EventEnum; se comparaba con la cadena "TERMINAR", de modo
+			// que la condición era siempre falsa y la ventana nunca se cerraba sola.
+			// El listener también salta con null al limpiarse la selección.
+			// De los tres argumentos del ChangeListener solo interesa el seleccionado.
+			list.getSelectionModel().selectedItemProperty().addListener(
+					(ignoredProperty, ignoredOldValue, selected) -> {
+						if (selected != null && selected.getTipo() == EventEnum.TERMINAR)
+							list.getScene().getWindow().hide();
+					});
 		}
 	}
 
@@ -43,4 +44,5 @@ public class EEGProtocolProgressController
 		this.events = events;
 		list.setItems(FXCollections.observableArrayList(getEvents()));
 	}
+
 }

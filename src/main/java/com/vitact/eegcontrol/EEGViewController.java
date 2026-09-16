@@ -3,6 +3,7 @@ package com.vitact.eegcontrol;
 import com.vitact.eegcontrol.bean.StudyBean;
 import java.io.*;
 import java.util.Arrays;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
@@ -23,7 +24,7 @@ public class EEGViewController {
 	Label lLastProtocolName;
 	@FXML
 	Button bContinueStudy;
-	String loggerNames[];
+	String[] loggerNames;
 	@FXML
 	Label lStudyCode;
 	@FXML
@@ -36,10 +37,51 @@ public class EEGViewController {
 	Button bRelauchProtocol;
 	@FXML
 	Label lVersion;
+	@FXML
+	Label timeT;
+	private AnimationTimer clock;
+	private String lastShown;
 
 	public EEGViewController() {
 		logger = LogManager.getLogger(this.getClass().getName());
 		loggerNames = getLastStudyAndProtocol();
+	}
+
+	/**
+	 * Arranca el cronómetro de tiempo transcurrido de la ventana principal. El AnimationTimer
+	 * corre en el hilo de JavaFX y solo lee {@code initTime} del hilo de protocolo, así que
+	 * este no tiene que llamar a nada: sus bucles de espera siguen sin asignar memoria.
+	 * <p>
+	 * La etiqueta se escribe solo cuando el texto cambia, una vez por segundo, en lugar de en
+	 * cada fotograma: un setText por fotograma ensucia el grafo de escena 60 veces por segundo
+	 * para mostrar lo mismo.
+	 *
+	 * @param thread el hilo cuyo tiempo de inicio se muestra
+	 */
+	void startClock(ProtocolThread thread) {
+		stopClock();
+		clock = new AnimationTimer() {
+			@Override
+			public void handle(long now) {
+				long init = thread.initTime;
+				// initTime se fija dentro de doRun(); antes de eso no hay nada que contar.
+				String text = (init == 0) ? "00:00:00"
+						: thread.toMin2(System.currentTimeMillis() - init);
+				if (!text.equals(lastShown)) {
+					timeT.setText(text);
+					lastShown = text;
+				}
+			}
+		};
+		clock.start();
+	}
+
+	/** Detiene el cronómetro. Es seguro llamarlo aunque no se haya arrancado. */
+	void stopClock() {
+		if (clock != null) {
+			clock.stop();
+			clock = null;
+		}
 	}
 
 	@FXML
@@ -55,7 +97,7 @@ public class EEGViewController {
 	}
 
 	@FXML
-	public void startGlasses(ActionEvent event) {
+	public void startGlasses() {
 		padre.loadCameras();
 	}
 
