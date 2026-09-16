@@ -1,0 +1,45 @@
+;==============================================================================
+; Protocolo de regresión EEGFX-31
+;
+; Cubre los casos que el troceado por espacios rompía. Antes del arreglo este
+; protocolo se rechazaba entero y la aplicación volvía al menú sin avisar.
+;
+; Ficheros usados:
+;   - "PRUEBA ESPACIOS.png"  (nombre CON espacio, a propósito)
+;   - white.png, Negro.bmp, 1500Hz-10ms.wav
+;
+; Todos los nombres van entrecomillados: las comillas son obligatorias si el
+; nombre contiene espacios.
+;==============================================================================
+
+FULLSCREEN false
+USE_EEG false
+USE_MATRIX false
+USE_GLOVE false
+USE_MULTI false
+
+INICIAR "inicio-experimento.png"
+ESPERAR 1000
+
+;--- 1. MOSTRAR con nombre sin espacios (control) -----------------------------
+MOSTRAR "white.png"
+ESPERAR 800
+
+;--- 2. MOSTRAR con nombre CON espacios ---------------------------------------
+MOSTRAR "PRUEBA ESPACIOS.png"
+ESPERAR 800
+
+;--- 3. SONAR con imagen de fondo: segunda forma documentada del comando -------
+SONAR "1500Hz-10ms.wav" "white.png"
+ESPERAR 800
+
+;--- 4. SONAR con imagen de fondo cuyo nombre lleva espacios ------------------
+SONAR "1500Hz-10ms.wav" "PRUEBA ESPACIOS.png"
+ESPERAR 800
+
+;--- 5. MULTI con tiempo de espera explícito ----------------------------------
+; El segundo argumento son milisegundos, no una imagen de fondo.
+MULTI "Negro.bmp" 300
+ESPERAR 800
+
+TERMINAR
