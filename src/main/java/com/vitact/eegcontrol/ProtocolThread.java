@@ -937,6 +937,7 @@ class ProtocolThread extends NotifyingThread {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error Ejecutando Protocolo");
 			alert.setContentText(message);
+			EEGControl.applyIcon(alert);
 
 			if (th != null) {
 				// Create expandable Exception.

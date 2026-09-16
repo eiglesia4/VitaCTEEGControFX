@@ -60,7 +60,7 @@ public class EEGViewController {
 	}
 
 	@FXML
-	public void newStudy(ActionEvent event) {
+	public void newStudy() {
 		int numStrudio = Integer.parseInt(loggerNames[0]) + 1;
 		loggerNames[0] = String.format("%04d", numStrudio);
 		loggerNames[1] = String.format("%02d", 2);
@@ -93,17 +93,18 @@ public class EEGViewController {
 
 	private void launchNewStudyDialog() {
 		try {
-			FXMLLoader loader = null;
+			FXMLLoader loader;
 			if (EEGControl.USE_FULL_STUDY_DATA) {
 				loader = new FXMLLoader(getClass().getResource("EEGStudyLoader.fxml"));
 			} else {
 				loader = new FXMLLoader(getClass().getResource("EEGStudyLoaderMinimal.fxml"));
 			}
-			BorderPane root = (BorderPane) loader.load();
+			BorderPane root = loader.load();
 			EEGStudyLoader eegStudyLoader = loader.getController();
 			eegStudyLoader.setPadre(this);
 			Scene scene = new Scene(root);
 			Stage stage = new Stage();
+			EEGControl.applyIcon(stage);
 			stage.setTitle("Configuración de Nuevo Estudio");
 
 			stage.setScene(scene);
@@ -142,13 +143,18 @@ public class EEGViewController {
 
 	@SuppressWarnings("finally")
 	private String[] getLastStudyAndProtocol() {
-		File f = null;
+		File f;
 		File[] paths;
 		File[] paths1;
 		String[] studyAndProtocol = new String[2];
 		try {
 			f = new File(EEGControl.STUDY_BASE_DIR);
 			paths = f.listFiles();
+			// listFiles() devuelve null si el directorio no existe o no se puede leer.
+			// Se lanza para que lo recoja el catch de abajo y se usen los valores por defecto.
+			if (paths == null)
+				throw new IOException(
+						"No se puede leer el directorio de estudios " + EEGControl.STUDY_BASE_DIR);
 			Arrays.sort(paths);
 
 			studyAndProtocol[0] = paths[paths.length - 1].getName();
@@ -157,9 +163,12 @@ public class EEGViewController {
 				studyAndProtocol[1] = "02";
 			} else {
 				paths1 = paths[paths.length - 1].listFiles();
+				if (paths1 == null)
+					throw new IOException("No se puede leer el directorio del estudio "
+							+ paths[paths.length - 1].getName());
 				Arrays.sort(paths1);
 				String fileName = paths1[paths1.length - 1].getName();
-				if (fileName != null && fileName.contains("-")) {
+				if (fileName.contains("-")) {
 					studyAndProtocol[1] = fileName.substring(fileName.lastIndexOf("-") + 1,
 							fileName.indexOf("."));
 					int protocolNumber = Integer.parseInt(studyAndProtocol[1]);
@@ -195,10 +204,6 @@ public class EEGViewController {
 		}
 	}
 
-	public EEGControl getPadre() {
-		return padre;
-	}
-
 	public void setPadre(EEGControl padre) {
 		this.padre = padre;
 		if (studyBean != null)
@@ -219,7 +224,7 @@ public class EEGViewController {
 			padre.setStudyBean(studyBean);
 	}
 
-	public void restartExperiment(ActionEvent actionEvent) {
+	public void restartExperiment() {
 		padre.fileProtocolLoaded(chosenFile);
 	}
 }
