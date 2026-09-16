@@ -4,21 +4,27 @@
 		<Console name="Console">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 		</Console>
+		<!-- immediateFlush a true: este es el log que se revisa al diagnosticar la máquina
+		     de Dr. Ortiz en remoto, y con escritura diferida se pierden justo las últimas
+		     líneas si la aplicación se cae, que son las que interesan. -->
 		<File name="MyFile" fileName="EEGControl.log"
-			immediateFlush="false" append="false">
-			<PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} - %msg%n" />
-		</File>
-		<File name="ProtocolLogFile" fileName="${sys:studyBaseDir}/${sys:studyNumber}/protocolo-${sys:studyNumber}-${sys:protocolNumber}.log">
 			immediateFlush="true" append="false">
 			<PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} - %msg%n" />
 		</File>
-		<File name="EventFile" fileName="${sys:studyBaseDir}/${sys:studyNumber}/eventos-${sys:studyNumber}-${sys:protocolNumber}.log">
+		<!-- Los ${sys:...} llevan valor por defecto para que la configuración se sostenga
+		     aunque se cargue antes de que EEGControl.reloadLoggers() defina las propiedades.
+		     Sin ellos Log4j crea un directorio llamado literalmente ${sys:studyBaseDir}. -->
+		<File name="ProtocolLogFile" fileName="${sys:studyBaseDir:-estudios}/${sys:studyNumber:-0000}/protocolo-${sys:studyNumber:-0000}-${sys:protocolNumber:-00}.log"
+			immediateFlush="true" append="false">
+			<PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} - %msg%n" />
+		</File>
+		<File name="EventFile" fileName="${sys:studyBaseDir:-estudios}/${sys:studyNumber:-0000}/eventos-${sys:studyNumber:-0000}-${sys:protocolNumber:-00}.log">
 			<PatternLayout pattern="%msg%n" />
 		</File>
-		<File name="StudyFile" fileName="${sys:studyBaseDir}/${sys:studyNumber}/estudio-${sys:studyNumber}.dat">
+		<File name="StudyFile" fileName="${sys:studyBaseDir:-estudios}/${sys:studyNumber:-0000}/estudio-${sys:studyNumber:-0000}.dat">
 			<PatternLayout pattern="%msg%n" />
 		</File>
-		<File name="ProtocolFile" fileName="${sys:studyBaseDir}/${sys:studyNumber}/protocolo-${sys:studyNumber}-${sys:protocolNumber}.dat">
+		<File name="ProtocolFile" fileName="${sys:studyBaseDir:-estudios}/${sys:studyNumber:-0000}/protocolo-${sys:studyNumber:-0000}-${sys:protocolNumber:-00}.dat">
 			<PatternLayout pattern="%msg%n" />
 		</File>
 					</Appenders>

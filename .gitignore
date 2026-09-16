@@ -34,3 +34,7 @@ Thumbs.db
 CLAUDE.md
 .claude/
 dependency-reduced-pom.xml
+
+# Directorio literal que Log4j crearía si la configuración se cargara sin las
+# propiedades del sistema definidas (ver EEGFX-29)
+${sys:studyBaseDir}/
