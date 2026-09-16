@@ -150,7 +150,11 @@ public class EEGViewController {
 		try {
 			f = new File(EEGControl.STUDY_BASE_DIR);
 			paths = f.listFiles();
-			assert paths != null;
+			// listFiles() devuelve null si el directorio no existe o no se puede leer.
+			// Se lanza para que lo recoja el catch de abajo y se usen los valores por defecto.
+			if (paths == null)
+				throw new IOException(
+						"No se puede leer el directorio de estudios " + EEGControl.STUDY_BASE_DIR);
 			Arrays.sort(paths);
 
 			studyAndProtocol[0] = paths[paths.length - 1].getName();
@@ -159,7 +163,9 @@ public class EEGViewController {
 				studyAndProtocol[1] = "02";
 			} else {
 				paths1 = paths[paths.length - 1].listFiles();
-				assert paths1 != null;
+				if (paths1 == null)
+					throw new IOException("No se puede leer el directorio del estudio "
+							+ paths[paths.length - 1].getName());
 				Arrays.sort(paths1);
 				String fileName = paths1[paths1.length - 1].getName();
 				if (fileName.contains("-")) {
