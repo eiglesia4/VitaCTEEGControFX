@@ -7,6 +7,7 @@ import com.vitact.eegcontrol.utils.ProtocolUtils;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import javafx.animation.PauseTransition;
 import javafx.application.*;
 import javafx.event.EventHandler;
 import javafx.fxml.*;
@@ -25,6 +26,7 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.*;
+import javafx.util.Duration;
 import org.apache.logging.log4j.*;
 public class EEGControl extends Application
 		implements ThreadCompleteListener, EventHandler<KeyEvent> {
@@ -96,6 +98,12 @@ public class EEGControl extends Application
 	static MediaPlayerFactory mediaPlayerFactory;
 	/** Caché del juego de iconos; se carga una sola vez en el primer uso. */
 	private static List<Image> appIcons = null;
+	/**
+	 * Se incrementa al cargar cada protocolo. La limpieza de fin de protocolo compara su
+	 * generación con esta: si no coinciden es que se ha cargado otro protocolo mientras
+	 * tanto, y limpiar borraría el estado del nuevo.
+	 */
+	private int protocolGeneration = 0;
 	Label label = new Label("PULSA EL RATON PARA CONTINUAR");
 	int multiStimulationMillisPlaying = 0;
 
@@ -592,6 +600,12 @@ public class EEGControl extends Application
 	private boolean checkProtocolFile(File p) {
 		events = new ArrayList<>();
 		estims = new ArrayList<>();
+		// Cargar un protocolo tiene que bastarse a sí mismo: si no se limpia aquí, el
+		// contenido multimedia del protocolo anterior sobrevive y validateAndStartProtocol()
+		// falla sobre ficheros que este protocolo ni siquiera referencia. No basta con
+		// limpiar en doClean(), porque un protocolo interrumpido puede no llegar a él.
+		resetMedias();
+		protocolGeneration++;
 
 		boolean check = true;
 		Scanner sc;
@@ -941,28 +955,59 @@ public class EEGControl extends Application
 
 	@Override
 	public void notifyOfThreadComplete(Thread thread) {
+		final int generation = protocolGeneration;
 		Platform.runLater(() -> {
 			addImage(rootProtocol, "fin-experimento.png", true);
-			try {
-				Thread.sleep(EEGControl.END_PROTOCOL_WAIT_MILIS);
-			} catch (InterruptedException ex) {
-				logger.error("Error finalizando aplicación " + ex.getLocalizedMessage());
-			}
-			rootProtocol.getScene().getWindow().hide();
-			doClean();
+			// La espera se hacía con Thread.sleep sobre el hilo de JavaFX, que lo bloqueaba:
+			// la imagen de fin no llegaba a pintarse hasta que terminaba la espera, porque el
+			// hilo no volvía al bucle de render. PauseTransition espera sin bloquearlo.
+			PauseTransition endWait = new PauseTransition(
+					Duration.millis(EEGControl.END_PROTOCOL_WAIT_MILIS));
+			endWait.setOnFinished(ignored -> closeProtocolWindow(generation));
+			endWait.play();
 		});
 	}
 
+	/**
+	 * Cierra la ventana de ejecución y limpia el estado. La limpieza va en un finally para
+	 * que se ejecute aunque el cierre falle: si no, el siguiente protocolo arrancaría con el
+	 * contenido multimedia del anterior todavía en memoria.
+	 */
+	private void closeProtocolWindow(int generation) {
+		try {
+			if (rootProtocol != null && rootProtocol.getScene() != null
+					&& rootProtocol.getScene().getWindow() != null)
+				rootProtocol.getScene().getWindow().hide();
+		} catch (Exception e) {
+			logger.warn("Error cerrando la ventana de ejecución del protocolo", e);
+		} finally {
+			if (generation == protocolGeneration)
+				doClean();
+			else
+				logger.debug("Se ha cargado otro protocolo durante la espera de fin; "
+						+ "se omite doClean() para no borrar su estado");
+		}
+	}
+
 	private void doClean() {
-		releaseVideoPlayers();
 		rootProtocol = null;
 		stageProtocol = null;
 		protocolController = null;
 		events = new ArrayList<>();
-		medias = new HashMap<>();
+		resetMedias();
 		estims = new ArrayList<>();
 		initalImage = null;
 		System.gc();
+	}
+
+	/**
+	 * Libera los reproductores de vídeo y vacía la caché de contenido multimedia. Se llama
+	 * tanto al cargar un protocolo como al terminarlo, para que ninguna de las dos vías
+	 * dependa de que la otra se haya ejecutado.
+	 */
+	private void resetMedias() {
+		releaseVideoPlayers();
+		medias = new HashMap<>();
 	}
 
 	private void releaseVideoPlayers() {
