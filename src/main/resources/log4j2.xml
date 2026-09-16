@@ -18,13 +18,16 @@
 			immediateFlush="true" append="false">
 			<PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} - %msg%n" />
 		</File>
-		<File name="EventFile" fileName="${sys:studyBaseDir:-estudios}/${sys:studyNumber:-0000}/eventos-${sys:studyNumber:-0000}-${sys:protocolNumber:-00}.log">
+		<File name="EventFile" fileName="${sys:studyBaseDir:-estudios}/${sys:studyNumber:-0000}/eventos-${sys:studyNumber:-0000}-${sys:protocolNumber:-00}.log"
+			append="false">
 			<PatternLayout pattern="%msg%n" />
 		</File>
-		<File name="StudyFile" fileName="${sys:studyBaseDir:-estudios}/${sys:studyNumber:-0000}/estudio-${sys:studyNumber:-0000}.dat">
+		<File name="StudyFile" fileName="${sys:studyBaseDir:-estudios}/${sys:studyNumber:-0000}/estudio-${sys:studyNumber:-0000}.dat"
+			append="false">
 			<PatternLayout pattern="%msg%n" />
 		</File>
-		<File name="ProtocolFile" fileName="${sys:studyBaseDir:-estudios}/${sys:studyNumber:-0000}/protocolo-${sys:studyNumber:-0000}-${sys:protocolNumber:-00}.dat">
+		<File name="ProtocolFile" fileName="${sys:studyBaseDir:-estudios}/${sys:studyNumber:-0000}/protocolo-${sys:studyNumber:-0000}-${sys:protocolNumber:-00}.dat"
+			append="false">
 			<PatternLayout pattern="%msg%n" />
 		</File>
 					</Appenders>
