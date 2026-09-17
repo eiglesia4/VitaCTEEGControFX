@@ -6,7 +6,7 @@
 ;
 ; Ficheros usados:
 ;   - "PRUEBA ESPACIOS.png"  (nombre CON espacio, a propósito)
-;   - white.png, Negro.bmp, 1500Hz-10ms.wav
+;   - white.png, "PRUEBA negro.png", 1500Hz-10ms.wav
 ;
 ; Todos los nombres van entrecomillados: las comillas son obligatorias si el
 ; nombre contiene espacios.
@@ -39,7 +39,7 @@ ESPERAR 800
 
 ;--- 5. MULTI con tiempo de espera explícito ----------------------------------
 ; El segundo argumento son milisegundos, no una imagen de fondo.
-MULTI "Negro.bmp" 300
+MULTI "PRUEBA negro.png" 300
 ESPERAR 800
 
 TERMINAR
