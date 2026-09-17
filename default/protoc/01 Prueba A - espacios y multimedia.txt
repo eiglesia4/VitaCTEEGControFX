@@ -1,0 +1,133 @@
+Prueba A - nombres con espacios, tildes y todos los tipos de media
+;==============================================================================
+; PROTOCOLO DE PRUEBA A  (release EEGFX003)
+;
+; Ejercita las tres clases de media con nombres que llevan ESPACIOS y TILDES,
+; y los comandos de audio y vídeo añadidos en esta ronda.
+;
+; Su media es DISJUNTA de la del protocolo B, a propósito: ejecutar A, cortarlo
+; a media reproducción y lanzar B después es la prueba del bug reportado
+; (la caché de multimedia no se limpiaba entre protocolos).
+;
+; NO NECESITA HARDWARE. Va con USE_EEG false y USE_MATRIX false.
+;
+; Ficheros que usa, todos en default/Multimedia/:
+;   "PRUEBA A cuadro rojo.png"    cuadro rojo liso
+;   "PRUEBA A cuadrícula.png"     patrón de barras de test   <- lleva tilde
+;   "PRUEBA A fondo sonido.png"   verde oscuro, fondo de SONAR
+;   "PRUEBA A tono largo.wav"     440 Hz, 10 s
+;   "PRUEBA A tono corto.wav"     880 Hz, 0,7 s  (más agudo)
+;   "PRUEBA A vídeo largo.mp4"    12 s, patrón con contador  <- lleva tilde
+;   "PRUEBA A vídeo corto.mp4"     3 s, patrón distinto      <- lleva tilde
+;
+; Las marcas MARCAR 1..9 separan los bloques en eventos-XXXX-XX.log, para poder
+; comprobar después los tiempos de cada uno.
+;==============================================================================
+
+FULLSCREEN false
+USE_EEG false
+USE_MATRIX false
+USE_GLOVE false
+USE_MULTI false
+CENTER_MOUSE false
+USE_SPACEKEY false
+
+INICIAR "inicio-experimento.png"
+ESPERAR 1500
+
+;------------------------------------------------------------------------------
+; BLOQUE 1 - Imágenes con espacios y con tilde
+; Esperado: cuadro ROJO 2 s, luego el patrón de BARRAS DE COLORES 2 s.
+;------------------------------------------------------------------------------
+MARCAR 1
+MOSTRAR "PRUEBA A cuadro rojo.png"
+ESPERAR 2000
+MOSTRAR "PRUEBA A cuadrícula.png"
+ESPERAR 2000
+
+;------------------------------------------------------------------------------
+; BLOQUE 2 - SONAR no bloqueante y ESPERAR_AUDIO
+; Esperado: empieza el tono grave (440 Hz) sobre el cuadro rojo. ESPERAR_AUDIO
+; retiene el protocolo hasta que termina: el bloque dura unos 10 s, no 2.
+;------------------------------------------------------------------------------
+MARCAR 2
+MOSTRAR "PRUEBA A cuadro rojo.png"
+SONAR "PRUEBA A tono largo.wav"
+ESPERAR_AUDIO
+ESPERAR 500
+
+;------------------------------------------------------------------------------
+; BLOQUE 3 - Un SONAR corta al anterior
+; Esperado: arranca el tono grave y a los 2 s lo sustituye el AGUDO (880 Hz).
+; No deben sonar los dos a la vez. El bloque dura unos 3 s, no 10.
+;------------------------------------------------------------------------------
+MARCAR 3
+SONAR "PRUEBA A tono largo.wav"
+ESPERAR 2000
+SONAR "PRUEBA A tono corto.wav"
+ESPERAR 1000
+
+;------------------------------------------------------------------------------
+; BLOQUE 4 - PARAR_AUDIO
+; Esperado: el tono grave se corta en seco a los 2 s y el protocolo sigue.
+;------------------------------------------------------------------------------
+MARCAR 4
+SONAR "PRUEBA A tono largo.wav"
+ESPERAR 2000
+PARAR_AUDIO
+ESPERAR 1000
+
+;------------------------------------------------------------------------------
+; BLOQUE 5 - SONAR con imagen de fondo (la forma de dos argumentos)
+; Esta variante está documentada pero NO funcionaba hasta EEGFX-31.
+; Esperado: fondo VERDE OSCURO mientras suena el tono agudo.
+;------------------------------------------------------------------------------
+MARCAR 5
+SONAR "PRUEBA A tono corto.wav" "PRUEBA A fondo sonido.png"
+ESPERAR 2000
+
+;------------------------------------------------------------------------------
+; BLOQUE 6 - Vídeo con espacios y tilde en el nombre
+; Este es el caso que NO cubría el protocolo de regresión de EEGFX-31: la ruta
+; llega a VLCJ sin codificar, al contrario que a JavaFX. En Windows además
+; lleva barras invertidas y letra de unidad.
+; Esperado: el vídeo se reproduce entero, con su contador avanzando, y
+; ESPERAR_VIDEO retiene el protocolo hasta el final (unos 12 s).
+;------------------------------------------------------------------------------
+MARCAR 6
+LANZAR "PRUEBA A vídeo largo.mp4"
+ESPERAR_VIDEO
+ESPERAR 500
+
+;------------------------------------------------------------------------------
+; BLOQUE 7 - PARAR_VIDEO
+; Esperado: el vídeo largo arranca y se corta a los 3 s. El bloque NO dura 12 s.
+;------------------------------------------------------------------------------
+MARCAR 7
+LANZAR "PRUEBA A vídeo largo.mp4"
+ESPERAR 3000
+PARAR_VIDEO
+MOSTRAR "PRUEBA A cuadro rojo.png"
+ESPERAR 1500
+
+;------------------------------------------------------------------------------
+; BLOQUE 8 - Vídeo corto sin esperar explícitamente
+; Esperado: el vídeo corto (patrón distinto al del bloque 6) se ve entero
+; porque el ESPERAR posterior cubre su duración.
+;------------------------------------------------------------------------------
+MARCAR 8
+LANZAR "PRUEBA A vídeo corto.mp4"
+ESPERAR 3500
+
+;------------------------------------------------------------------------------
+; BLOQUE 9 - Parada por acción del operador
+; Esperado: se queda esperando INDEFINIDAMENTE hasta que se pulse el ratón.
+; No debe haber timeout. Si en vez de pulsar se cierra la ventana, el protocolo
+; debe terminar, no quedarse colgado.
+;------------------------------------------------------------------------------
+MARCAR 9
+MOSTRAR "PRUEBA A cuadrícula.png"
+CLICKSTOP
+ESPERAR 1000
+
+TERMINAR

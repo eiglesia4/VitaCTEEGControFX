@@ -18,7 +18,12 @@ Thumbs.db
 
 # Runtime data
 /estudios/*
-/default/Mult*
+# Se excluye el CONTENIDO de Multimedia, no el directorio: git no desciende en un
+# directorio excluido, y entonces la excepción de abajo nunca llegaría a evaluarse.
+/default/Multimedia/*
+# Excepción: el material sintético de los protocolos de prueba. Pesa poco y sin él
+# esos protocolos no funcionan en otra máquina.
+!/default/Multimedia/PRUEBA*
 /CurrentExperiment.log
 /CurrentExperiment_Events.log
 /EEGControl.log

@@ -1,0 +1,62 @@
+Prueba B - media completamente distinta de la del protocolo A
+;==============================================================================
+; PROTOCOLO DE PRUEBA B  (release EEGFX003)
+;
+; No comparte NI UN fichero con el protocolo A. Sirve para la prueba principal
+; de esta entrega, el bug que se reportó:
+;
+;   1. Lanzar "01 Prueba A", dejar que llegue al bloque 6 (vídeo largo) y
+;      CORTARLO a media reproducción cerrando la ventana.
+;   2. Lanzar este protocolo B.
+;   3. Debe arrancar limpio. Antes fallaba con un error sobre un fichero del
+;      protocolo A, que este ni siquiera menciona.
+;
+; Es corto a propósito: lo que se comprueba es que ARRANQUE, no su contenido.
+;
+; Ficheros que usa, todos en default/Multimedia/:
+;   "PRUEBA B cuadro azul.png"   cuadro azul liso
+;   "PRUEBA B tono medio.wav"    660 Hz, 3 s
+;   "PRUEBA B vídeo dos.mp4"     5 s, patrón en negativo (colores invertidos)
+;==============================================================================
+
+FULLSCREEN false
+USE_EEG false
+USE_MATRIX false
+USE_GLOVE false
+USE_MULTI false
+CENTER_MOUSE false
+USE_SPACEKEY false
+
+INICIAR "inicio-experimento.png"
+ESPERAR 1000
+
+;------------------------------------------------------------------------------
+; Imagen, audio y vídeo, los tres con espacios en el nombre.
+; Esperado: cuadro AZUL, un tono intermedio, y un vídeo de colores INVERTIDOS,
+; claramente distinto de los del protocolo A.
+;------------------------------------------------------------------------------
+MARCAR 1
+MOSTRAR "PRUEBA B cuadro azul.png"
+ESPERAR 2000
+
+MARCAR 2
+SONAR "PRUEBA B tono medio.wav"
+ESPERAR_AUDIO
+ESPERAR 500
+
+MARCAR 3
+LANZAR "PRUEBA B vídeo dos.mp4"
+ESPERAR_VIDEO
+ESPERAR 500
+
+;------------------------------------------------------------------------------
+; PRUEBA DE MEDIA COMPARTIDA (opcional)
+;
+; Descomentar la línea siguiente para que A y B compartan un fichero. Entonces,
+; tras ejecutar A, este protocolo debe reproducirlo sin problema: comprueba que
+; el fichero común recibe un reproductor NUEVO y no uno ya liberado.
+;------------------------------------------------------------------------------
+; LANZAR "PRUEBA A vídeo corto.mp4"
+; ESPERAR 3500
+
+TERMINAR
