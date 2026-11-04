@@ -34,6 +34,12 @@ public class EEGControl extends Application
 	private static final int EEG_BAUDRATE = 1200;
 	private static final int MATRIX_BAUDRATE = 115200; // 9600;
 	private static final int MULTI_BAUDRATE = 9600; // 9600;
+	private static final int PRISMA_BAUDRATE = 9600;
+	/**
+	 * Lo que tarda el Arduino Nano del Prisma en estar listo tras abrir su puerto: al abrirlo
+	 * se resetea por DTR y lo que llegue mientras arranca el bootloader se pierde.
+	 */
+	public static final long PRISMA_RESET_WAIT_MILIS = 2000;
 	public static final long STIMULUS_TIME_MILIS = 3000;
 	public static final long END_PROTOCOL_WAIT_MILIS = 5000;
 	/** Plazo máximo de espera a que muera el hilo de un protocolo que se está abortando. */
@@ -67,6 +73,12 @@ public class EEGControl extends Application
 	SerialPort comEEG;
 	SerialPort comGlove;
 	SerialPort comMulti;
+	SerialPort comPrisma;
+	/**
+	 * Instante en que se abrió de verdad el puerto del Prisma, para esperar a su reset antes
+	 * del primer comando. Volatile: lo escribe el hilo de JavaFX y lo lee el del protocolo.
+	 */
+	volatile long prismaOpenedAt = 0;
 	Stage primaryStage;
 	String protocolName = null;
 	Stage stageProtocol;
@@ -81,6 +93,7 @@ public class EEGControl extends Application
 	static boolean useSpaceAsKey = false;
 	static boolean useTarget = false;
 	static boolean useMultiStimulator = false;
+	static boolean usePrisma = false;
 	boolean correctStimulus = false;
 	static int matrixDimension = 28;
 	static boolean waitingForSpace = false;
@@ -210,7 +223,8 @@ public class EEGControl extends Application
 			if (doReusePorts)
 				portsLoaded();
 			else {
-				if (useEEGProtocol || useMatrixProtocol || useGloveProtocol || useMultiStimulator)
+				if (useEEGProtocol || useMatrixProtocol || useGloveProtocol || useMultiStimulator
+						|| usePrisma)
 					loadPorts();
 				else
 					loadBusinessLogic();
@@ -272,7 +286,7 @@ public class EEGControl extends Application
 			GridPane root = loader.load();
 			EEGPortsViewController controller = loader.getController();
 			controller.setPadre(this);
-			Scene scene = new Scene(root, 500, 265);
+			Scene scene = new Scene(root, 500, 302);
 			applyStylesheet(scene);
 			Stage stage = new Stage();
 			applyIcon(stage);
@@ -286,6 +300,7 @@ public class EEGControl extends Application
 					comEEG = controller.getComEEG();
 					comGlove = controller.getComGlove();
 					comMulti = controller.getComMulti();
+					comPrisma = controller.getComPrisma();
 					doReusePorts = controller.getCbPorts().isSelected();
 					portsLoaded();
 				}
@@ -306,6 +321,8 @@ public class EEGControl extends Application
 			logger.debug("Puerto Guante: " + comGlove.getDescriptivePortName());
 		if (comMulti != null)
 			logger.debug("Puerto Multi-Estimulador: " + comMulti.getDescriptivePortName());
+		if (comPrisma != null)
+			logger.debug("Puerto Prisma: " + comPrisma.getDescriptivePortName());
 
 		/*
 		 * if (comMatrix != null)
@@ -356,6 +373,24 @@ public class EEGControl extends Application
 				logger.debug("Multistimulator port IS NOT ready");
 				showErrorDialog(
 						"No se puede abrir la comunicación con el multiestimulador, reinicie el programa.");
+				return;
+			}
+		}
+		if (comPrisma != null) {
+			// Al reutilizar puertos sigue abierto del protocolo anterior y no se resetea:
+			// solo una apertura real obliga a esperar al Arduino.
+			boolean wasOpen = comPrisma.isOpen();
+			comPrisma.setComPortParameters(PRISMA_BAUDRATE, 8, SerialPort.ONE_STOP_BIT,
+					SerialPort.NO_PARITY);
+			boolean portOpen = wasOpen || comPrisma.openPort();
+			if (portOpen) {
+				if (!wasOpen)
+					prismaOpenedAt = System.currentTimeMillis();
+				logger.debug("Prisma port ready");
+			} else {
+				logger.debug("Prisma port IS NOT ready");
+				showErrorDialog(
+						"No se puede abrir la comunicación con el estimulador Prisma, reinicie el programa.");
 				return;
 			}
 		}
@@ -428,7 +463,7 @@ public class EEGControl extends Application
 		rootProtocol = new BorderPane();
 
 		executer = new ProtocolThread(controller.list, events, medias, marks, estims, estNull,
-				comEEG, comMatrix, comGlove, comMulti, this);
+				comEEG, comMatrix, comGlove, comMulti, comPrisma, this);
 		executer.addListener(this);
 
 		if (comMatrix != null) {
@@ -451,6 +486,14 @@ public class EEGControl extends Application
 			if (!comMulti.isOpen()) {
 				showErrorDialog(
 						"El puerto de comunicación con el multistimulador está cerrado, apague y encienda el dispositivo.");
+				return;
+			}
+		}
+		if (comPrisma != null) {
+			if (!comPrisma.isOpen()) {
+				showErrorDialog(
+						"El puerto de comunicación con el estimulador Prisma está cerrado, desconecte y vuelva a conectar el dispositivo.");
+				stageProtocol.close();
 				return;
 			}
 		}
@@ -776,6 +819,15 @@ public class EEGControl extends Application
 									+ e.getMessage());
 					check = false;
 				}
+			} else if (anal.indexOf("USE_PRISMA") == 0) {
+				try {
+					EEGControl.usePrisma = ProtocolUtils.trueFalseLine(arr[i]);
+				} catch (Exception e) {
+					logger.debug(
+							"Error en línea " + (i + 1) + " del protocolo: " + arr[i].trim() + ", Error: "
+									+ e.getMessage());
+					check = false;
+				}
 			}
 
 			// TEST COMMANDS
@@ -951,6 +1003,21 @@ public class EEGControl extends Application
 			} else if (anal.indexOf("VIBRAR") == 0) {
 				try {
 					String params = arr[i].substring(7).trim();
+					if (PrismaCommandEnum.isPrismaArgument(params)) {
+						// Comando del Prisma: se valida aquí para que una errata salte al
+						// cargar el protocolo y no con el sujeto ya conectado.
+						PrismaCommandEnum command = PrismaCommandEnum.fromProtocolArgument(params);
+						if (command == null) {
+							showErrorDialog("Error en línea " + (i + 1) + " del protocolo: "
+									+ arr[i] + "\nComando del estimulador Prisma desconocido: "
+									+ params + "\nComandos válidos: "
+									+ PrismaCommandEnum.validArguments());
+							check = false;
+							continue;
+						}
+						// Se normaliza a minúsculas, que es como lo compara el firmware
+						params = PrismaCommandEnum.PROTOCOL_PREFIX + command.getCommand();
+					}
 					EventBean lanzarEvent = new EventBean(EventEnum.VIBRAR, params, i+1);
 					events.add(lanzarEvent);
 

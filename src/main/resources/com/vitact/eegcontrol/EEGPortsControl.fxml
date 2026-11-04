@@ -11,32 +11,28 @@
 <?import javafx.scene.layout.RowConstraints?>
 
 <GridPane hgap="10.0" vgap="10.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vitact.eegcontrol.EEGPortsViewController">
-<padding><Insets bottom="10.0" left="25.0" right="25.0" top="25.0" /></padding>
-   <children>
-      <HBox alignment="CENTER" GridPane.columnSpan="2" GridPane.valignment="CENTER">
-         <children>
-      		<Label alignment="CENTER" contentDisplay="CENTER" text="Selector de Puertos de Conexión" />
-         </children>
-      </HBox>
-        <Label fx:id="lEEG" text="Puerto conectado al EEG:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-    		<ComboBox fx:id="cbEEG" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <Label fx:id="lMatrix" text="Puerto conectado a la Matriz:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-    		<ComboBox fx:id="cbMatrix" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-    	<Label fx:id="lGlove" text="Puerto conectado al Guante" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-    		<ComboBox fx:id="cbGlove" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-    	<Label fx:id="lMulti" text="Puerto conectado al Multiestimulador" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-    		<ComboBox fx:id="cbMulti" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-     	<HBox alignment="CENTER" GridPane.columnSpan="2" GridPane.rowIndex="5">
-        		<children>
-            		<Button mnemonicParsing="false" onAction="#conectar" text="Conectar" />
-        		</children>
-         <GridPane.margin>
-            <Insets bottom="10.0" />
-         </GridPane.margin>
-      	</HBox>
-      <CheckBox fx:id="cbPorts" mnemonicParsing="false" text="Usar estos puertos para todos los experimentos" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+   <padding><Insets bottom="10.0" left="25.0" right="25.0" top="25.0" /></padding>
+   <HBox alignment="CENTER" GridPane.columnSpan="2" GridPane.valignment="CENTER">
+      <Label alignment="CENTER" contentDisplay="CENTER" text="Selector de Puertos de Conexión" />
+   </HBox>
+   <Label fx:id="lEEG" text="Puerto conectado al EEG:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+   <ComboBox fx:id="cbEEG" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+   <Label fx:id="lMatrix" text="Puerto conectado a la Matriz:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+   <ComboBox fx:id="cbMatrix" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+   <Label fx:id="lGlove" text="Puerto conectado al Guante" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+   <ComboBox fx:id="cbGlove" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+   <Label fx:id="lMulti" text="Puerto conectado al Multiestimulador" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+   <ComboBox fx:id="cbMulti" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+   <Label fx:id="lPrisma" text="Puerto conectado al estimulador Prisma" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+   <ComboBox fx:id="cbPrisma" prefHeight="27.0" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+   <HBox alignment="CENTER" GridPane.columnSpan="2" GridPane.rowIndex="6">
+      <Button mnemonicParsing="false" onAction="#conectar" text="Conectar" />
+      <GridPane.margin>
+         <Insets bottom="10.0" />
+      </GridPane.margin>
+   </HBox>
+   <CheckBox fx:id="cbPorts" mnemonicParsing="false" text="Usar estos puertos para todos los experimentos" GridPane.columnSpan="2" GridPane.rowIndex="7" />
 
-   </children>
    <columnConstraints>
       <ColumnConstraints />
       <ColumnConstraints />

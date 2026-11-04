@@ -1,0 +1,145 @@
+Prueba C - estimulador Prisma ELA (VIBRAR g_<comando>)
+;==============================================================================
+; PROTOCOLO DE PRUEBA C  (EEGFX-36)
+;
+; Recorre todos los comandos del estimulador Prisma ELA de Guillermo
+; (Controller_Board v1.0.X, firmware ELA_SW v2.2), primero las pruebas de un
+; conector cada vez y después los comandos combinados.
+;
+; Cada estímulo dura 4 s:
+;   - 2 s con la imagen de la zona que vibra (figura gris, zona en negro),
+;     mostrada a la vez que se envía el comando;
+;   - 2 s de pantalla en blanco, sin estímulo.
+;
+; NECESITA EL PRISMA conectado por USB. Al cargar el protocolo aparece el
+; selector de puertos: elegir el del Arduino en "estimulador Prisma".
+; Puerto a 9600 8N1; cada comando viaja como "<comando>\r\n".
+;
+; Al abrir el puerto el Arduino se resetea: el protocolo espera hasta 2 s antes
+; de empezar. Si el PRIMER comando (t_j2, brazo) no se nota, esa espera es
+; corta y hay que subir EEGControl.PRISMA_RESET_WAIT_MILIS.
+;
+; Revisar los puentes de J9 (diafragma) antes de ejecutarlo: según cómo esté
+; montada la placa, J9 puede no recibir tensión o activarse junto al brazo.
+;
+; Comprobar en protocolo-XXXX-XX.log una línea
+;   "ENVIADO COMANDO <comando> AL PRISMA"
+; por cada VIBRAR, en el mismo orden que aquí.
+;
+; Ficheros que usa, todos en default/Multimedia/, 800x600:
+;   "PRUEBA PRISMA <zona o comando>.png"   figura con la zona en negro
+;   "PRUEBA PRISMA blanco.png"             pausa entre estímulos
+;==============================================================================
+
+FULLSCREEN false
+USE_EEG false
+USE_MATRIX false
+USE_GLOVE false
+USE_PRISMA true
+
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; --- Pruebas: un conector cada vez ---
+
+; J2 brazo
+MOSTRAR "PRUEBA PRISMA brazo.png"
+VIBRAR g_t_j2
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; J3 pierna
+MOSTRAR "PRUEBA PRISMA pierna.png"
+VIBRAR g_t_j3
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; J5 mano
+MOSTRAR "PRUEBA PRISMA mano.png"
+VIBRAR g_t_j5
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; J7 cuello
+MOSTRAR "PRUEBA PRISMA cuello.png"
+VIBRAR g_t_j7
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; J8 solo olor
+MOSTRAR "PRUEBA PRISMA olor.png"
+VIBRAR g_t_j8
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; J9 diafragma (D9 directo)
+MOSTRAR "PRUEBA PRISMA diafragma.png"
+VIBRAR g_t_j9
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; --- Comandos combinados, los que usará el vídeo ---
+
+; Brazo, pierna, mano y cuello (el PDF no incluye el cuello: ver qué hace)
+MOSTRAR "PRUEBA PRISMA brazopiernamano.png"
+VIBRAR g_brazopiernamano
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; Brazo y mano
+MOSTRAR "PRUEBA PRISMA brazomano.png"
+VIBRAR g_brazomano
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; Pierna
+MOSTRAR "PRUEBA PRISMA pierna.png"
+VIBRAR g_pierna
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; Mano
+MOSTRAR "PRUEBA PRISMA mano.png"
+VIBRAR g_mano
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; Cuello
+MOSTRAR "PRUEBA PRISMA cuello.png"
+VIBRAR g_cuello
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; Diafragma y cuello
+MOSTRAR "PRUEBA PRISMA diafragmacuello.png"
+VIBRAR g_diafragmacuello
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; Diafragma y olor
+MOSTRAR "PRUEBA PRISMA olordiafragma.png"
+VIBRAR g_olordiafragma
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+; --- Mayúsculas: se acepta y se envía en minúsculas ("mano") ---
+MOSTRAR "PRUEBA PRISMA mano.png"
+VIBRAR G_MANO
+ESPERAR 2000
+MOSTRAR "PRUEBA PRISMA blanco.png"
+ESPERAR 2000
+
+TERMINAR

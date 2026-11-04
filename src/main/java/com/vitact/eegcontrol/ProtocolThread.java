@@ -3,6 +3,7 @@ package com.vitact.eegcontrol;
 import com.fazecast.jSerialComm.SerialPort;
 import com.vitact.eegcontrol.bean.*;
 import com.vitact.eegcontrol.type.EventEnum;
+import com.vitact.eegcontrol.type.PrismaCommandEnum;
 import java.awt.*;
 import java.io.*;
 import java.util.List;
@@ -38,6 +39,16 @@ class ProtocolThread extends NotifyingThread {
 	SerialPort comMatrix;
 	SerialPort comGlove;
 	SerialPort comMulti;
+	SerialPort comPrisma;
+	/**
+	 * Envía los comandos del Prisma fuera del hilo del protocolo, para no frenar su timing, y
+	 * de uno en uno y en orden: dos VIBRAR seguidos no deben mezclar sus bytes en el puerto.
+	 */
+	private final ExecutorService prismaSender = Executors.newSingleThreadExecutor(r -> {
+		Thread t = new Thread(r, "prisma-sender");
+		t.setDaemon(true);
+		return t;
+	});
 	byte[] zeros = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	Logger loggerProtocol;
 	Logger loggerEvent;
@@ -77,7 +88,7 @@ class ProtocolThread extends NotifyingThread {
 	public ProtocolThread(ListView<EventBean> l, ArrayList<EventBean> ev,
 			HashMap<String, MediaBean> medias, List<Integer> ma, ArrayList<EstimulusBean> es,
 			EstimulusBean eN, SerialPort cEEG, SerialPort cMatr, SerialPort cGlove,
-			SerialPort cMulti, EEGControl padre) {
+			SerialPort cMulti, SerialPort cPrisma, EEGControl padre) {
 		logger = LogManager.getLogger(this.getClass().getName());
 		loggerProtocol = LogManager.getLogger("ProtocolLog");
 		loggerEvent = LogManager.getLogger("EventsLog");
@@ -92,6 +103,7 @@ class ProtocolThread extends NotifyingThread {
 		comMatrix = cMatr;
 		comGlove = cGlove;
 		comMulti = cMulti;
+		comPrisma = cPrisma;
 		this.medias = medias;
 
 		defaultStimulus = new EstimulusBean(1, EEGControl.matrixDimension, stimInsubInt);
@@ -169,6 +181,20 @@ class ProtocolThread extends NotifyingThread {
 				} else {
 					throw new RuntimeException("The comunications with the glove is closed.");
 				}
+			}
+		}
+
+		if (EEGControl.usePrisma && comPrisma != null) {
+			logger.info("PREPARANDO PRISMA");
+			if (!comPrisma.isOpen())
+				throw new RuntimeException("The communications with the Prisma stimulator are closed.");
+			// El Nano se resetea al abrir su puerto; lo que se le envíe antes de que arranque
+			// se pierde. Solo se espera lo que falte desde la apertura real del puerto.
+			long prismaReady = padre.prismaOpenedAt + EEGControl.PRISMA_RESET_WAIT_MILIS;
+			if (System.currentTimeMillis() < prismaReady) {
+				logger.debug("Esperando " + (prismaReady - System.currentTimeMillis())
+						+ " ms a que arranque el Prisma");
+				waitFor(prismaReady);
 			}
 		}
 
@@ -445,8 +471,13 @@ class ProtocolThread extends NotifyingThread {
 				case VIBRAR: {
 					loggerProtocol.info(e.getTipo().getCode() + " " + e.getFile());
 
-					Thread t1 = new Thread(() -> sendGlove(e.getFile()));
-					t1.start();
+					if (PrismaCommandEnum.isPrismaArgument(e.getFile())) {
+						String command = e.getFile().substring(PrismaCommandEnum.PROTOCOL_PREFIX.length());
+						prismaSender.execute(() -> sendPrisma(command));
+					} else {
+						Thread t1 = new Thread(() -> sendGlove(e.getFile()));
+						t1.start();
+					}
 					break;
 				}
 				case ESPERAR: {
@@ -522,6 +553,8 @@ class ProtocolThread extends NotifyingThread {
 			}
 		}
 		loggerProtocol.info("FINALIZADO");
+		// Los comandos ya encolados se terminan de enviar; no se aceptan más
+		prismaSender.shutdown();
 
 		if (comMatrix != null) {
 			if (comMatrix.isOpen()) {
@@ -881,6 +914,32 @@ class ProtocolThread extends NotifyingThread {
 		return true;
 	}
 
+	/**
+	 * Envía un comando al estimulador Prisma. Se ejecuta en {@link #prismaSender}.
+	 *
+	 * @param command comando del firmware, ya sin el prefijo {@code g_}
+	 */
+	void sendPrisma(String command) {
+		if (!EEGControl.usePrisma) {
+			loggerProtocol.info("COMANDO " + command
+					+ " NO ENVIADO AL PRISMA DEBIDO A CONFIGURACIÓN DEL PROTOCOLO");
+			return;
+		}
+		SerialPort port = comPrisma;
+		if (port == null || !port.isOpen()) {
+			logger.error("The communications with the Prisma stimulator are closed.");
+			return;
+		}
+		byte[] bytes = (command + PrismaCommandEnum.TERMINATOR).getBytes(
+				java.nio.charset.StandardCharsets.US_ASCII);
+		int written = port.writeBytes(bytes, bytes.length);
+		if (written == bytes.length)
+			loggerProtocol.info("ENVIADO COMANDO " + command + " AL PRISMA");
+		else
+			logger.error("Envío incompleto al Prisma del comando " + command + ": " + written
+					+ " de " + bytes.length + " bytes");
+	}
+
 	void sendStrGlove(String t) {
 		comGlove.writeBytes(t.getBytes(), t.getBytes().length);
 	}
@@ -1071,6 +1130,20 @@ class ProtocolThread extends NotifyingThread {
 			if (comMulti.isOpen()) {
 				comMulti.closePort();
 				comMulti = null;
+			}
+		}
+		if (comPrisma != null) {
+			// Antes de cerrar, dejar que salgan los comandos ya encolados
+			prismaSender.shutdown();
+			try {
+				if (!prismaSender.awaitTermination(1, TimeUnit.SECONDS))
+					logger.warn("Quedaban comandos del Prisma sin enviar al cerrar su puerto");
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+			if (comPrisma.isOpen()) {
+				comPrisma.closePort();
+				comPrisma = null;
 			}
 		}
 	}
