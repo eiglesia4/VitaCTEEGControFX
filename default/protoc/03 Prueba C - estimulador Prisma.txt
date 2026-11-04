@@ -27,8 +27,8 @@ Prueba C - estimulador Prisma ELA (VIBRAR g_<comando>)
 ; por cada VIBRAR, en el mismo orden que aquí.
 ;
 ; Ficheros que usa, todos en default/Multimedia/, 800x600:
-;   "PRUEBA PRISMA <zona o comando>.png"   figura con la zona en negro
-;   "PRUEBA PRISMA blanco.png"             pausa entre estímulos
+;   PRUEBA_PRISMA_<zona o comando>.png   figura con la zona en negro
+;   PRUEBA_PRISMA_blanco.png             pausa entre estímulos
 ;==============================================================================
 
 FULLSCREEN false
@@ -37,109 +37,109 @@ USE_MATRIX false
 USE_GLOVE false
 USE_PRISMA true
 
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; --- Pruebas: un conector cada vez ---
 
 ; J2 brazo
-MOSTRAR "PRUEBA PRISMA brazo.png"
+MOSTRAR PRUEBA_PRISMA_brazo.png
 VIBRAR g_t_j2
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; J3 pierna
-MOSTRAR "PRUEBA PRISMA pierna.png"
+MOSTRAR PRUEBA_PRISMA_pierna.png
 VIBRAR g_t_j3
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; J5 mano
-MOSTRAR "PRUEBA PRISMA mano.png"
+MOSTRAR PRUEBA_PRISMA_mano.png
 VIBRAR g_t_j5
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; J7 cuello
-MOSTRAR "PRUEBA PRISMA cuello.png"
+MOSTRAR PRUEBA_PRISMA_cuello.png
 VIBRAR g_t_j7
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; J8 solo olor
-MOSTRAR "PRUEBA PRISMA olor.png"
+MOSTRAR PRUEBA_PRISMA_olor.png
 VIBRAR g_t_j8
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; J9 diafragma (D9 directo)
-MOSTRAR "PRUEBA PRISMA diafragma.png"
+MOSTRAR PRUEBA_PRISMA_diafragma.png
 VIBRAR g_t_j9
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; --- Comandos combinados, los que usará el vídeo ---
 
 ; Brazo, pierna, mano y cuello (el PDF no incluye el cuello: ver qué hace)
-MOSTRAR "PRUEBA PRISMA brazopiernamano.png"
+MOSTRAR PRUEBA_PRISMA_brazopiernamano.png
 VIBRAR g_brazopiernamano
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; Brazo y mano
-MOSTRAR "PRUEBA PRISMA brazomano.png"
+MOSTRAR PRUEBA_PRISMA_brazomano.png
 VIBRAR g_brazomano
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; Pierna
-MOSTRAR "PRUEBA PRISMA pierna.png"
+MOSTRAR PRUEBA_PRISMA_pierna.png
 VIBRAR g_pierna
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; Mano
-MOSTRAR "PRUEBA PRISMA mano.png"
+MOSTRAR PRUEBA_PRISMA_mano.png
 VIBRAR g_mano
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; Cuello
-MOSTRAR "PRUEBA PRISMA cuello.png"
+MOSTRAR PRUEBA_PRISMA_cuello.png
 VIBRAR g_cuello
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; Diafragma y cuello
-MOSTRAR "PRUEBA PRISMA diafragmacuello.png"
+MOSTRAR PRUEBA_PRISMA_diafragmacuello.png
 VIBRAR g_diafragmacuello
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; Diafragma y olor
-MOSTRAR "PRUEBA PRISMA olordiafragma.png"
+MOSTRAR PRUEBA_PRISMA_olordiafragma.png
 VIBRAR g_olordiafragma
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 ; --- Mayúsculas: se acepta y se envía en minúsculas ("mano") ---
-MOSTRAR "PRUEBA PRISMA mano.png"
+MOSTRAR PRUEBA_PRISMA_mano.png
 VIBRAR G_MANO
 ESPERAR 2000
-MOSTRAR "PRUEBA PRISMA blanco.png"
+MOSTRAR PRUEBA_PRISMA_blanco.png
 ESPERAR 2000
 
 TERMINAR
