@@ -31,6 +31,10 @@ Thumbs.db
 /Tokens.txt
 /~$*
 
+# VLC portable (EEGFX-38): se descarga con scripts/fetch-vlc-win64.sh y se despliega
+# junto al JAR. Son binarios de terceros (~28 MB) que no deben ir en el repositorio.
+/vlc/
+
 # Old build artifacts
 /lib/
 /windows-repository/

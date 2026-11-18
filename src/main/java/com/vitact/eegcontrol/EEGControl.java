@@ -21,6 +21,8 @@ import javafx.scene.layout.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
+import uk.co.caprica.vlcj.factory.discovery.strategy.NativeDiscoveryStrategy;
 import uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurface;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import javafx.scene.paint.Color;
@@ -138,9 +140,19 @@ public class EEGControl extends Application
 		// Sin VLC, VLCJ no lanza una Exception sino un UnsatisfiedLinkError (un LinkageError):
 		// si no se captura, la aplicación muere aquí sin abrir ventana. Sin VLC solo deben
 		// fallar los protocolos con vídeo, y eso ya lo comprueba la carga de cada vídeo.
+		// VLCJ busca primero el VLC portable de vlc/ (VlcDirectoryProvider) y, si no está,
+		// el instalado. Se registra cuál se ha cargado para poder identificarlo en los logs
+		// de campo.
 		try {
-			mediaPlayerFactory = new MediaPlayerFactory();
-			logger.info("VLCJ MediaPlayerFactory initialized successfully");
+			NativeDiscovery discovery = new NativeDiscovery() {
+				@Override
+				protected void onFound(String path, NativeDiscoveryStrategy strategy) {
+					logger.info("VLC encontrado en " + path);
+				}
+			};
+			mediaPlayerFactory = new MediaPlayerFactory(discovery);
+			logger.info("VLCJ MediaPlayerFactory initialized successfully, VLC "
+					+ mediaPlayerFactory.application().version());
 		} catch (Exception | LinkageError e) {
 			mediaPlayerFactory = null;
 			logger.error("Failed to initialize VLCJ. Is 64-bit VLC installed?", e);
