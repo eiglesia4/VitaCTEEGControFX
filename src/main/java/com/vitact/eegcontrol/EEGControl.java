@@ -135,11 +135,15 @@ public class EEGControl extends Application
 		logger.info("BAse dir " + EEGControl.BASE_FILE);
 
 		// Initialize VLCJ MediaPlayerFactory
+		// Sin VLC, VLCJ no lanza una Exception sino un UnsatisfiedLinkError (un LinkageError):
+		// si no se captura, la aplicación muere aquí sin abrir ventana. Sin VLC solo deben
+		// fallar los protocolos con vídeo, y eso ya lo comprueba la carga de cada vídeo.
 		try {
 			mediaPlayerFactory = new MediaPlayerFactory();
 			logger.info("VLCJ MediaPlayerFactory initialized successfully");
-		} catch (Exception e) {
-			logger.error("Failed to initialize VLCJ. Is VLC installed?", e);
+		} catch (Exception | LinkageError e) {
+			mediaPlayerFactory = null;
+			logger.error("Failed to initialize VLCJ. Is 64-bit VLC installed?", e);
 		}
 
 		File file = new File(CONFIG_FILE);
@@ -192,6 +196,8 @@ public class EEGControl extends Application
 			primaryStage.setOnCloseRequest(ignored -> Platform.exit());
 			primaryStage.show();
 			this.primaryStage = primaryStage;
+			if (mediaPlayerFactory == null)
+				showVlcMissingWarning(primaryStage);
 		} catch (Exception e) {
 			logger.error("Error while loading main scene", e);
 			Platform.exit();
@@ -1358,7 +1364,8 @@ public class EEGControl extends Application
 			}
 			case VIDEO: {
 				if (mediaPlayerFactory == null) {
-					showErrorDialog("VLCJ no inicializado. ¿Está VLC instalado?");
+					showErrorDialog("No se puede reproducir el vídeo " + fileNamePrimary
+							+ ": no se ha encontrado VLC de 64 bits. Instálelo y reinicie el programa.");
 					return false;
 				}
 				String videoPath = file.getAbsolutePath();
@@ -1539,6 +1546,25 @@ public class EEGControl extends Application
 		Scene scene = alert.getDialogPane().getScene();
 		if (scene != null && scene.getWindow() instanceof Stage stage)
 			applyIcon(stage);
+	}
+
+	/**
+	 * Avisa al arrancar de que no se ha encontrado VLC, para que se sepa antes de tener al
+	 * sujeto delante y no al cargar el primer protocolo con vídeo. No bloquea: sin VLC se
+	 * pueden seguir ejecutando los protocolos que no usan vídeo.
+	 */
+	private void showVlcMissingWarning(Stage owner) {
+		Alert alert = new Alert(AlertType.WARNING);
+		alert.initOwner(owner);
+		alert.setTitle("VLC no encontrado");
+		alert.setHeaderText("No se ha encontrado VLC de 64 bits");
+		alert.setContentText("""
+				Los protocolos con vídeo (LANZAR) no podrán ejecutarse. \
+				El resto de protocolos funciona con normalidad.
+				
+				Para reproducir vídeos, instale VLC de 64 bits y reinicie el programa.""");
+		applyIcon(alert);
+		alert.show();
 	}
 
 	private void showErrorDialog(String message) {
