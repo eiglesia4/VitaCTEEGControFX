@@ -3,7 +3,6 @@ package com.vitact.eegcontrol;
 import com.fazecast.jSerialComm.SerialPort;
 import com.vitact.eegcontrol.bean.ComPortBean;
 import javafx.collections.*;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
@@ -23,11 +22,15 @@ public class EEGPortsViewController {
 	@FXML
 	ComboBox<ComPortBean> cbMulti;
 	@FXML
+	ComboBox<ComPortBean> cbPrisma;
+	@FXML
 	Label lMatrix;
 	@FXML
 	Label lGlove;
 	@FXML
 	Label lMulti;
+	@FXML
+	Label lPrisma;
 	@FXML
 	CheckBox cbPorts;
 
@@ -36,7 +39,7 @@ public class EEGPortsViewController {
 	SerialPort comMatrix;
 	SerialPort comGlove;
 	SerialPort comMulti;
-	SerialPort comPort[];
+	SerialPort comPrisma;
 	boolean configured = false;
 	static Logger logger = null;
 
@@ -46,26 +49,16 @@ public class EEGPortsViewController {
 
 	@FXML
 	public void initialize() {
-		comPort = SerialPort.getCommPorts();
-		String[] coms = new String[comPort.length + 1];
-		coms[0] = "";
-		for (int i = 0; i < comPort.length; i++)
-			coms[i + 1] = comPort[i].getDescriptivePortName();
-
-		String[] coms2 = new String[comPort.length + 1];
-		coms2[0] = "";
-		for (int i = 0; i < comPort.length; i++)
-			coms2[i + 1] = comPort[i].getDescriptivePortName();
-
 		ObservableList<ComPortBean> list = FXCollections.observableArrayList();
 		list.add(null);
-		for (int i = 0; i < comPort.length; i++)
-			list.add(new ComPortBean(comPort[i]));
+		for (SerialPort port : SerialPort.getCommPorts())
+			list.add(new ComPortBean(port));
 
 		cbEEG.setItems(list);
 		cbMatrix.setItems(list);
 		cbGlove.setItems(list);
 		cbMulti.setItems(list);
+		cbPrisma.setItems(list);
 
 		if (!EEGControl.useEEGProtocol)
 			cbEEG.setDisable(true);
@@ -75,35 +68,32 @@ public class EEGPortsViewController {
 			cbGlove.setDisable(true);
 		if (!EEGControl.useMultiStimulator)
 			cbMulti.setDisable(true);
+		if (!EEGControl.usePrisma)
+			cbPrisma.setDisable(true);
+	}
+
+	/** Puerto elegido en el combo, o null si no se eligió ninguno. */
+	private static SerialPort selectedPort(ComboBox<ComPortBean> combo, String noneMessage) {
+		if (combo.getValue() == null) {
+			logger.debug(noneMessage);
+			return null;
+		}
+		return combo.getValue().getSerialPort();
 	}
 
 	@FXML
-	public void conectar(ActionEvent event) {
-		if (cbEEG.getValue() == null) {
-			logger.debug("Ningún EEG seleccionado");
-			comEEG = null;
-		} else
-			comEEG = cbEEG.getValue().getSerialPort();
-		if (cbMatrix.getValue() == null) {
-			logger.debug("Ninguna matriz seleccionada");
-			comMatrix = null;
-		} else
-			comMatrix = cbMatrix.getValue().getSerialPort();
-		if (cbGlove.getValue() == null) {
-			logger.debug("Ningún guante seleccionado");
-			comGlove = null;
-		} else
-			comGlove = cbGlove.getValue().getSerialPort();
-		if (cbMulti.getValue() == null) {
-			logger.debug("Ningún multiestimulador seleccionado");
-			cbMulti = null;
-		} else
-			comMulti = cbMulti.getValue().getSerialPort();
+	public void conectar() {
+		comEEG = selectedPort(cbEEG, "Ningún EEG seleccionado");
+		comMatrix = selectedPort(cbMatrix, "Ninguna matriz seleccionada");
+		comGlove = selectedPort(cbGlove, "Ningún guante seleccionado");
+		comMulti = selectedPort(cbMulti, "Ningún multiestimulador seleccionado");
+		comPrisma = selectedPort(cbPrisma, "Ningún estimulador Prisma seleccionado");
 
 		if ((comEEG == null || !EEGControl.useEEGProtocol) &&
 				(comMatrix == null || !EEGControl.useMatrixProtocol) &&
 				(comGlove == null || !EEGControl.useGloveProtocol) &&
-				(comMulti == null || !EEGControl.useMultiStimulator)) {
+				(comMulti == null || !EEGControl.useMultiStimulator) &&
+				(comPrisma == null || !EEGControl.usePrisma)) {
 			logger.info("Programa terminado. Ningún puerto abierto");
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
@@ -116,18 +106,15 @@ public class EEGPortsViewController {
 				message = message + "Debe elegir un puerto para la comunicación con el Guante\n";
 			else if (EEGControl.useMultiStimulator && comMulti == null)
 				message = message + "Debe elegir un puerto para la comunicación con el Multiestimulador\n";
+			else if (EEGControl.usePrisma && comPrisma == null)
+				message = message + "Debe elegir un puerto para la comunicación con el estimulador Prisma\n";
 			alert.setContentText(message);
 			alert.show();
 		} else {
 			configured = true;
 			Stage stage = (Stage) cbEEG.getScene().getWindow();
-			// do what you have to do
 			stage.close();
 		}
-	}
-
-	public EEGControl getPadre() {
-		return padre;
 	}
 
 	public void setPadre(EEGControl padre) {
@@ -138,40 +125,27 @@ public class EEGPortsViewController {
 		return comEEG;
 	}
 
-	public void setComEEG(SerialPort comEEG) {
-		this.comEEG = comEEG;
-	}
-
 	public SerialPort getComMatrix() {
 		return comMatrix;
 	}
 
-	public void setComMatrix(SerialPort comMatrix) {
-		this.comMatrix = comMatrix;
+	public SerialPort getComGlove() {
+		return comGlove;
 	}
 
-	public SerialPort getComGlove() { return comGlove; }
+	public SerialPort getComMulti() {
+		return comMulti;
+	}
 
-	public SerialPort getComMulti() { return comMulti; }
-
-	public void setComGlove(SerialPort comGlove) {
-		this.comGlove = comGlove;
+	public SerialPort getComPrisma() {
+		return comPrisma;
 	}
 
 	public CheckBox getCbPorts() {
 		return cbPorts;
 	}
 
-	public void setCbPorts(CheckBox cbPorts) {
-		this.cbPorts = cbPorts;
-	}
-
 	public boolean isConfigured() {
 		return configured;
 	}
-
-	public void setConfigured(boolean configured) {
-		this.configured = configured;
-	}
-
 }
