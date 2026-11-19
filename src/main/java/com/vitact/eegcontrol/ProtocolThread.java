@@ -54,7 +54,11 @@ class ProtocolThread extends NotifyingThread {
 	Logger loggerEvent;
 	Logger logger;
 	boolean useOldProtocol = false;
-	boolean multimediaFlag = true;
+	// volatile: lo ponen a true el hilo de JavaFX (imagen pintada, clic, espacio) y los
+	// callbacks de VLCJ (vídeo arrancado), mientras este hilo lo espera en un bucle activo.
+	// Sin volatile, el JIT puede sacar la lectura del bucle y la espera no termina hasta el
+	// timeout, aunque el aviso ya se haya dado (EEGFX-41).
+	volatile boolean multimediaFlag = true;
 	volatile boolean videoEndFlag = true;
 	volatile EmbeddedMediaPlayer currentVideoPlayer = null;
 	volatile boolean audioEndFlag = true;
@@ -615,6 +619,10 @@ class ProtocolThread extends NotifyingThread {
 	// Todos los bucles de espera comprueban isStop(): sin eso, interrumpir el protocolo
 	// mientras espera deja el hilo girando para siempre, doRun() nunca retorna y la
 	// limpieza de fin de protocolo no llega a ejecutarse.
+	// Y todo flag que se consulte en estos bucles y lo escriba otro hilo debe ser volatile
+	// (multimediaFlag, videoEndFlag, audioEndFlag, stop). Sin volatile, el JIT puede leerlo
+	// una sola vez antes del bucle y quedarse esperando un aviso que ya llegó. Antes de
+	// EEGFX-33 una llamada inútil a toMin2() en cada vuelta lo tapaba por casualidad (EEGFX-41).
 	private void waitFor(long t) {
 		// Espera activa a propósito: la precisión exigida es de milisegundos, así que no
 		// se puede dormir. onSpinWait() le dice a la CPU que esto es un bucle de espera.
